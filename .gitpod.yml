@@ -1,0 +1,18 @@
+tasks:
+  - name: Install GUI dependencies and start virtual desktop
+    init: |
+      sudo apt-get update
+      sudo apt-get install -y xvfb fluxbox x11vnc novnc websockify git
+      sudo mkdir -p /tmp/.X11-unix
+      sudo chmod 1777 /tmp/.X11-unix
+    command: |
+      Xvfb :0 -screen 0 1920x1080x24 &
+      sleep 2
+      DISPLAY=:0 fluxbox &
+      sleep 2
+      x11vnc -display :0 -forever -shared -rfbport 5900 &
+      sleep 2
+      /usr/share/novnc/utils/novnc_proxy --vnc localhost:5900 --listen 6080 &
+ports:
+  - port: 6080
+    onOpen: open-browser
