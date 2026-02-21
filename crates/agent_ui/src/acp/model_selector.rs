@@ -42,7 +42,12 @@ pub fn acp_model_selector(
 }
 
 enum AcpModelPickerEntry {
-    Separator(SharedString),
+    Separator {
+        title: SharedString,
+        model_count: Option<usize>,
+        is_collapsible: bool,
+        is_collapsed: bool,
+    },
     Model(AgentModelInfo, bool),
 }
 
@@ -52,10 +57,12 @@ pub struct AcpModelPickerDelegate {
     fs: Arc<dyn Fs>,
     filtered_entries: Vec<AcpModelPickerEntry>,
     models: Option<AgentModelList>,
+    display_models: Option<AgentModelList>,
     selected_index: usize,
     selected_description: Option<(usize, SharedString, bool)>,
     selected_model: Option<AgentModelInfo>,
     favorites: HashSet<ModelId>,
+    collapsed_groups: HashSet<SharedString>,
     _refresh_models_task: Task<()>,
     _settings_subscription: Subscription,
     focus_handle: FocusHandle,
@@ -90,7 +97,9 @@ impl AcpModelPickerDelegate {
 
                         this.update_in(cx, |this, window, cx| {
                             this.delegate.models = models.ok();
+                            this.delegate.display_models = this.delegate.models.clone();
                             this.delegate.selected_model = selected_model.ok();
+                            this.delegate.rebuild_filtered_entries();
                             this.refresh(window, cx)
                         })
                     }
@@ -124,14 +133,36 @@ impl AcpModelPickerDelegate {
             fs,
             filtered_entries: Vec::new(),
             models: None,
+            display_models: None,
             selected_model: None,
             selected_index: 0,
             selected_description: None,
             favorites,
+            collapsed_groups: HashSet::default(),
             _refresh_models_task: refresh_models_task,
             _settings_subscription: settings_subscription,
             focus_handle,
         }
+    }
+
+    fn rebuild_filtered_entries(&mut self) {
+        self.filtered_entries = self
+            .display_models
+            .clone()
+            .map(|models| info_list_to_picker_entries(models, &self.favorites, &self.collapsed_groups))
+            .unwrap_or_default();
+    }
+
+    fn toggle_group(&mut self, title: &SharedString) {
+        if self.collapsed_groups.contains(title) {
+            self.collapsed_groups.remove(title);
+        } else {
+            self.collapsed_groups.insert(title.clone());
+        }
+        self.rebuild_filtered_entries();
+        self.selected_index = self
+            .selected_index
+            .min(self.filtered_entries.len().saturating_sub(1));
     }
 
     pub fn active_model(&self) -> Option<&AgentModelInfo> {
@@ -221,7 +252,7 @@ impl PickerDelegate for AcpModelPickerDelegate {
     ) -> bool {
         match self.filtered_entries.get(ix) {
             Some(AcpModelPickerEntry::Model(_, _)) => true,
-            Some(AcpModelPickerEntry::Separator(_)) | None => false,
+            Some(AcpModelPickerEntry::Separator { .. }) | None => false,
         }
     }
 
@@ -252,8 +283,8 @@ impl PickerDelegate for AcpModelPickerDelegate {
             };
 
             this.update_in(cx, |this, window, cx| {
-                this.delegate.filtered_entries =
-                    info_list_to_picker_entries(filtered_models, &favorites);
+                this.delegate.display_models = Some(filtered_models);
+                this.delegate.rebuild_filtered_entries();
                 // Finds the currently selected model in the list
                 let new_index = this
                     .delegate
@@ -320,8 +351,38 @@ impl PickerDelegate for AcpModelPickerDelegate {
         cx: &mut Context<Picker<Self>>,
     ) -> Option<Self::ListItem> {
         match self.filtered_entries.get(ix)? {
-            AcpModelPickerEntry::Separator(title) => {
-                Some(ModelSelectorHeader::new(title, ix > 1).into_any_element())
+            AcpModelPickerEntry::Separator {
+                title,
+                model_count,
+                is_collapsible,
+                is_collapsed,
+            } => {
+                let title = title.clone();
+                let mut header = ModelSelectorHeader::new(title.clone(), ix > 1);
+                if let Some(model_count) = model_count {
+                    header = header.model_count(*model_count);
+                }
+                if *is_collapsible {
+                    header = header.collapse_icon(if *is_collapsed {
+                        IconName::ChevronRight
+                    } else {
+                        IconName::ChevronDown
+                    });
+                }
+
+                let row = div().child(header);
+                if *is_collapsible {
+                    Some(
+                        row.id(("model-group-header", ix))
+                            .on_click(cx.listener(move |this, _event, _window, cx| {
+                                this.delegate.toggle_group(&title);
+                                cx.notify();
+                            }))
+                            .into_any_element(),
+                    )
+                } else {
+                    Some(row.into_any_element())
+                }
             }
             AcpModelPickerEntry::Model(model_info, is_favorite) => {
                 let is_selected = Some(model_info) == self.selected_model.as_ref();
@@ -434,6 +495,7 @@ impl PickerDelegate for AcpModelPickerDelegate {
 fn info_list_to_picker_entries(
     model_list: AgentModelList,
     favorites: &HashSet<ModelId>,
+    collapsed_groups: &HashSet<SharedString>,
 ) -> Vec<AcpModelPickerEntry> {
     let mut entries = Vec::new();
 
@@ -450,7 +512,12 @@ fn info_list_to_picker_entries(
 
     let has_favorites = !favorite_models.is_empty();
     if has_favorites {
-        entries.push(AcpModelPickerEntry::Separator("Favorite".into()));
+        entries.push(AcpModelPickerEntry::Separator {
+            title: "Favorite".into(),
+            model_count: Some(favorite_models.len()),
+            is_collapsible: false,
+            is_collapsed: false,
+        });
         for model in favorite_models {
             entries.push(AcpModelPickerEntry::Model((*model).clone(), true));
         }
@@ -459,7 +526,12 @@ fn info_list_to_picker_entries(
     match model_list {
         AgentModelList::Flat(list) => {
             if has_favorites {
-                entries.push(AcpModelPickerEntry::Separator("All".into()));
+                entries.push(AcpModelPickerEntry::Separator {
+                    title: "All".into(),
+                    model_count: Some(list.len()),
+                    is_collapsible: false,
+                    is_collapsed: false,
+                });
             }
             for model in list {
                 let is_favorite = favorites.contains(&model.id);
@@ -468,10 +540,19 @@ fn info_list_to_picker_entries(
         }
         AgentModelList::Grouped(index_map) => {
             for (group_name, models) in index_map {
-                entries.push(AcpModelPickerEntry::Separator(group_name.0));
-                for model in models {
-                    let is_favorite = favorites.contains(&model.id);
-                    entries.push(AcpModelPickerEntry::Model(model, is_favorite));
+                let group_title = group_name.0;
+                let is_collapsed = collapsed_groups.contains(&group_title);
+                entries.push(AcpModelPickerEntry::Separator {
+                    title: group_title.clone(),
+                    model_count: Some(models.len()),
+                    is_collapsible: true,
+                    is_collapsed,
+                });
+                if !is_collapsed {
+                    for model in models {
+                        let is_favorite = favorites.contains(&model.id);
+                        entries.push(AcpModelPickerEntry::Model(model, is_favorite));
+                    }
                 }
             }
         }
@@ -623,7 +704,7 @@ mod tests {
             .iter()
             .map(|entry| match entry {
                 AcpModelPickerEntry::Model(info, _) => info.id.0.as_ref(),
-                AcpModelPickerEntry::Separator(s) => &s,
+                AcpModelPickerEntry::Separator { title, .. } => title,
             })
             .collect()
     }
@@ -667,11 +748,12 @@ mod tests {
         ]);
         let favorites = create_favorites(vec!["zed/gemini"]);
 
-        let entries = info_list_to_picker_entries(models, &favorites);
+        let collapsed_groups = HashSet::default();
+        let entries = info_list_to_picker_entries(models, &favorites, &collapsed_groups);
 
         assert!(matches!(
             entries.first(),
-            Some(AcpModelPickerEntry::Separator(s)) if s == "Favorite"
+            Some(AcpModelPickerEntry::Separator { title, .. }) if title == "Favorite"
         ));
 
         let model_ids = get_entry_model_ids(&entries);
@@ -683,11 +765,12 @@ mod tests {
         let models = create_model_list(vec![("zed", vec!["zed/claude", "zed/gemini"])]);
         let favorites = create_favorites(vec![]);
 
-        let entries = info_list_to_picker_entries(models, &favorites);
+        let collapsed_groups = HashSet::default();
+        let entries = info_list_to_picker_entries(models, &favorites, &collapsed_groups);
 
         assert!(matches!(
             entries.first(),
-            Some(AcpModelPickerEntry::Separator(s)) if s == "zed"
+            Some(AcpModelPickerEntry::Separator { title, .. }) if title == "zed"
         ));
     }
 
@@ -699,7 +782,8 @@ mod tests {
         ]);
         let favorites = create_favorites(vec!["zed/claude"]);
 
-        let entries = info_list_to_picker_entries(models, &favorites);
+        let collapsed_groups = HashSet::default();
+        let entries = info_list_to_picker_entries(models, &favorites, &collapsed_groups);
 
         for entry in &entries {
             if let AcpModelPickerEntry::Model(info, is_favorite) = entry {
@@ -720,7 +804,8 @@ mod tests {
         ]);
         let favorites = create_favorites(vec!["zed/gemini", "openai/gpt-5"]);
 
-        let entries = info_list_to_picker_entries(models, &favorites);
+        let collapsed_groups = HashSet::default();
+        let entries = info_list_to_picker_entries(models, &favorites, &collapsed_groups);
         let model_ids = get_entry_model_ids(&entries);
 
         assert_eq!(model_ids[0], "zed/gemini");
@@ -741,7 +826,8 @@ mod tests {
 
         let favorites = create_favorites(vec!["zed/claude"]);
 
-        let entries = info_list_to_picker_entries(models, &favorites);
+        let collapsed_groups = HashSet::default();
+        let entries = info_list_to_picker_entries(models, &favorites, &collapsed_groups);
         let labels = get_entry_labels(&entries);
 
         assert_eq!(
@@ -785,16 +871,17 @@ mod tests {
         ]);
         let favorites = create_favorites(vec!["zed/gemini"]);
 
-        let entries = info_list_to_picker_entries(models, &favorites);
+        let collapsed_groups = HashSet::default();
+        let entries = info_list_to_picker_entries(models, &favorites, &collapsed_groups);
 
         assert!(matches!(
             entries.first(),
-            Some(AcpModelPickerEntry::Separator(s)) if s == "Favorite"
+            Some(AcpModelPickerEntry::Separator { title, .. }) if title == "Favorite"
         ));
 
         assert!(entries.iter().any(|e| matches!(
             e,
-            AcpModelPickerEntry::Separator(s) if s == "All"
+            AcpModelPickerEntry::Separator { title, .. } if title == "All"
         )));
     }
 
@@ -835,7 +922,8 @@ mod tests {
         ]);
         let favorites = create_favorites(vec!["favorite-model"]);
 
-        let entries = info_list_to_picker_entries(models, &favorites);
+        let collapsed_groups = HashSet::default();
+        let entries = info_list_to_picker_entries(models, &favorites, &collapsed_groups);
 
         for entry in &entries {
             if let AcpModelPickerEntry::Model(info, is_favorite) = entry {

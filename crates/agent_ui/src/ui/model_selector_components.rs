@@ -13,6 +13,8 @@ enum ModelIcon {
 pub struct ModelSelectorHeader {
     title: SharedString,
     has_border: bool,
+    model_count: Option<usize>,
+    collapse_icon: Option<IconName>,
 }
 
 impl ModelSelectorHeader {
@@ -20,7 +22,19 @@ impl ModelSelectorHeader {
         Self {
             title: title.into(),
             has_border,
+            model_count: None,
+            collapse_icon: None,
         }
+    }
+
+    pub fn model_count(mut self, model_count: usize) -> Self {
+        self.model_count = Some(model_count);
+        self
+    }
+
+    pub fn collapse_icon(mut self, icon: IconName) -> Self {
+        self.collapse_icon = Some(icon);
+        self
     }
 }
 
@@ -36,9 +50,30 @@ impl RenderOnce for ModelSelectorHeader {
                     .border_color(cx.theme().colors().border_variant)
             })
             .child(
-                Label::new(self.title)
-                    .size(LabelSize::XSmall)
-                    .color(Color::Muted),
+                h_flex()
+                    .justify_between()
+                    .items_center()
+                    .gap_2()
+                    .child(
+                        h_flex()
+                            .items_center()
+                            .gap_1()
+                            .when_some(self.collapse_icon, |this, icon| {
+                                this.child(
+                                    Icon::new(icon)
+                                        .size(IconSize::XSmall)
+                                        .color(Color::Muted),
+                                )
+                            })
+                            .child(
+                                Label::new(self.title)
+                                    .size(LabelSize::XSmall)
+                                    .color(Color::Muted),
+                            ),
+                    )
+                    .when_some(self.model_count, |this, model_count| {
+                        this.child(Chip::new(model_count.to_string()))
+                    }),
             )
     }
 }
