@@ -1,8 +1,9 @@
 use anyhow::Result;
 use convert_case::{Case, Casing};
-use futures::{FutureExt, StreamExt, future::BoxFuture};
+use futures::{AsyncReadExt, FutureExt, StreamExt, future::BoxFuture, stream};
 use gpui::{AnyView, App, AsyncApp, Context, Entity, SharedString, Task, Window};
 use http_client::HttpClient;
+use http_client::{AsyncBody, Method, Request as HttpRequest};
 use language_model::{
     ApiKeyState, AuthenticateError, EnvVar, IconOrSvg, LanguageModel, LanguageModelCompletionError,
     LanguageModelCompletionEvent, LanguageModelId, LanguageModelName, LanguageModelProvider,
@@ -16,6 +17,7 @@ use open_ai::{
     stream_completion,
 };
 use settings::{Settings, SettingsStore};
+use serde::Deserialize;
 use std::sync::Arc;
 use ui::{ElevationIndex, Tooltip, prelude::*};
 use ui_input::InputField;
@@ -48,7 +50,7 @@ pub struct State {
 
 impl State {
     fn requires_api_key(&self) -> bool {
-        self.id.as_ref() != "opencode"
+        !matches!(self.id.as_ref(), "opencode" | "pollinations" | "mlvoca")
     }
 
     fn is_authenticated(&self) -> bool {
@@ -111,7 +113,7 @@ impl OpenAiCompatibleLanguageModelProvider {
 
         Self {
             id: id.clone().into(),
-            name: if id.as_ref() == "opencode" {
+            name: if matches!(id.as_ref(), "opencode" | "pollinations" | "mlvoca") {
                 LanguageModelProviderName::from("Free".to_string())
             } else {
                 id.into()
@@ -222,6 +224,146 @@ impl OpenAiCompatibleLanguageModel {
         }
     }
 
+    fn mlvoca_prompt_from_request(request: &open_ai::Request) -> String {
+        fn content_to_text(content: &open_ai::MessageContent) -> String {
+            match content {
+                open_ai::MessageContent::Plain(text) => text.clone(),
+                open_ai::MessageContent::Multipart(parts) => parts
+                    .iter()
+                    .filter_map(|part| match part {
+                        open_ai::MessagePart::Text { text } => Some(text.as_str()),
+                        open_ai::MessagePart::Image { .. } => None,
+                    })
+                    .collect::<Vec<_>>()
+                    .join("\n"),
+            }
+        }
+
+        for message in request.messages.iter().rev() {
+            if let open_ai::RequestMessage::User { content } = message {
+                let prompt = content_to_text(content);
+                if !prompt.trim().is_empty() {
+                    return prompt;
+                }
+            }
+        }
+
+        for message in request.messages.iter().rev() {
+            let prompt = match message {
+                open_ai::RequestMessage::Assistant { content, .. } => {
+                    content.as_ref().map(content_to_text)
+                }
+                open_ai::RequestMessage::System { content }
+                | open_ai::RequestMessage::Tool { content, .. } => Some(content_to_text(content)),
+                open_ai::RequestMessage::User { content } => Some(content_to_text(content)),
+            };
+
+            if let Some(prompt) = prompt
+                && !prompt.trim().is_empty()
+            {
+                return prompt;
+            }
+        }
+
+        String::new()
+    }
+
+    fn stream_mlvoca_completion(
+        &self,
+        request: open_ai::Request,
+        api_url: String,
+        api_key: String,
+    ) -> BoxFuture<
+        'static,
+        Result<
+            futures::stream::BoxStream<'static, Result<ResponseStreamEvent>>,
+            LanguageModelCompletionError,
+        >,
+    > {
+        #[derive(Deserialize)]
+        struct MlvocaResponse {
+            response: String,
+        }
+
+        let http_client = self.http_client.clone();
+        let model_name = request.model.clone();
+        let prompt = Self::mlvoca_prompt_from_request(&request);
+
+        async move {
+            let uri = format!("{api_url}/api/generate");
+            let mut request_builder = HttpRequest::builder()
+                .method(Method::POST)
+                .uri(uri)
+                .header("Content-Type", "application/json");
+
+            if !api_key.trim().is_empty() {
+                request_builder =
+                    request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+            }
+
+            let body = serde_json::json!({
+                "model": model_name,
+                "prompt": prompt,
+                "stream": false,
+            });
+
+            let request = request_builder
+                .body(AsyncBody::from(body.to_string()))
+                .map_err(|error| LanguageModelCompletionError::Other(error.into()))?;
+
+            let mut response = http_client
+                .send(request)
+                .await
+                .map_err(LanguageModelCompletionError::from)?;
+
+            let mut response_body = String::new();
+            response
+                .body_mut()
+                .read_to_string(&mut response_body)
+                .await
+                .map_err(|error| LanguageModelCompletionError::Other(error.into()))?;
+
+            if !response.status().is_success() {
+                return Err(LanguageModelCompletionError::Other(anyhow::anyhow!(
+                    "mlvoca API error ({}): {}",
+                    response.status(),
+                    response_body
+                )));
+            }
+
+            let parsed: MlvocaResponse =
+                serde_json::from_str(&response_body)
+                    .map_err(|error| LanguageModelCompletionError::Other(error.into()))?;
+
+            let events = vec![
+                Ok(ResponseStreamEvent {
+                    choices: vec![open_ai::ChoiceDelta {
+                        index: 0,
+                        delta: Some(open_ai::ResponseMessageDelta {
+                            role: Some(open_ai::Role::Assistant),
+                            content: Some(parsed.response),
+                            tool_calls: None,
+                            reasoning_content: None,
+                        }),
+                        finish_reason: None,
+                    }],
+                    usage: None,
+                }),
+                Ok(ResponseStreamEvent {
+                    choices: vec![open_ai::ChoiceDelta {
+                        index: 0,
+                        delta: None,
+                        finish_reason: Some("stop".to_string()),
+                    }],
+                    usage: None,
+                }),
+            ];
+
+            Ok(stream::iter(events).boxed())
+        }
+        .boxed()
+    }
+
     fn stream_completion(
         &self,
         request: open_ai::Request,
@@ -235,14 +377,20 @@ impl OpenAiCompatibleLanguageModel {
     > {
         let http_client = self.http_client.clone();
 
-        let (api_key, api_url, requires_api_key) = self.state.read_with(cx, |state, _cx| {
+        let (api_key, api_url, requires_api_key, provider_id) = self.state.read_with(cx, |state, _cx| {
             let api_url = &state.settings.api_url;
             (
                 state.api_key_state.key(api_url),
                 state.settings.api_url.clone(),
                 state.requires_api_key(),
+                state.id.clone(),
             )
         });
+
+        if provider_id.as_ref() == "mlvoca" {
+            let api_key = api_key.unwrap_or_default().to_string();
+            return self.stream_mlvoca_completion(request, api_url, api_key);
+        }
 
         let provider = self.provider_name.clone();
         let future = self.request_limiter.stream(async move {

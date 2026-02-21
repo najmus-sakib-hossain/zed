@@ -87,17 +87,27 @@ impl RenderOnce for ModelSelectorHeader {
                                     .color(Color::Muted),
                             ),
                     )
-                    .when_some(self.model_count, |this, model_count| {
-                        this.child(Chip::new(model_count.to_string()))
-                    })
-                    .when_some(self.notice_tooltip.zip(self.on_notice_click), |this, (notice_tooltip, on_notice_click)| {
-                        this.child(
-                            IconButton::new(notice_icon_id.clone(), IconName::Info)
-                                .icon_size(IconSize::XSmall)
-                                .tooltip(Tooltip::text(notice_tooltip))
-                                .on_click(move |event, window, cx| (on_notice_click)(event, window, cx)),
-                        )
-                    }),
+                    .child(
+                        h_flex()
+                            .items_center()
+                            .gap_2()
+                            .when_some(self.model_count, |this, model_count| {
+                                this.child(Chip::new(model_count.to_string()))
+                            })
+                            .when_some(
+                                self.notice_tooltip.zip(self.on_notice_click),
+                                |this, (notice_tooltip, on_notice_click)| {
+                                    this.child(
+                                        IconButton::new(notice_icon_id.clone(), IconName::Info)
+                                            .icon_size(IconSize::XSmall)
+                                            .tooltip(Tooltip::text(notice_tooltip))
+                                            .on_click(move |event, window, cx| {
+                                                (on_notice_click)(event, window, cx)
+                                            }),
+                                    )
+                                },
+                            ),
+                    ),
             )
     }
 }

@@ -2237,6 +2237,34 @@
           },
         ],
       },
+      "pollinations": {
+        "api_url": "https://text.pollinations.ai/openai",
+        "available_models": [
+          {
+            "name": "openai-fast",
+            "display_name": "OpenAI Fast",
+            "max_tokens": 131000,
+            "max_output_tokens": 32768,
+          },
+        ],
+      },
+      "mlvoca": {
+        "api_url": "https://mlvoca.com",
+        "available_models": [
+          {
+            "name": "tinyllama",
+            "display_name": "TinyLlama",
+            "max_tokens": 131000,
+            "max_output_tokens": 32768,
+          },
+          {
+            "name": "deepseek-r1:1.5b",
+            "display_name": "DeepSeek R1 1.5B",
+            "max_tokens": 131000,
+            "max_output_tokens": 32768,
+          },
+        ],
+      },
     },
     "open_router": {
       "api_url": "https://openrouter.ai/api/v1",

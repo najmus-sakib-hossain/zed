@@ -27,7 +27,11 @@ pub type AcpModelSelector = Picker<AcpModelPickerDelegate>;
 
 const FREE_PROVIDER_GROUP_NAME: &str = "Free";
 const FREE_PROVIDER_NOTICE: &str =
-    "We are currently using OpenCode Zen free models. These models are free for everyone and all credits go to OpenCode Zen.";
+    "We are currently using free models from OpenCode Zen, Pollinations, and MLVoca.";
+
+fn is_free_provider_group(group_name: &str) -> bool {
+    matches!(group_name, "opencode" | "pollinations" | "mlvoca")
+}
 
 pub fn acp_model_selector(
     selector: Rc<dyn AgentModelSelector>,
@@ -557,13 +561,22 @@ fn info_list_to_picker_entries(
             }
         }
         AgentModelList::Grouped(index_map) => {
+            let mut merged_groups: IndexMap<SharedString, Vec<AgentModelInfo>> = Default::default();
+
             for (group_name, models) in index_map {
-                let group_title = if group_name.0.as_ref() == "opencode" {
+                let group_title: SharedString = if is_free_provider_group(group_name.0.as_ref()) {
                     SharedString::from(FREE_PROVIDER_GROUP_NAME)
                 } else {
-                    group_name.0
+                    group_name.0.clone()
                 };
-                let is_collapsed = collapsed_groups.contains(&group_title);
+                merged_groups
+                    .entry(group_title)
+                    .or_default()
+                    .extend(models);
+            }
+
+            for (group_title, models) in merged_groups {
+                let is_collapsed = collapsed_groups.contains(group_title.as_ref());
                 entries.push(AcpModelPickerEntry::Separator {
                     title: group_title.clone(),
                     model_count: Some(models.len()),

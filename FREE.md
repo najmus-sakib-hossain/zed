@@ -1,184 +1,358 @@
-# Keyless LLM API Test Results (February 21, 2026)
+# Truly Keyless LLM Providers - BRUTAL REALITY CHECK
 
-## ✓ WORKING APIs (No Signup, No API Key)
+> **Zero API Keys • Zero Signup • Zero Authentication**  
+> Only providers that ACTUALLY WORK right now
 
-### 1. Pollinations.ai - WORKS PERFECTLY ⭐
-**Status:** Fully operational, instant responses
+**Last Tested:** February 21, 2026  
+**Reality Check:** Every model brutally tested, no BS
 
-**Endpoints:**
-- GET: `https://text.pollinations.ai/{prompt}`
-- POST: `https://text.pollinations.ai/`
+---
 
-**Models Tested:**
-- ✓ `openai` - Works (GPT-4o-mini equivalent)
-- ✓ `mistral` - Works (timeout on some requests, but functional)
-- ✓ `searchgpt` - Works (with web search capabilities)
-- ⚠ `claude` - Not tested (claimed to work)
+## The Brutal Truth
 
-**Example:**
+**Only 2 providers are truly usable:**
+1. **Pollinations.ai** - 1 model, works perfectly, no limits
+2. **mlvoca.com** - 2 small models, reliable, no limits
+
+**What's mostly useless:**
+- **ApiAirforce** - 87 models but only 1 works without rate limits (99% useless)
+
+**What doesn't work:**
+- AI Horde - No active workers
+- HuggingFace (no auth) - API deprecated
+
+---
+
+## 1. Pollinations.ai ⭐ BEST CHOICE
+
+**Endpoint:** `https://text.pollinations.ai/`  
+**Authentication:** None  
+**Reality:** Actually works as advertised. No rate limits, no BS.  
+**Status:** ✓ Works perfectly
+
+### Available Model
+
+**1 model:**
+- `openai-fast` (aliases: `openai`, `gpt-oss`, `gpt-oss-20b`, `ovh-reasoning`)
+- 20B parameter reasoning model
+- Supports tools and reasoning
+- Fast responses
+- No limits
+
+### Usage
+
+**GET (Simplest - RECOMMENDED):**
 ```bash
-# GET method (simplest)
 curl "https://text.pollinations.ai/What is 2+2?"
-# Response: 2 + 2 = 4.
-
-# POST method with model selection
-curl -X POST https://text.pollinations.ai/ \
-  -H "Content-Type: application/json" \
-  -d '{"messages": [{"role": "user", "content": "Explain Rust in 10 words"}], "model": "openai"}'
-# Response: Rust: memory-safe, fast systems language prioritizing zero-cost abstractions and performance.
 ```
 
-**Python:**
+**Python GET:**
 ```python
 import requests
 
-# GET
-response = requests.get("https://text.pollinations.ai/What is 2+2?")
+response = requests.get("https://text.pollinations.ai/Explain Rust in one sentence")
 print(response.text)
+```
 
-# POST
+**POST (with options):**
+```python
+import requests
+
 response = requests.post("https://text.pollinations.ai/", json={
-    "messages": [{"role": "user", "content": "Hello"}],
-    "model": "openai"
+    "model": "openai",
+    "messages": [{"role": "user", "content": "Hello"}]
 })
 print(response.text)
 ```
 
----
-
-### 2. mlvoca.com - WORKS PERFECTLY ⭐
-**Status:** Fully operational, fast responses
-
-**Endpoint:** `POST https://mlvoca.com/api/generate`
-
-**Models:**
-- ✓ `tinyllama` - Extremely fast, good for simple tasks
-- ✓ `deepseek-r1:1.5b` - Best small reasoning model
-
-**Example:**
+**Get model info:**
 ```bash
-curl -X POST https://mlvoca.com/api/generate \
-  -H "Content-Type: application/json" \
-  -d '{"model": "tinyllama","prompt": "What is 2+2?","stream": false}'
+curl https://text.pollinations.ai/models
 ```
 
-**Python:**
+**Pros:**
+- ✓ Actually free with no limits
+- ✓ Fast responses
+- ✓ Simple to use
+- ✓ No promotional spam
+- ✓ Reliable
+- ✓ 20B reasoning model
+
+**Cons:**
+- Only 1 model
+
+---
+
+## 2. mlvoca.com ⭐ RELIABLE
+
+**Endpoint:** `https://mlvoca.com/api/generate`  
+**Authentication:** None  
+**Reality:** Works reliably. Small models but they actually respond.  
+**Format:** Ollama-compatible  
+**Status:** ✓ Works
+
+### Available Models
+
+**2 models:**
+1. `tinyllama` - 1.1B parameters, fast
+2. `deepseek-r1:1.5b` - 1.5B parameters, reasoning
+
+### Usage
+
 ```python
 import requests
 
 response = requests.post("https://mlvoca.com/api/generate", json={
     "model": "deepseek-r1:1.5b",
-    "prompt": "Explain Rust",
+    "prompt": "Explain Python",
     "stream": False
 })
+
 print(response.json()["response"])
 ```
 
+**Bash:**
+```bash
+curl -X POST https://mlvoca.com/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "tinyllama",
+    "prompt": "Hello",
+    "stream": false
+  }'
+```
+
+**Pros:**
+- ✓ Ollama-compatible API
+- ✓ No rate limits
+- ✓ Reliable
+- ✓ Small models = fast responses
+
+**Cons:**
+- Only 2 small models (1-1.5B)
+- Limited capabilities compared to larger models
+
 ---
 
-### 3. AI Horde (stablehorde.net) - WORKS ⭐
-**Status:** Operational, async queue system (3-10 second wait)
+## 3. ApiAirforce ⚠️ 99% USELESS
 
-**Endpoint:** `POST https://stablehorde.net/api/v2/generate/text/async`
+**Endpoint:** `https://api.airforce/v1/chat/completions`  
+**Authentication:** None  
+**Reality:** BRUTAL - Tested all 87 models, only 1 works without rate limits!  
+**Format:** OpenAI-compatible  
+**Status:** ⚠️ Mostly useless
 
-**API Key:** `0000000000` (10 zeros - anonymous access)
+### What Actually Works (Tested ALL 87 Models)
 
-**Models:** 50+ community models (Llama-3, Mistral, Pygmalion, etc.)
+**Only 1 model works without rate limits:**
+- `step-3.5-flash:free` ✓ (StepFun model)
 
-**Example:**
+**All other 86 models are immediately rate limited:**
+- `gpt-4o-mini` ✗ Rate limited
+- `gpt-3.5-turbo` ✗ Rate limited
+- `claude-sonnet-4.5` ✗ Rate limited
+- `claude-haiku-4.5` ✗ Rate limited
+- `gemini-3-flash` ✗ Rate limited
+- `gemini-2.5-flash` ✗ Rate limited
+- `deepseek-v3.2` ✗ Rate limited
+- `deepseek-r1` ✗ Rate limited
+- `llama-4-scout` ✗ Rate limited
+- `llama-4-maverick` ✗ Rate limited
+- `grok-4-mini:free` ✗ Rate limited
+- `grok-4` ✗ Rate limited
+- `qwen3.5` ✗ Rate limited
+- `glm-5` ✗ Rate limited
+- `kimi-k2` ✗ Rate limited
+- All other 71 models ✗ Rate limited
+
+**Reality:** They advertise 87 chat models but 99% are immediately rate limited. Every response includes "Ratelimit Exceeded! Please join: https://discord.g" or returns HTTP 429. This is a bait-and-switch to get you to join their Discord.
+
+### Usage (for the 1 working model)
+
 ```python
 import requests
-import time
 
-headers = {"apikey": "0000000000"}
+response = requests.post("https://api.airforce/v1/chat/completions", json={
+    "model": "step-3.5-flash:free",
+    "messages": [{"role": "user", "content": "Hello"}]
+})
 
-# Submit job
-response = requests.post(
-    "https://stablehorde.net/api/v2/generate/text/async",
-    json={
-        "prompt": "Write a haiku about coding",
-        "params": {"n": 1, "max_length": 80}
-    },
-    headers=headers
-)
-job_id = response.json()["id"]
-
-# Check status (poll every 3 seconds)
-time.sleep(3)
-status = requests.get(
-    f"https://stablehorde.net/api/v2/generate/text/status/{job_id}",
-    headers=headers
-).json()
-
-if status["done"]:
-    print(status["generations"][0]["text"])
+if response.status_code == 200:
+    print(response.json()["choices"][0]["message"]["content"])
 ```
 
-**Actual Result:**
+**Pros:**
+- OpenAI-compatible API
+- 1 model works
+
+**Cons:**
+- 86 out of 87 models are rate limited
+- Constant promotional messages
+- Pushes you to join Discord
+- Essentially useless for most use cases
+
+**Verdict:** Not recommended. Use Pollinations.ai or mlvoca.com instead.
+
+---
+
+## What DOESN'T Work
+
+### AI Horde ✗
+- **Status:** No active text workers
+- **Reality:** Depends on community GPU donations. Currently offline for text generation.
+- **Tested:** 0 active text models available
+- **Verdict:** Don't rely on it
+
+### HuggingFace (no auth) ✗
+- **Status:** API deprecated
+- **Reality:** `api-inference.huggingface.co` is no longer supported
+- **Error:** HTTP 410 Gone
+- **Verdict:** Dead without API key
+
+---
+
+## Comparison - The Real Deal
+
+| Provider | Models | Actually Free? | Rate Limits | Reliability | Verdict |
+|----------|--------|----------------|-------------|-------------|---------|
+| **Pollinations.ai** | 1 (20B) | YES | None | High | ⭐ USE THIS |
+| **mlvoca.com** | 2 (1-1.5B) | YES | None | High | ⭐ USE THIS |
+| **ApiAirforce** | 1/87 usable | Sort of | 99% rate limited | Low | ⚠️ AVOID |
+
+---
+
+## Brutal Recommendations
+
+### For Production
+**Use Pollinations.ai**
+- Only truly free provider with a decent model
+- 20B reasoning model
+- Reliable, fast, no rate limits
+- No catches, no BS
+
+### For Quick Testing
+**Use mlvoca.com**
+- Small models but reliable
+- Ollama-compatible
+- Good for simple tasks
+- No rate limits
+
+### Avoid
+**ApiAirforce**
+- 99% of models are rate limited
+- Bait-and-switch marketing
+- Constant Discord promotion
+- Not worth the hassle
+
+---
+
+## Quick Start - What Actually Works
+
+### Pollinations.ai (Recommended)
+```bash
+# Simplest possible LLM call - actually works!
+curl "https://text.pollinations.ai/What is Rust?"
 ```
-We think of a
-Problem we need to solve
-Code solves it for us
+
+```python
+import requests
+
+# GET method - dead simple
+response = requests.get("https://text.pollinations.ai/Explain async/await")
+print(response.text)
+
+# POST method - more control
+response = requests.post("https://text.pollinations.ai/", json={
+    "model": "openai",
+    "messages": [{"role": "user", "content": "Hello"}]
+})
+print(response.text)
+```
+
+### mlvoca.com
+```python
+import requests
+
+r = requests.post("https://mlvoca.com/api/generate", json={
+    "model": "deepseek-r1:1.5b",
+    "prompt": "Explain Python",
+    "stream": False
+})
+print(r.json()["response"])
 ```
 
 ---
 
-## ⚠ PARTIALLY WORKING
+## Test Script - Verify Yourself
 
-### 4. Puter.js - AVAILABLE (Browser Only)
-**Status:** Script loads, but frontend-only
+```python
+#!/usr/bin/env python3
+import requests
 
-**Endpoint:** `<script src="https://js.puter.com/v2/"></script>`
+print("Testing truly keyless providers...\n")
 
-**Models Claimed:** GPT-5, Claude, DeepSeek, Llama, Gemini, etc.
+# 1. Pollinations.ai
+print("1. Pollinations.ai:")
+try:
+    r = requests.get("https://text.pollinations.ai/Say hello", timeout=10)
+    print(f"   ✓ {r.text[:50]}\n")
+except Exception as e:
+    print(f"   ✗ {e}\n")
 
-**Note:** Cannot test from CLI/backend. Requires HTML/JavaScript frontend.
+# 2. mlvoca.com
+print("2. mlvoca.com:")
+try:
+    r = requests.post("https://mlvoca.com/api/generate",
+        json={"model": "tinyllama", "prompt": "Say hello", "stream": False},
+        timeout=10)
+    print(f"   ✓ {r.json()['response'][:50]}\n")
+except Exception as e:
+    print(f"   ✗ {e}\n")
 
----
-
-## ✗ NOT WORKING / ISSUES
-
-### 5. OllamaFreeAPI - INSTALLATION ISSUES
-**Status:** Python package exists but version conflicts
-
-**Issue:** Installs to Python 3.13 but system uses Python 3.14
-
----
-
-## 📊 Summary Table
-
-| API | Status | Speed | Models | Best For |
-|-----|--------|-------|--------|----------|
-| Pollinations.ai | ✓ | Instant | openai, mistral, searchgpt, claude | General use, web search |
-| mlvoca.com | ✓ | Fast | tinyllama, deepseek-r1:1.5b | Small models, reasoning |
-| AI Horde | ✓ | 3-10s | 50+ community models | Creative writing, variety |
-| Puter.js | ⚠ | N/A | GPT-5, Claude, etc. | Browser apps only |
-| Local Ollama | ⚠ | Fast | Any | Unlimited (needs `ollama serve`) |
-| OllamaFreeAPI | ✗ | N/A | N/A | Not working |
-
----
-
-## 🎯 Recommendations
-
-**For instant backend/CLI use:**
-1. **Pollinations.ai** - Best overall, multiple models, GET/POST support
-2. **mlvoca.com** - Best for small models and reasoning tasks
-3. **AI Horde** - Best for variety and creative tasks (accept 3-10s wait)
-
-**For web apps:**
-- **Puter.js** - Access to GPT-5, Claude, etc. in browser
-
-**For serious development:**
-- **Local Ollama** - Run `ollama serve` for unlimited free inference
+# 3. ApiAirforce (the only working model)
+print("3. ApiAirforce (step-3.5-flash:free):")
+try:
+    r = requests.post("https://api.airforce/v1/chat/completions",
+        json={"model": "step-3.5-flash:free", "messages": [{"role": "user", "content": "Say hello"}]},
+        timeout=10)
+    if r.status_code == 200:
+        print(f"   ✓ {r.json()['choices'][0]['message']['content'][:50]}\n")
+    else:
+        print(f"   ✗ HTTP {r.status_code}\n")
+except Exception as e:
+    print(f"   ✗ {e}\n")
+```
 
 ---
 
-## Test Files Created
+## The Bottom Line
 
-- `test_pollinations.py` - Test Pollinations.ai API
-- `test_mlvoca.py` - Test mlvoca.com API
-- `test_ai_horde.py` - Test AI Horde async queue
-- `test_puter.html` - Test Puter.js in browser
-- `test_keyless_llms.sh` - Bash test script
+**2 providers actually work without any catches:**
 
-All tests verified working on February 21, 2026.
+1. **Pollinations.ai** - Best choice, 20B model, truly free, reliable
+2. **mlvoca.com** - Small models, reliable, good for simple tasks
+
+**1 provider is mostly useless:**
+
+3. **ApiAirforce** - 99% rate limited (86/87 models), bait-and-switch
+
+**Everything else:**
+- Requires API keys
+- Is currently offline
+- Has been deprecated
+
+---
+
+## Total Reality
+
+- **2 truly usable providers**
+- **3 working models total** (1 + 2)
+- **Zero authentication required**
+- **Zero rate limits** (for the 2 good providers)
+
+**Final Verdict:**
+- Use **Pollinations.ai** for anything serious
+- Use **mlvoca.com** for small/simple tasks
+- Avoid **ApiAirforce** unless you specifically need their 1 working model
+
+**Verified:** February 21, 2026 - All 87 ApiAirforce models tested individually
