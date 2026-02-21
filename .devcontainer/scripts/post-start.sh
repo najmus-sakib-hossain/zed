@@ -27,6 +27,11 @@ ensure_vnc_stack() {
     nohup /usr/share/novnc/utils/novnc_proxy --listen 6080 --vnc localhost:5900 >/tmp/zed-novnc.log 2>&1 &
     sleep 1
   fi
+
+  if ! pgrep -f 'fluxbox' >/dev/null 2>&1; then
+    nohup env DISPLAY="${DISPLAY_NUMBER}" fluxbox >/tmp/zed-fluxbox.log 2>&1 &
+    sleep 1
+  fi
 }
 
 ensure_vnc_stack
@@ -40,6 +45,8 @@ if pgrep -f "$CARGO_TARGET_DIR/debug/zed --user-data-dir /tmp/zed-user" >/dev/nu
 else
   nohup env \
     DISPLAY="${DISPLAY_NUMBER}" \
+    WGPU_BACKEND=gl \
+    LIBGL_ALWAYS_SOFTWARE=1 \
     XDG_CACHE_HOME=/tmp/zed-xdg/cache \
     XDG_CONFIG_HOME=/tmp/zed-xdg/config \
     XDG_DATA_HOME=/tmp/zed-xdg/data \
