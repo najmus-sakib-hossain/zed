@@ -257,11 +257,14 @@ pub async fn stream_response(
     request: Request,
 ) -> Result<BoxStream<'static, Result<StreamEvent>>, RequestError> {
     let uri = format!("{api_url}/responses");
-    let request_builder = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::POST)
         .uri(uri)
-        .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", api_key.trim()));
+        .header("Content-Type", "application/json");
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
 
     let is_streaming = request.stream;
     let request = request_builder

@@ -2204,7 +2204,7 @@ fn current_pointer_device_states(
             }),
     );
     if pointer_device_states.is_empty() {
-        log::error!("Found no xinput mouse pointers.");
+        log::warn!("Found no xinput mouse pointers.");
     }
     Some(pointer_device_states)
 }

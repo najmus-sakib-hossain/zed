@@ -47,8 +47,12 @@ pub struct State {
 }
 
 impl State {
+    fn requires_api_key(&self) -> bool {
+        self.id.as_ref() != "opencode"
+    }
+
     fn is_authenticated(&self) -> bool {
-        self.api_key_state.has_key()
+        !self.requires_api_key() || self.api_key_state.has_key()
     }
 
     fn set_api_key(&mut self, api_key: Option<String>, cx: &mut Context<Self>) -> Task<Result<()>> {
@@ -58,6 +62,10 @@ impl State {
     }
 
     fn authenticate(&mut self, cx: &mut Context<Self>) -> Task<Result<(), AuthenticateError>> {
+        if !self.requires_api_key() {
+            return Task::ready(Ok(()));
+        }
+
         let api_url = SharedString::new(self.settings.api_url.clone());
         self.api_key_state
             .load_if_needed(api_url, |this| &mut this.api_key_state, cx)
@@ -214,18 +222,23 @@ impl OpenAiCompatibleLanguageModel {
     > {
         let http_client = self.http_client.clone();
 
-        let (api_key, api_url) = self.state.read_with(cx, |state, _cx| {
+        let (api_key, api_url, requires_api_key) = self.state.read_with(cx, |state, _cx| {
             let api_url = &state.settings.api_url;
             (
                 state.api_key_state.key(api_url),
                 state.settings.api_url.clone(),
+                state.requires_api_key(),
             )
         });
 
         let provider = self.provider_name.clone();
         let future = self.request_limiter.stream(async move {
-            let Some(api_key) = api_key else {
-                return Err(LanguageModelCompletionError::NoApiKey { provider });
+            let api_key = match api_key {
+                Some(api_key) => api_key,
+                None if !requires_api_key => "".into(),
+                None => {
+                    return Err(LanguageModelCompletionError::NoApiKey { provider });
+                }
             };
             let request = stream_completion(
                 http_client.as_ref(),
@@ -249,18 +262,23 @@ impl OpenAiCompatibleLanguageModel {
     {
         let http_client = self.http_client.clone();
 
-        let (api_key, api_url) = self.state.read_with(cx, |state, _cx| {
+        let (api_key, api_url, requires_api_key) = self.state.read_with(cx, |state, _cx| {
             let api_url = &state.settings.api_url;
             (
                 state.api_key_state.key(api_url),
                 state.settings.api_url.clone(),
+                state.requires_api_key(),
             )
         });
 
         let provider = self.provider_name.clone();
         let future = self.request_limiter.stream(async move {
-            let Some(api_key) = api_key else {
-                return Err(LanguageModelCompletionError::NoApiKey { provider });
+            let api_key = match api_key {
+                Some(api_key) => api_key,
+                None if !requires_api_key => "".into(),
+                None => {
+                    return Err(LanguageModelCompletionError::NoApiKey { provider });
+                }
             };
             let request = stream_response(
                 http_client.as_ref(),

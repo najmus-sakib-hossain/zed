@@ -642,11 +642,12 @@ impl AgentPanel {
                         panel.load_agent_thread(session_info, window, cx);
                     })?;
                 } else {
-                    log::error!(
+                    log::warn!(
                         "could not restore last active thread: \
-                         no thread found in database with ID {:?}",
+                         no thread found in database with ID {:?}; clearing stale panel state",
                         thread_info.session_id
                     );
+                    panel.update(cx, |panel, cx| panel.serialize(cx));
                 }
             }
 

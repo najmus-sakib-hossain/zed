@@ -71,7 +71,22 @@ CARGO_TARGET_DIR=/tmp/zed-target cargo watch -x 'check -p zed'
 
 # Build binary only when needed to run changed code
 CARGO_TARGET_DIR=/tmp/zed-target cargo build -p zed
+
+# Live browser preview without full rebuild cycle
+# - Uses incremental compilation
+# - Re-runs Zed automatically after code changes
+bash .devcontainer/scripts/live-preview.sh
 ```
+
+### Live preview details
+
+`live-preview.sh` keeps noVNC running and uses `cargo watch` to execute:
+
+```bash
+cargo run -p zed -- --user-data-dir /tmp/zed-user
+```
+
+on each change, so only incremental recompilation is done for modified crates instead of a full clean build.
 
 ## Verification checklist
 

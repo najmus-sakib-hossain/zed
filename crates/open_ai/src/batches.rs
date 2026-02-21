@@ -148,14 +148,18 @@ pub async fn upload_batch_file(
     body.extend_from_slice(&content);
     body.extend_from_slice(format!("\r\n--{boundary}--\r\n").as_bytes());
 
-    let request = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::POST)
         .uri(uri)
-        .header("Authorization", format!("Bearer {}", api_key.trim()))
         .header(
             "Content-Type",
             format!("multipart/form-data; boundary={boundary}"),
-        )
+        );
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
+    let request = request_builder
         .body(AsyncBody::from(body))
         .map_err(|e| RequestError::Other(e.into()))?;
 
@@ -198,11 +202,15 @@ pub async fn create_batch(
 
     let serialized = serde_json::to_string(&request).map_err(|e| RequestError::Other(e.into()))?;
 
-    let request = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::POST)
         .uri(uri)
-        .header("Authorization", format!("Bearer {}", api_key.trim()))
-        .header("Content-Type", "application/json")
+        .header("Content-Type", "application/json");
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
+    let request = request_builder
         .body(AsyncBody::from(serialized))
         .map_err(|e| RequestError::Other(e.into()))?;
 
@@ -243,10 +251,14 @@ pub async fn retrieve_batch(
 ) -> Result<Batch, RequestError> {
     let uri = format!("{api_url}/batches/{batch_id}");
 
-    let request = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::GET)
-        .uri(uri)
-        .header("Authorization", format!("Bearer {}", api_key.trim()))
+        .uri(uri);
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
+    let request = request_builder
         .body(AsyncBody::default())
         .map_err(|e| RequestError::Other(e.into()))?;
 
@@ -287,10 +299,14 @@ pub async fn download_file(
 ) -> Result<String, RequestError> {
     let uri = format!("{api_url}/files/{file_id}/content");
 
-    let request = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::GET)
-        .uri(uri)
-        .header("Authorization", format!("Bearer {}", api_key.trim()))
+        .uri(uri);
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
+    let request = request_builder
         .body(AsyncBody::default())
         .map_err(|e| RequestError::Other(e.into()))?;
 

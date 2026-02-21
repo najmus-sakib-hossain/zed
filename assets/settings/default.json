@@ -2206,7 +2206,37 @@
     "openai": {
       "api_url": "https://api.openai.com/v1",
     },
-    "openai_compatible": {},
+    "openai_compatible": {
+      "opencode": {
+        "api_url": "https://opencode.ai/zen/v1",
+        "available_models": [
+          {
+            "name": "glm-5-free",
+            "display_name": "GLM-5 Free",
+            "max_tokens": 204800,
+            "max_output_tokens": 131072,
+          },
+          {
+            "name": "minimax-m2.5-free",
+            "display_name": "MiniMax M2.5 Free",
+            "max_tokens": 204800,
+            "max_output_tokens": 131072,
+          },
+          {
+            "name": "big-pickle",
+            "display_name": "Big Pickle",
+            "max_tokens": 200000,
+            "max_output_tokens": 128000,
+          },
+          {
+            "name": "trinity-large-preview-free",
+            "display_name": "Trinity Large Preview",
+            "max_tokens": 131072,
+            "max_output_tokens": 131072,
+          },
+        ],
+      },
+    },
     "open_router": {
       "api_url": "https://openrouter.ai/api/v1",
     },

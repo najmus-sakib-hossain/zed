@@ -503,11 +503,14 @@ pub async fn non_streaming_completion(
     request: Request,
 ) -> Result<Response, RequestError> {
     let uri = format!("{api_url}/chat/completions");
-    let request_builder = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::POST)
         .uri(uri)
-        .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", api_key.trim()));
+        .header("Content-Type", "application/json");
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
 
     let request = request_builder
         .body(AsyncBody::from(
@@ -550,11 +553,14 @@ pub async fn stream_completion(
     request: Request,
 ) -> Result<BoxStream<'static, Result<ResponseStreamEvent>>, RequestError> {
     let uri = format!("{api_url}/chat/completions");
-    let request_builder = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::POST)
         .uri(uri)
-        .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", api_key.trim()));
+        .header("Content-Type", "application/json");
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
 
     let request = request_builder
         .body(AsyncBody::from(
@@ -650,13 +656,15 @@ pub fn embed<'a>(
         input: texts.into_iter().collect(),
     };
     let body = AsyncBody::from(serde_json::to_string(&request).unwrap());
-    let request = HttpRequest::builder()
+    let mut request_builder = HttpRequest::builder()
         .method(Method::POST)
         .uri(uri)
-        .header("Content-Type", "application/json")
-        .header("Authorization", format!("Bearer {}", api_key.trim()))
-        .body(body)
-        .map(|request| client.send(request));
+        .header("Content-Type", "application/json");
+    if !api_key.trim().is_empty() {
+        request_builder =
+            request_builder.header("Authorization", format!("Bearer {}", api_key.trim()));
+    }
+    let request = request_builder.body(body).map(|request| client.send(request));
 
     async move {
         let mut response = request?.await?;
