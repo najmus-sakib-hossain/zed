@@ -15,6 +15,8 @@ pub struct ModelSelectorHeader {
     has_border: bool,
     model_count: Option<usize>,
     collapse_icon: Option<IconName>,
+    notice_tooltip: Option<SharedString>,
+    on_notice_click: Option<Box<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>>,
 }
 
 impl ModelSelectorHeader {
@@ -24,6 +26,8 @@ impl ModelSelectorHeader {
             has_border,
             model_count: None,
             collapse_icon: None,
+            notice_tooltip: None,
+            on_notice_click: None,
         }
     }
 
@@ -36,10 +40,22 @@ impl ModelSelectorHeader {
         self.collapse_icon = Some(icon);
         self
     }
+
+    pub fn notice(
+        mut self,
+        tooltip: impl Into<SharedString>,
+        on_click: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
+    ) -> Self {
+        self.notice_tooltip = Some(tooltip.into());
+        self.on_notice_click = Some(Box::new(on_click));
+        self
+    }
 }
 
 impl RenderOnce for ModelSelectorHeader {
     fn render(self, _window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let notice_icon_id = format!("provider-notice-{}", self.title);
+
         div()
             .px_2()
             .pb_1()
@@ -67,12 +83,20 @@ impl RenderOnce for ModelSelectorHeader {
                             })
                             .child(
                                 Label::new(self.title)
-                                    .size(LabelSize::XSmall)
+                                    .size(LabelSize::Small)
                                     .color(Color::Muted),
                             ),
                     )
                     .when_some(self.model_count, |this, model_count| {
                         this.child(Chip::new(model_count.to_string()))
+                    })
+                    .when_some(self.notice_tooltip.zip(self.on_notice_click), |this, (notice_tooltip, on_notice_click)| {
+                        this.child(
+                            IconButton::new(notice_icon_id.clone(), IconName::Info)
+                                .icon_size(IconSize::XSmall)
+                                .tooltip(Tooltip::text(notice_tooltip))
+                                .on_click(move |event, window, cx| (on_notice_click)(event, window, cx)),
+                        )
                     }),
             )
     }

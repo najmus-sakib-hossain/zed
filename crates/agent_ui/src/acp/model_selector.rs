@@ -25,6 +25,10 @@ use crate::ui::{HoldForDefault, ModelSelectorFooter, ModelSelectorHeader, ModelS
 
 pub type AcpModelSelector = Picker<AcpModelPickerDelegate>;
 
+const FREE_PROVIDER_GROUP_NAME: &str = "Free";
+const FREE_PROVIDER_NOTICE: &str =
+    "We are currently using OpenCode Zen free models. These models are free for everyone and all credits go to OpenCode Zen.";
+
 pub fn acp_model_selector(
     selector: Rc<dyn AgentModelSelector>,
     agent_server: Rc<dyn AgentServer>,
@@ -47,6 +51,7 @@ enum AcpModelPickerEntry {
         model_count: Option<usize>,
         is_collapsible: bool,
         is_collapsed: bool,
+        notice_tooltip: Option<SharedString>,
     },
     Model(AgentModelInfo, bool),
 }
@@ -266,8 +271,6 @@ impl PickerDelegate for AcpModelPickerDelegate {
         window: &mut Window,
         cx: &mut Context<Picker<Self>>,
     ) -> Task<()> {
-        let favorites = self.favorites.clone();
-
         cx.spawn_in(window, async move |this, cx| {
             let filtered_models = match this
                 .read_with(cx, |this, cx| {
@@ -356,6 +359,7 @@ impl PickerDelegate for AcpModelPickerDelegate {
                 model_count,
                 is_collapsible,
                 is_collapsed,
+                notice_tooltip,
             } => {
                 let title = title.clone();
                 let mut header = ModelSelectorHeader::new(title.clone(), ix > 1);
@@ -367,6 +371,18 @@ impl PickerDelegate for AcpModelPickerDelegate {
                         IconName::ChevronRight
                     } else {
                         IconName::ChevronDown
+                    });
+                }
+                if let Some(notice_tooltip) = notice_tooltip.clone() {
+                    let notice_message = notice_tooltip.clone();
+                    header = header.notice(notice_tooltip, move |_, window, cx| {
+                        drop(window.prompt(
+                            gpui::PromptLevel::Info,
+                            &notice_message,
+                            None,
+                            &["OK"],
+                            cx,
+                        ));
                     });
                 }
 
@@ -517,6 +533,7 @@ fn info_list_to_picker_entries(
             model_count: Some(favorite_models.len()),
             is_collapsible: false,
             is_collapsed: false,
+            notice_tooltip: None,
         });
         for model in favorite_models {
             entries.push(AcpModelPickerEntry::Model((*model).clone(), true));
@@ -531,6 +548,7 @@ fn info_list_to_picker_entries(
                     model_count: Some(list.len()),
                     is_collapsible: false,
                     is_collapsed: false,
+                    notice_tooltip: None,
                 });
             }
             for model in list {
@@ -540,13 +558,22 @@ fn info_list_to_picker_entries(
         }
         AgentModelList::Grouped(index_map) => {
             for (group_name, models) in index_map {
-                let group_title = group_name.0;
+                let group_title = if group_name.0.as_ref() == "opencode" {
+                    SharedString::from(FREE_PROVIDER_GROUP_NAME)
+                } else {
+                    group_name.0
+                };
                 let is_collapsed = collapsed_groups.contains(&group_title);
                 entries.push(AcpModelPickerEntry::Separator {
                     title: group_title.clone(),
                     model_count: Some(models.len()),
                     is_collapsible: true,
                     is_collapsed,
+                    notice_tooltip: if group_title.as_ref() == FREE_PROVIDER_GROUP_NAME {
+                        Some(FREE_PROVIDER_NOTICE.into())
+                    } else {
+                        None
+                    },
                 });
                 if !is_collapsed {
                     for model in models {

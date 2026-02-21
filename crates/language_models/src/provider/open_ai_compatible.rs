@@ -111,7 +111,11 @@ impl OpenAiCompatibleLanguageModelProvider {
 
         Self {
             id: id.clone().into(),
-            name: id.into(),
+            name: if id.as_ref() == "opencode" {
+                LanguageModelProviderName::from("Free".to_string())
+            } else {
+                id.into()
+            },
             http_client,
             state,
         }
@@ -209,6 +213,15 @@ pub struct OpenAiCompatibleLanguageModel {
 }
 
 impl OpenAiCompatibleLanguageModel {
+    fn effective_max_output_tokens(&self) -> Option<u64> {
+        let configured_max_output_tokens = self.max_output_tokens();
+        if self.provider_name.0.as_ref() == "Free" {
+            Some(configured_max_output_tokens.unwrap_or(4096).min(4096))
+        } else {
+            configured_max_output_tokens
+        }
+    }
+
     fn stream_completion(
         &self,
         request: open_ai::Request,
@@ -389,12 +402,13 @@ impl LanguageModel for OpenAiCompatibleLanguageModel {
         >,
     > {
         if self.model.capabilities.chat_completions {
+            let max_output_tokens = self.effective_max_output_tokens();
             let request = into_open_ai(
                 request,
                 &self.model.name,
                 self.model.capabilities.parallel_tool_calls,
                 self.model.capabilities.prompt_cache_key,
-                self.max_output_tokens(),
+                max_output_tokens,
                 None,
             );
             let completions = self.stream_completion(request, cx);
@@ -404,12 +418,13 @@ impl LanguageModel for OpenAiCompatibleLanguageModel {
             }
             .boxed()
         } else {
+            let max_output_tokens = self.effective_max_output_tokens();
             let request = into_open_ai_response(
                 request,
                 &self.model.name,
                 self.model.capabilities.parallel_tool_calls,
                 self.model.capabilities.prompt_cache_key,
-                self.max_output_tokens(),
+                max_output_tokens,
                 None,
             );
             let completions = self.stream_response(request, cx);

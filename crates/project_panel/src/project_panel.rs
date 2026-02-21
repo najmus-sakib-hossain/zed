@@ -6369,6 +6369,62 @@ impl Render for ProjectPanel {
                 .child(
                     v_flex()
                         .child(
+                            h_flex()
+                                .w_full()
+                                .justify_end()
+                                .items_center()
+                                .gap_1()
+                                .px_2()
+                                .pt_1()
+                                .pb_1()
+                                .border_b_1()
+                                .border_color(cx.theme().colors().border_variant)
+                                .when(!project.is_read_only(cx), |el| {
+                                    el.child(
+                                        IconButton::new("project-panel-new-file", IconName::FileDoc)
+                                            .icon_size(IconSize::Small)
+                                            .tooltip(Tooltip::text("New File"))
+                                            .on_click(cx.listener(|this, _event, window, cx| {
+                                                this.new_file(&NewFile, window, cx);
+                                            })),
+                                    )
+                                    .child(
+                                        IconButton::new("project-panel-new-folder", IconName::Folder)
+                                            .icon_size(IconSize::Small)
+                                            .tooltip(Tooltip::text("New Folder"))
+                                            .on_click(cx.listener(|this, _event, window, cx| {
+                                                this.new_directory(&NewDirectory, window, cx);
+                                            })),
+                                    )
+                                })
+                                .child(
+                                    IconButton::new("project-panel-reload", IconName::ArrowCircle)
+                                        .icon_size(IconSize::Small)
+                                        .tooltip(Tooltip::text("Reload"))
+                                        .on_click(cx.listener(|this, _event, window, cx| {
+                                            this.update_visible_entries(None, false, false, window, cx);
+                                        })),
+                                )
+                                .child(
+                                    IconButton::new("project-panel-collapse-all", IconName::ListCollapse)
+                                        .icon_size(IconSize::Small)
+                                        .tooltip(Tooltip::text("Collapse Folders"))
+                                        .on_click(cx.listener(|this, _event, window, cx| {
+                                            this.collapse_all_entries(&CollapseAllEntries, window, cx);
+                                        })),
+                                )
+                                .child(
+                                    IconButton::new("project-panel-more", IconName::Ellipsis)
+                                        .icon_size(IconSize::Small)
+                                        .tooltip(Tooltip::text("More"))
+                                        .on_click(cx.listener(|this, event: &gpui::ClickEvent, window, cx| {
+                                            if let Some(entry_id) = this.state.last_worktree_root_id {
+                                                this.deploy_context_menu(event.position(), entry_id, window, cx);
+                                            }
+                                        })),
+                                ),
+                        )
+                        .child(
                             uniform_list("entries", item_count, {
                                 cx.processor(|this, range: Range<usize>, window, cx| {
                                     this.rendered_entries_len = range.end - range.start;

@@ -11,8 +11,8 @@
   // - "dark": Use the theme indicated by the "dark" field
   "theme": {
     "mode": "system",
-    "light": "One Light",
-    "dark": "One Dark",
+    "light": "Dx Light",
+    "dark": "Dx Dark",
   },
   "icon_theme": "Zed (Default)",
   // The name of a base set of key bindings to use.
@@ -945,9 +945,9 @@
     // The default model to use when creating new threads.
     "default_model": {
       // The provider to use.
-      "provider": "zed.dev",
+      "provider": "opencode",
       // The model to use.
-      "model": "claude-sonnet-4",
+      "model": "glm-5-free",
       // Whether thinking is enabled.
       "enable_thinking": false,
     },
@@ -1156,7 +1156,7 @@
   //     "autosave": "on_focus_change",
   // 4. Save when idle for a certain amount of time:
   //     "autosave": { "after_delay": {"milliseconds": 500} },
-  "autosave": "off",
+  "autosave": { "after_delay": { "milliseconds": 500 } },
   // Maximum number of tabs per pane. Unset for unlimited.
   "max_tabs": null,
   // Settings related to the editor's tab bar.
@@ -2208,6 +2208,7 @@
     },
     "openai_compatible": {
       "opencode": {
+        // "api_url": "https://api.opencode.ai/v1", // Not working for chat completions in current integration.
         "api_url": "https://opencode.ai/zen/v1",
         "available_models": [
           {
