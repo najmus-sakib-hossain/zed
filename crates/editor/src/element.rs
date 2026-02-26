@@ -12215,9 +12215,13 @@ fn compute_auto_height_layout(
 
     editor.gutter_dimensions = gutter_dimensions;
     let text_width = width - gutter_dimensions.width;
-    let overscroll = size(em_width, px(0.));
 
-    let editor_width = text_width - gutter_dimensions.margin - overscroll.width - em_width;
+    let editor_width = if editor.offset_content {
+        let overscroll = size(em_width, px(0.));
+        text_width - gutter_dimensions.margin - overscroll.width - em_width
+    } else {
+        text_width - gutter_dimensions.margin
+    };
     let wrap_width = calculate_wrap_width(editor.soft_wrap_mode(cx), editor_width, em_width);
     if wrap_width.is_some() && editor.set_wrap_width(wrap_width, cx) {
         snapshot = editor.snapshot(window, cx);

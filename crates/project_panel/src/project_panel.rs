@@ -21,7 +21,7 @@ use git_ui::file_diff_view::FileDiffView;
 use gpui::{
     Action, AnyElement, App, AsyncWindowContext, Bounds, ClipboardItem, Context, CursorStyle,
     DismissEvent, Div, DragMoveEvent, Entity, EventEmitter, ExternalPaths, FocusHandle, Focusable,
-    FontWeight, Hsla, InteractiveElement, KeyContext, ListHorizontalSizingBehavior,
+    FontWeight, Hsla, InteractiveElement, KeyContext,
     ListSizingBehavior, Modifiers, ModifiersChangedEvent, MouseButton, MouseDownEvent,
     ParentElement, PathPromptOptions, Pixels, Point, PromptLevel, Render, ScrollStrategy, Stateful,
     Styled, Subscription, Task, UniformListScrollHandle, WeakEntity, Window, actions, anchored,
@@ -60,7 +60,7 @@ use theme::ThemeSettings;
 use ui::{
     Color, ContextMenu, ContextMenuEntry, DecoratedIcon, Divider, Icon, IconDecoration,
     IconDecorationKind, IndentGuideColors, IndentGuideLayout, KeyBinding, Label, LabelSize,
-    ListItem, ListItemSpacing, ScrollAxes, ScrollableHandle, Scrollbars, StickyCandidate, Tooltip,
+    ListItem, ListItemSpacing, ScrollableHandle, Scrollbars, StickyCandidate, Tooltip,
     WithScrollbar, prelude::*, v_flex,
 };
 use util::{
@@ -5146,6 +5146,64 @@ impl ProjectPanel {
             (entry_id.to_proto() as usize).into()
         };
 
+        // Compute hover tooltip details for the entry
+        let tooltip_meta = {
+            let project = self.project.read(cx);
+            if let Some(worktree) = project.worktree_for_id(worktree_id, cx) {
+                let worktree = worktree.read(cx);
+                if let Some(entry) = worktree.entry_for_id(entry_id) {
+                    if kind.is_dir() {
+                        // Count children (files and folders) and total size
+                        let mut file_count: usize = 0;
+                        let mut folder_count: usize = 0;
+                        let mut total_size: u64 = 0;
+                        for child in worktree.child_entries(&entry.path) {
+                            if child.kind.is_dir() {
+                                folder_count += 1;
+                            } else {
+                                file_count += 1;
+                                total_size += child.size;
+                            }
+                        }
+                        Some(format!(
+                            "{} files, {} folders · {}",
+                            file_count,
+                            folder_count,
+                            format_file_size(total_size)
+                        ))
+                    } else {
+                        let size = entry.size;
+                        let ext = Path::new(&details.filename)
+                            .extension()
+                            .and_then(|e| e.to_str())
+                            .unwrap_or("");
+                        let is_media = matches!(
+                            ext,
+                            "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" | "ico"
+                                | "mp3" | "wav" | "ogg" | "flac" | "aac" | "mp4" | "avi"
+                                | "mkv" | "mov" | "webm"
+                        );
+                        if is_media {
+                            Some(format!("Media · {}", format_file_size(size)))
+                        } else {
+                            // Estimate lines of code from file size (rough: ~40 bytes per line)
+                            let estimated_lines = if size > 0 { size / 40 } else { 0 };
+                            Some(format!(
+                                "~{} lines · {}",
+                                estimated_lines,
+                                format_file_size(size)
+                            ))
+                        }
+                    }
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        };
+        let tooltip_path: SharedString = path.as_unix_str().to_owned().into();
+
         div()
             .id(id.clone())
             .relative()
@@ -5157,6 +5215,13 @@ impl ProjectPanel {
             .border_r_2()
             .border_color(border_color)
             .hover(|style| style.bg(bg_hover_color).border_color(border_hover_color))
+            .tooltip(move |_window, cx| {
+                if let Some(meta) = &tooltip_meta {
+                    Tooltip::with_meta(tooltip_path.clone(), None, meta.clone(), cx)
+                } else {
+                    Tooltip::with_meta(tooltip_path.clone(), None, "", cx)
+                }
+            })
             .when(is_sticky, |this| this.block_mouse_except_scroll())
             .when(!is_sticky, |this| {
                 this.when(
@@ -5598,8 +5663,7 @@ impl ProjectPanel {
                             }
                             this.deploy_context_menu(event.position, entry_id, window, cx);
                         },
-                    ))
-                    .overflow_x(),
+                    )),
             )
             .when_some(validation_color_and_message, |this, (color, message)| {
                 this.relative().child(deferred(
@@ -6576,10 +6640,6 @@ impl Render for ProjectPanel {
                                 })
                             })
                             .with_sizing_behavior(ListSizingBehavior::Infer)
-                            .with_horizontal_sizing_behavior(
-                                ListHorizontalSizingBehavior::Unconstrained,
-                            )
-                            .with_width_from_item(self.state.max_width_item_index)
                             .track_scroll(&self.scroll_handle),
                         )
                         .child(
@@ -6724,10 +6784,6 @@ impl Render for ProjectPanel {
                 .custom_scrollbars(
                     Scrollbars::for_settings::<ProjectPanelSettings>()
                         .tracked_scroll_handle(&self.scroll_handle)
-                        .with_track_along(
-                            ScrollAxes::Horizontal,
-                            cx.theme().colors().panel_background,
-                        )
                         .notify_content(),
                     window,
                     cx,
@@ -6995,3 +7051,15 @@ pub fn par_sort_worktree_entries_with_mode(
 
 #[cfg(test)]
 mod project_panel_tests;
+
+fn format_file_size(bytes: u64) -> String {
+    if bytes < 1024 {
+        format!("{} B", bytes)
+    } else if bytes < 1024 * 1024 {
+        format!("{:.1} KB", bytes as f64 / 1024.0)
+    } else if bytes < 1024 * 1024 * 1024 {
+        format!("{:.1} MB", bytes as f64 / (1024.0 * 1024.0))
+    } else {
+        format!("{:.1} GB", bytes as f64 / (1024.0 * 1024.0 * 1024.0))
+    }
+}

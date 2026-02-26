@@ -20,7 +20,7 @@ use editor::scroll::Autoscroll;
 use editor::{
     Editor, EditorEvent, EditorMode, MultiBuffer, PathKey, SelectionEffects, SizingBehavior,
 };
-use feature_flags::{AgentSharingFeatureFlag, AgentV2FeatureFlag, FeatureFlagAppExt as _};
+use feature_flags::{AgentV2FeatureFlag, FeatureFlagAppExt as _};
 use file_icons::FileIcons;
 use fs::Fs;
 use futures::FutureExt as _;
@@ -90,6 +90,7 @@ pub struct QueuedMessage {
     pub tracked_buffers: Vec<Entity<Buffer>>,
 }
 
+#[allow(dead_code)]
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 enum ThreadFeedback {
     Positive,
@@ -2595,14 +2596,14 @@ fn loading_contents_spinner(size: IconSize) -> AnyElement {
 
 fn placeholder_text(agent_name: &str, has_commands: bool) -> String {
     if agent_name == "Zed Agent" {
-        format!("Message the {} — @ to include context", agent_name)
+        format!("Message the {} — @ to include context about what you want to build/create/search/research next!", agent_name)
     } else if has_commands {
         format!(
-            "Message {} — @ to include context, / for commands",
+            "Message {} — @ to include context, / for commands about what you want to build/create/search/research next!",
             agent_name
         )
     } else {
-        format!("Message {} — @ to include context", agent_name)
+        format!("Message {} — @ to include context about what you want to build/create/search/research next!", agent_name)
     }
 }
 

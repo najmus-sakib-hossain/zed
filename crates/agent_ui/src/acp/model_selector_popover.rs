@@ -58,11 +58,17 @@ impl Render for AcpModelSelectorPopover {
             .unwrap_or_else(|| SharedString::from("Select a Model"));
 
         let model_icon = model.as_ref().and_then(|model| model.icon.clone());
+        let is_selected = model.is_some();
 
-        let (color, icon) = if self.menu_handle.is_deployed() {
-            (Color::Accent, IconName::ChevronUp)
+        let color = if is_selected {
+            Color::Accent
         } else {
-            (Color::Muted, IconName::ChevronDown)
+            Color::Muted
+        };
+        let icon = if self.menu_handle.is_deployed() {
+            IconName::ChevronUp
+        } else {
+            IconName::ChevronDown
         };
 
         let show_cycle_row = selector.delegate.favorites_count() > 1;
@@ -78,7 +84,11 @@ impl Render for AcpModelSelectorPopover {
         PickerPopoverMenu::new(
             self.selector.clone(),
             ButtonLike::new("active-model")
-                .selected_style(ButtonStyle::Tinted(TintColor::Accent))
+                .style(if is_selected {
+                    ButtonStyle::Tinted(TintColor::Accent)
+                } else {
+                    ButtonStyle::Outlined
+                })
                 .when_some(model_icon, |this, icon| {
                     this.child(
                         match icon {
@@ -95,7 +105,7 @@ impl Render for AcpModelSelectorPopover {
                         .size(LabelSize::Small)
                         .ml_0p5(),
                 )
-                .child(Icon::new(icon).color(Color::Muted).size(IconSize::XSmall)),
+                .child(Icon::new(icon).color(color).size(IconSize::XSmall)),
             tooltip,
             gpui::Corner::BottomRight,
             cx,

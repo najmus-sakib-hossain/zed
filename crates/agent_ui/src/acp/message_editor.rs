@@ -133,7 +133,15 @@ impl MessageEditor {
             editor.set_placeholder_text(placeholder, window, cx);
             editor.set_show_indent_guides(false, cx);
             editor.set_show_completions_on_input(Some(true));
-            editor.set_soft_wrap();
+            editor.set_soft_wrap_mode(language::language_settings::SoftWrap::EditorWidth, cx);
+            editor.set_offset_content(false, cx);
+            editor.set_show_gutter(false, cx);
+            editor.set_show_line_numbers(false, cx);
+            editor.set_show_git_diff_gutter(false, cx);
+            editor.set_show_code_actions(false, cx);
+            editor.set_show_runnables(false, cx);
+            editor.set_show_breakpoints(false, cx);
+            editor.set_show_wrap_guides(false, cx);
             editor.set_use_modal_editing(true);
             editor.set_context_menu_options(ContextMenuOptions {
                 min_entries_visible: 12,
@@ -1324,6 +1332,8 @@ impl Render for MessageEditor {
             .on_action(cx.listener(Self::cancel))
             .on_action(cx.listener(Self::paste_raw))
             .capture_action(cx.listener(Self::paste))
+            .size_full()
+            .w_full()
             .flex_1()
             .child({
                 let settings = ThemeSettings::get_global(cx);

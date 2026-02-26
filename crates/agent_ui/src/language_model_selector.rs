@@ -123,6 +123,7 @@ pub struct LanguageModelPickerDelegate {
     on_toggle_favorite: OnToggleFavorite,
     all_models: Arc<GroupedModels>,
     filtered_entries: Vec<LanguageModelPickerEntry>,
+    collapsed_providers: HashSet<SharedString>,
     selected_index: usize,
     _authenticate_all_providers_task: Task<()>,
     _subscriptions: Vec<Subscription>,
@@ -149,6 +150,7 @@ impl LanguageModelPickerDelegate {
             all_models: Arc::new(models),
             selected_index: Self::get_active_model_index(&entries, get_active_model(cx)),
             filtered_entries: entries,
+            collapsed_providers: HashSet::default(),
             get_active_model: Arc::new(get_active_model),
             on_toggle_favorite: Arc::new(on_toggle_favorite),
             _authenticate_all_providers_task: Self::authenticate_all_providers(cx),
@@ -326,26 +328,47 @@ impl GroupedModels {
         let mut entries = Vec::new();
 
         if !self.favorites.is_empty() {
-            entries.push(LanguageModelPickerEntry::Separator("Favorite".into()));
+            entries.push(LanguageModelPickerEntry::Separator {
+                title: "Favorite".into(),
+                model_count: self.favorites.len(),
+            });
             for info in &self.favorites {
                 entries.push(LanguageModelPickerEntry::Model(info.clone()));
             }
         }
 
+        // Free provider always comes right after favorites, before everything else.
+        let free_provider_id = LanguageModelProviderId::new("free");
+        if let Some(free_models) = self.all.get(&free_provider_id) {
+            if !free_models.is_empty() {
+                entries.push(LanguageModelPickerEntry::Separator {
+                    title: free_models[0].model.provider_name().0,
+                    model_count: free_models.len(),
+                });
+                for info in free_models {
+                    entries.push(LanguageModelPickerEntry::Model(info.clone()));
+                }
+            }
+        }
+
         if !self.recommended.is_empty() {
-            entries.push(LanguageModelPickerEntry::Separator("Recommended".into()));
+            entries.push(LanguageModelPickerEntry::Separator {
+                title: "Recommended".into(),
+                model_count: self.recommended.len(),
+            });
             for info in &self.recommended {
                 entries.push(LanguageModelPickerEntry::Model(info.clone()));
             }
         }
 
-        for models in self.all.values() {
-            if models.is_empty() {
+        for (provider_id, models) in &self.all {
+            if models.is_empty() || *provider_id == free_provider_id {
                 continue;
             }
-            entries.push(LanguageModelPickerEntry::Separator(
-                models[0].model.provider_name().0,
-            ));
+            entries.push(LanguageModelPickerEntry::Separator {
+                title: models[0].model.provider_name().0,
+                model_count: models.len(),
+            });
             for info in models {
                 entries.push(LanguageModelPickerEntry::Model(info.clone()));
             }
@@ -357,7 +380,10 @@ impl GroupedModels {
 
 enum LanguageModelPickerEntry {
     Model(ModelInfo),
-    Separator(SharedString),
+    Separator {
+        title: SharedString,
+        model_count: usize,
+    },
 }
 
 struct ModelMatcher {
@@ -462,8 +488,11 @@ impl PickerDelegate for LanguageModelPickerDelegate {
         _cx: &mut Context<Picker<Self>>,
     ) -> bool {
         match self.filtered_entries.get(ix) {
-            Some(LanguageModelPickerEntry::Model(_)) => true,
-            Some(LanguageModelPickerEntry::Separator(_)) | None => false,
+            Some(LanguageModelPickerEntry::Model(model_info)) => {
+                let provider_name = model_info.model.provider_name().0;
+                !self.collapsed_providers.contains(&provider_name)
+            }
+            Some(LanguageModelPickerEntry::Separator { .. }) | None => false,
         }
     }
 
@@ -560,10 +589,35 @@ impl PickerDelegate for LanguageModelPickerDelegate {
         cx: &mut Context<Picker<Self>>,
     ) -> Option<Self::ListItem> {
         match self.filtered_entries.get(ix)? {
-            LanguageModelPickerEntry::Separator(title) => {
-                Some(ModelSelectorHeader::new(title, ix > 1).into_any_element())
+            LanguageModelPickerEntry::Separator { title, model_count } => {
+                let title_clone = title.clone();
+                let is_collapsed = self.collapsed_providers.contains(title);
+                Some(
+                    ModelSelectorHeader::new(title, ix > 1)
+                        .model_count(*model_count)
+                        .is_collapsed(is_collapsed)
+                        .on_toggle_collapse(cx.listener(move |picker, _, _window, cx| {
+                            if picker.delegate.collapsed_providers.contains(&title_clone) {
+                                picker.delegate.collapsed_providers.remove(&title_clone);
+                            } else {
+                                picker
+                                    .delegate
+                                    .collapsed_providers
+                                    .insert(title_clone.clone());
+                            }
+                            cx.notify();
+                        }))
+                        .into_any_element(),
+                )
             }
             LanguageModelPickerEntry::Model(model_info) => {
+                // Check if this model's provider section is collapsed
+                let provider_name = model_info.model.provider_name().0;
+                if self.collapsed_providers.contains(&provider_name) {
+                    // Return a zero-height hidden element for collapsed models
+                    return Some(div().h(px(0.)).overflow_hidden().into_any_element());
+                }
+
                 let active_model = (self.get_active_model)(cx);
                 let active_provider_id = active_model.as_ref().map(|m| m.provider.id());
                 let active_model_id = active_model.map(|m| m.model.id());

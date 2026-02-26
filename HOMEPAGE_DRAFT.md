@@ -4,5 +4,4 @@ In our dx desktop app we will show chat-input in the center bottom and in the ce
 3. emails: managing emails of different mails at once is a headacqe so we will solve it
 And other 7 idea is needed from you!!!
 
-
-# 
+I liked your suggestions very much - now you have the me the suggestions for text generation of dx now we have other 6 types of generation left and all 7 of these generation has 10 view in the homepage now please give me game changing 10 suggestions to show in the homepage image generation!!!

@@ -136,6 +136,12 @@ Other entities can then register a callback to handle these events by doing `cx.
 ## Build guidelines
 
 - Use `./script/clippy` instead of `cargo clippy`
+- **NEVER run `cargo build -p <crate>`, `cargo check -p <crate>`, or `cargo test -p <crate>`** — each creates a separate artifact tree wasting gigabytes of disk space.
+- The **ONLY** allowed build/verify command is:
+  ```bash
+  CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=1 CARGO_PROFILE_DEV_CODEGEN_UNITS=1 CARGO_PROFILE_DEV_BUILD_OVERRIDE_CODEGEN_UNITS=1 cargo run -p zed --locked
+  ```
+- This compiles all changed crates incrementally in one shared artifact tree and runs the app.
 
 # Pull request hygiene
 

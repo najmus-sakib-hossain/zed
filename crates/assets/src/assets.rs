@@ -63,3 +63,28 @@ impl Assets {
             .unwrap()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Assets;
+
+    const MOOD_ICON_PATHS: &[&str] = &[
+        "icons/mood_live.svg",
+        "icons/mood_text.svg",
+        "icons/mood_image.svg",
+        "icons/mood_video.svg",
+        "icons/mood_audio.svg",
+        "icons/mood3d.svg",
+        "icons/mood_document.svg",
+    ];
+
+    #[test]
+    fn embeds_mood_icons() {
+        for path in MOOD_ICON_PATHS {
+            assert!(
+                Assets::get(path).is_some(),
+                "expected embedded asset to exist: {path}"
+            );
+        }
+    }
+}

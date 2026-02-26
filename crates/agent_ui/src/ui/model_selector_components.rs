@@ -1,4 +1,4 @@
-use gpui::{Action, ClickEvent, FocusHandle, prelude::*};
+use gpui::{Action, ClickEvent, ElementId, FocusHandle, prelude::*};
 use ui::{Chip, ElevationIndex, KeyBinding, ListItem, ListItemSpacing, Tooltip, prelude::*};
 use zed_actions::agent::ToggleModelSelector;
 
@@ -13,6 +13,9 @@ enum ModelIcon {
 pub struct ModelSelectorHeader {
     title: SharedString,
     has_border: bool,
+    model_count: Option<usize>,
+    is_collapsed: bool,
+    on_toggle_collapse: Option<Box<dyn Fn(&ClickEvent, &mut Window, &mut App) + 'static>>,
 }
 
 impl ModelSelectorHeader {
@@ -20,12 +23,39 @@ impl ModelSelectorHeader {
         Self {
             title: title.into(),
             has_border,
+            model_count: None,
+            is_collapsed: false,
+            on_toggle_collapse: None,
         }
+    }
+
+    pub fn model_count(mut self, count: usize) -> Self {
+        self.model_count = Some(count);
+        self
+    }
+
+    pub fn is_collapsed(mut self, collapsed: bool) -> Self {
+        self.is_collapsed = collapsed;
+        self
+    }
+
+    pub fn on_toggle_collapse(
+        mut self,
+        handler: impl Fn(&ClickEvent, &mut Window, &mut App) + 'static,
+    ) -> Self {
+        self.on_toggle_collapse = Some(Box::new(handler));
+        self
     }
 }
 
 impl RenderOnce for ModelSelectorHeader {
     fn render(self, _window: &mut Window, cx: &mut App) -> impl IntoElement {
+        let chevron_icon = if self.is_collapsed {
+            IconName::ChevronRight
+        } else {
+            IconName::ChevronDown
+        };
+
         div()
             .px_2()
             .pb_1()
@@ -36,9 +66,58 @@ impl RenderOnce for ModelSelectorHeader {
                     .border_color(cx.theme().colors().border_variant)
             })
             .child(
-                Label::new(self.title)
-                    .size(LabelSize::XSmall)
-                    .color(Color::Muted),
+                h_flex()
+                    .id(ElementId::Name(self.title.clone()))
+                    .w_full()
+                    .items_center()
+                    .justify_between()
+                    .cursor_pointer()
+                    .group("provider-header")
+                    .hover(|style| style.bg(cx.theme().colors().ghost_element_hover))
+                    .rounded_sm()
+                    .px_0p5()
+                    .py_px()
+                    .on_click({
+                        let handler = self.on_toggle_collapse;
+                        move |event, window, cx| {
+                            // Stop propagation so the Picker's wrapping on_click
+                            // doesn't fire and close/confirm the popover.
+                            cx.stop_propagation();
+                            window.prevent_default();
+                            if let Some(handler) = &handler {
+                                handler(event, window, cx);
+                            }
+                        }
+                    })
+                    .child(
+                        Label::new(self.title)
+                            .size(LabelSize::Small)
+                            .weight(gpui::FontWeight::SEMIBOLD)
+                            .color(Color::Default),
+                    )
+                    .child(
+                        h_flex()
+                            .items_center()
+                            .gap_1()
+                            .when_some(self.model_count, |this, count| {
+                                this.child(
+                                    div()
+                                        .px_1()
+                                        .rounded_sm()
+                                        .bg(cx.theme().colors().ghost_element_hover)
+                                        .child(
+                                            Label::new(format!("{}", count))
+                                                .size(LabelSize::XSmall)
+                                                .color(Color::Muted),
+                                        ),
+                                )
+                            })
+                            .child(
+                                Icon::new(chevron_icon)
+                                    .size(IconSize::XSmall)
+                                    .color(Color::Muted),
+                            ),
+                    ),
             )
     }
 }

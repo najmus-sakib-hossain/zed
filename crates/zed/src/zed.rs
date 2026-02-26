@@ -3,6 +3,7 @@ pub mod edit_prediction_registry;
 #[cfg(target_os = "macos")]
 pub(crate) mod mac_only_instance;
 mod migrate;
+mod mood_selector;
 mod open_listener;
 mod open_url_modal;
 mod quick_action_bar;
@@ -470,11 +471,13 @@ pub fn initialize_workspace(
             cx.new(|_| go_to_line::cursor_position::CursorPosition::new(workspace));
         let line_ending_indicator =
             cx.new(|_| line_ending_selector::LineEndingIndicator::default());
+        let mood_selector = cx.new(|_| mood_selector::MoodSelector::new());
         workspace.status_bar().update(cx, |status_bar, cx| {
             status_bar.add_left_item(search_button, window, cx);
             status_bar.add_left_item(lsp_button, window, cx);
             status_bar.add_left_item(diagnostic_summary, window, cx);
             status_bar.add_left_item(activity_indicator, window, cx);
+            status_bar.add_center_item(mood_selector, window, cx);
             status_bar.add_right_item(edit_prediction_ui, window, cx);
             status_bar.add_right_item(active_buffer_encoding, window, cx);
             status_bar.add_right_item(active_buffer_language, window, cx);

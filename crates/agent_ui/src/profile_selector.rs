@@ -15,8 +15,8 @@ use std::{
     sync::{Arc, atomic::AtomicBool},
 };
 use ui::{
-    DocumentationAside, DocumentationSide, HighlightedLabel, KeyBinding, LabelSize, ListItem,
-    ListItemSpacing, PopoverMenuHandle, TintColor, Tooltip, prelude::*,
+    ButtonLike, DocumentationAside, DocumentationSide, HighlightedLabel, KeyBinding, LabelSize,
+    ListItem, ListItemSpacing, PopoverMenuHandle, TintColor, Tooltip, prelude::*,
 };
 
 /// Trait for types that can provide and manage agent profiles
@@ -160,13 +160,8 @@ impl Render for ProfileSelector {
 
         let picker = self.ensure_picker(window, cx);
 
-        let settings = AgentSettings::get_global(cx);
         let profile_id = self.provider.profile_id(cx);
-        let profile = settings.profiles.get(&profile_id);
-
-        let selected_profile = profile
-            .map(|profile| profile.name.clone())
-            .unwrap_or_else(|| "Unknown".into());
+        let selected_icon = profile_icon_for_id(&profile_id);
 
         let icon = if self.picker_handle.is_deployed() {
             IconName::ChevronUp
@@ -174,14 +169,10 @@ impl Render for ProfileSelector {
             IconName::ChevronDown
         };
 
-        let trigger_button = Button::new("profile-selector", selected_profile)
-            .label_size(LabelSize::Small)
-            .color(Color::Muted)
-            .icon(icon)
-            .icon_size(IconSize::XSmall)
-            .icon_position(IconPosition::End)
-            .icon_color(Color::Muted)
-            .selected_style(ButtonStyle::Tinted(TintColor::Accent));
+        let trigger_button = ButtonLike::new("profile-selector")
+            .style(ButtonStyle::Tinted(TintColor::Accent))
+            .child(Icon::new(selected_icon).size(IconSize::XSmall).color(Color::Accent))
+            .child(Icon::new(icon).size(IconSize::XSmall).color(Color::Accent));
 
         PickerPopoverMenu::new(
             picker,
@@ -582,6 +573,7 @@ impl PickerDelegate for ProfilePickerDelegate {
                 let active_id = self.provider.profile_id(cx);
                 let is_active = active_id == candidate.id;
                 let has_documentation = Self::documentation(candidate).is_some();
+                let candidate_icon = profile_icon_for_id(&candidate.id);
 
                 Some(
                     div()
@@ -601,6 +593,11 @@ impl PickerDelegate for ProfilePickerDelegate {
                                 .inset(true)
                                 .spacing(ListItemSpacing::Sparse)
                                 .toggle_state(selected)
+                                .start_slot(
+                                    Icon::new(candidate_icon)
+                                        .size(IconSize::Small)
+                                        .color(Color::Muted),
+                                )
                                 .child(HighlightedLabel::new(
                                     candidate.name.clone(),
                                     entry.positions.clone(),
@@ -684,6 +681,15 @@ impl PickerDelegate for ProfilePickerDelegate {
                 )
                 .into_any(),
         )
+    }
+}
+
+fn profile_icon_for_id(profile_id: &AgentProfileId) -> IconName {
+    match profile_id.as_str() {
+        builtin_profiles::WRITE => IconName::Pencil,
+        builtin_profiles::ASK => IconName::Chat,
+        builtin_profiles::MINIMAL => IconName::UserRoundPen,
+        _ => IconName::UserRoundPen,
     }
 }
 

@@ -8,11 +8,13 @@ use super::*;
 
 #[derive(Default)]
 struct ThreadFeedbackState {
+    #[allow(dead_code)]
     feedback: Option<ThreadFeedback>,
     comments_editor: Option<Entity<Editor>>,
 }
 
 impl ThreadFeedbackState {
+    #[allow(dead_code)]
     pub fn submit(
         &mut self,
         thread: Entity<AcpThread>,
@@ -119,6 +121,7 @@ impl ThreadFeedbackState {
         self.comments_editor.take();
     }
 
+    #[allow(dead_code)]
     fn build_feedback_comments_editor(window: &mut Window, cx: &mut App) -> Entity<Editor> {
         let buffer = cx.new(|cx| {
             let empty_string = String::new();
@@ -148,6 +151,72 @@ impl ThreadFeedbackState {
         editor
     }
 }
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ChatTarget {
+    Local,
+    Background,
+    Cloud,
+}
+
+impl ChatTarget {
+    fn all() -> [Self; 3] {
+        [Self::Local, Self::Background, Self::Cloud]
+    }
+
+    fn label(self) -> &'static str {
+        match self {
+            Self::Local => "Local",
+            Self::Background => "Background",
+            Self::Cloud => "Cloud",
+        }
+    }
+
+    fn icon(self) -> IconName {
+        match self {
+            Self::Local => IconName::Server,
+            Self::Background => IconName::TerminalGhost,
+            Self::Cloud => IconName::Public,
+        }
+    }
+}
+
+/// A mood/content-type icon shown in chat input controls.
+struct ChatInputMoodIcon {
+    icon: IconName,
+    label: &'static str,
+}
+
+const CHAT_INPUT_MOOD_ICONS: &[ChatInputMoodIcon] = &[
+    ChatInputMoodIcon {
+        icon: IconName::MoodText,
+        label: "Text",
+    },
+    ChatInputMoodIcon {
+        icon: IconName::MoodImage,
+        label: "Image",
+    },
+    ChatInputMoodIcon {
+        icon: IconName::MoodVideo,
+        label: "Video",
+    },
+    ChatInputMoodIcon {
+        icon: IconName::MoodLive,
+        label: "Live",
+    },
+    ChatInputMoodIcon {
+        icon: IconName::MoodAudio,
+        label: "Audio",
+    },
+    ChatInputMoodIcon {
+        icon: IconName::Mood3d,
+        label: "3D/AR/VR",
+    },
+    ChatInputMoodIcon {
+        icon: IconName::MoodDocument,
+        label: "PDF, DOCS",
+    },
+];
 
 #[derive(Default, Clone, Copy)]
 struct DiffStats {
@@ -249,12 +318,15 @@ pub struct AcpThreadView {
     pub message_editor: Entity<MessageEditor>,
     pub add_context_menu_handle: PopoverMenuHandle<ContextMenu>,
     pub thinking_effort_menu_handle: PopoverMenuHandle<ContextMenu>,
+    message_share_menu_handle: PopoverMenuHandle<ContextMenu>,
     pub project: WeakEntity<Project>,
     pub recent_history_entries: Vec<AgentSessionInfo>,
     pub hovered_recent_history_item: Option<usize>,
     pub show_codex_windows_warning: bool,
     pub history: Entity<AcpThreadHistory>,
     pub _history_subscription: Subscription,
+    target_selector_menu_handle: PopoverMenuHandle<ContextMenu>,
+    selected_chat_target: ChatTarget,
 }
 impl Focusable for AcpThreadView {
     fn focus_handle(&self, cx: &App) -> FocusHandle {
@@ -439,12 +511,15 @@ impl AcpThreadView {
             message_editor,
             add_context_menu_handle: PopoverMenuHandle::default(),
             thinking_effort_menu_handle: PopoverMenuHandle::default(),
+            message_share_menu_handle: PopoverMenuHandle::default(),
             project,
             recent_history_entries,
             hovered_recent_history_item: None,
             history,
             _history_subscription: history_subscription,
             show_codex_windows_warning,
+            target_selector_menu_handle: PopoverMenuHandle::default(),
+            selected_chat_target: ChatTarget::Local,
         };
         if should_auto_submit {
             this.send(window, cx);
@@ -1448,6 +1523,7 @@ impl AcpThreadView {
 
     // thread stuff
 
+    #[allow(dead_code)]
     fn share_thread(&mut self, _window: &mut Window, cx: &mut Context<Self>) {
         let Some((thread, project)) = self.as_native_thread(cx).zip(self.project.upgrade()) else {
             return;
@@ -1592,6 +1668,7 @@ impl AcpThreadView {
         cx.notify();
     }
 
+    #[allow(dead_code)]
     fn is_following(&self, cx: &App) -> bool {
         match self.thread.read(cx).status() {
             ThreadStatus::Generating => self
@@ -1604,6 +1681,7 @@ impl AcpThreadView {
         }
     }
 
+    #[allow(dead_code)]
     fn toggle_following(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         let following = self.is_following(cx);
 
@@ -2411,18 +2489,17 @@ impl AcpThreadView {
             return div().into_any_element();
         }
 
-        let focus_handle = self.message_editor.focus_handle(cx);
         let editor_bg_color = cx.theme().colors().editor_background;
         let editor_expanded = self.editor_expanded;
-        let (expand_icon, expand_tooltip) = if editor_expanded {
-            (IconName::Minimize, "Minimize Message Editor")
-        } else {
-            (IconName::Maximize, "Expand Message Editor")
-        };
 
         v_flex()
             .on_action(cx.listener(Self::expand_message_editor))
+            .w_full()
             .p_2()
+            // .pt_2()
+            // .pl_2()
+            // .pb_2()
+            // .pr_0()
             .gap_2()
             .border_t_1()
             .border_color(cx.theme().colors().border)
@@ -2433,39 +2510,35 @@ impl AcpThreadView {
             .child(
                 v_flex()
                     .relative()
+                    .w_full()
                     .size_full()
-                    .pt_1()
-                    .pr_2p5()
-                    .child(self.message_editor.clone())
+                    .pt_6()
+                    .child(
+                        div()
+                            .w_full()
+                            .flex_grow()
+                            .child(self.message_editor.clone()),
+                    )
+                    .child(
+                        h_flex()
+                            .absolute()
+                            .top_0()
+                            .left_0()
+                            .opacity(0.5)
+                            .hover(|this| this.opacity(1.0))
+                            .child(self.render_add_context_button(cx)),
+                    )
                     .child(
                         h_flex()
                             .absolute()
                             .top_0()
                             .right_0()
                             .opacity(0.5)
+                            .gap_0p5()
                             .hover(|this| this.opacity(1.0))
-                            .child(
-                                IconButton::new("toggle-height", expand_icon)
-                                    .icon_size(IconSize::Small)
-                                    .icon_color(Color::Muted)
-                                    .tooltip({
-                                        move |_window, cx| {
-                                            Tooltip::for_action_in(
-                                                expand_tooltip,
-                                                &ExpandMessageEditor,
-                                                &focus_handle,
-                                                cx,
-                                            )
-                                        }
-                                    })
-                                    .on_click(cx.listener(|this, _, window, cx| {
-                                        this.expand_message_editor(
-                                            &ExpandMessageEditor,
-                                            window,
-                                            cx,
-                                        );
-                                    })),
-                            ),
+                            .child(self.render_enhance_prompt_button())
+                            .child(self.render_message_share_popover(cx))
+                            .children(self.render_token_usage(cx)),
                     ),
             )
             .child(
@@ -2475,29 +2548,220 @@ impl AcpThreadView {
                     .justify_between()
                     .child(
                         h_flex()
-                            .gap_0p5()
-                            .child(self.render_add_context_button(cx))
-                            .child(self.render_follow_toggle(cx))
-                            .children(self.render_thinking_control(cx)),
-                    )
-                    .child(
-                        h_flex()
                             .gap_1()
-                            .children(self.render_token_usage(cx))
+                            .child(self.render_target_selector(cx))
                             .children(self.profile_selector.clone())
                             .map(|this| {
-                                // Either config_options_view OR (mode_selector + model_selector)
                                 match self.config_options_view.clone() {
                                     Some(config_view) => this.child(config_view),
                                     None => this
                                         .children(self.mode_selector.clone())
                                         .children(self.model_selector.clone()),
                                 }
-                            })
+                            }),
+                    )
+                    .child(
+                        h_flex()
+                            .gap_1()
+                            .child(self.render_chat_input_mood_selector(cx))
+                            // .child(self.render_follow_toggle(cx))
                             .child(self.render_send_button(cx)),
                     ),
             )
             .into_any()
+    }
+
+    fn render_enhance_prompt_button(&self) -> impl IntoElement {
+        IconButton::new("enhance-prompt", IconName::Sparkle)
+            .icon_size(IconSize::Small)
+            .icon_color(Color::Muted)
+            .tooltip(Tooltip::text("Enhance Prompt"))
+    }
+
+    fn render_message_share_popover(&self, _cx: &Context<Self>) -> impl IntoElement {
+        let menu_handle = self.message_share_menu_handle.clone();
+        let workspace = self.workspace.clone();
+
+        PopoverMenu::new("message-share-popover")
+            .trigger_with_tooltip(
+                ButtonLike::new_rounded_all("message-share-trigger")
+                    .style(ButtonStyle::OutlinedGhost)
+                    .size(ButtonSize::Compact)
+                    .child(Icon::new(IconName::Chat).size(IconSize::Small).color(Color::Muted))
+                    .child(
+                        Icon::new(if menu_handle.is_deployed() {
+                            IconName::ChevronUp
+                        } else {
+                            IconName::ChevronDown
+                        })
+                        .size(IconSize::XSmall)
+                        .color(Color::Muted),
+                    ),
+                Tooltip::text("Share"),
+            )
+            .with_handle(menu_handle)
+            .anchor(Corner::BottomRight)
+            .offset(gpui::Point {
+                x: px(0.0),
+                y: px(-2.0),
+            })
+            .menu(move |window, cx| {
+                Some(ContextMenu::build(window, cx, |menu, _window, _cx| {
+                    menu.header("Share")
+                        .item(
+                            ContextMenuEntry::new("Facebook")
+                                .icon(IconName::Link)
+                                .icon_color(Color::Muted)
+                                .icon_size(IconSize::XSmall)
+                                .handler({
+                                    let workspace = workspace.clone();
+                                    move |window, cx| {
+                                        open_link(
+                                            "https://www.facebook.com/sharer/sharer.php".into(),
+                                            &workspace,
+                                            window,
+                                            cx,
+                                        );
+                                    }
+                                }),
+                        )
+                        .item(
+                            ContextMenuEntry::new("WhatsApp")
+                                .icon(IconName::Link)
+                                .icon_color(Color::Muted)
+                                .icon_size(IconSize::XSmall)
+                                .handler({
+                                    let workspace = workspace.clone();
+                                    move |window, cx| {
+                                        open_link(
+                                            "https://wa.me".into(),
+                                            &workspace,
+                                            window,
+                                            cx,
+                                        );
+                                    }
+                                }),
+                        )
+                        .item(
+                            ContextMenuEntry::new("Twitter / X")
+                                .icon(IconName::Link)
+                                .icon_color(Color::Muted)
+                                .icon_size(IconSize::XSmall)
+                                .handler({
+                                    let workspace = workspace.clone();
+                                    move |window, cx| {
+                                        open_link(
+                                            "https://x.com/intent/post".into(),
+                                            &workspace,
+                                            window,
+                                            cx,
+                                        );
+                                    }
+                                }),
+                        )
+                        .item(
+                            ContextMenuEntry::new("Telegram")
+                                .icon(IconName::Link)
+                                .icon_color(Color::Muted)
+                                .icon_size(IconSize::XSmall)
+                                .handler({
+                                    let workspace = workspace.clone();
+                                    move |window, cx| {
+                                        open_link(
+                                            "https://t.me/share/url".into(),
+                                            &workspace,
+                                            window,
+                                            cx,
+                                        );
+                                    }
+                                }),
+                        )
+                        .item(
+                            ContextMenuEntry::new("Discord")
+                                .icon(IconName::Link)
+                                .icon_color(Color::Muted)
+                                .icon_size(IconSize::XSmall)
+                                .handler({
+                                    let workspace = workspace.clone();
+                                    move |window, cx| {
+                                        open_link(
+                                            "https://discord.com/channels/@me".into(),
+                                            &workspace,
+                                            window,
+                                            cx,
+                                        );
+                                    }
+                                }),
+                        )
+                }))
+            })
+    }
+
+    fn render_chat_input_mood_selector(&self, cx: &Context<Self>) -> impl IntoElement {
+        let visible_moods = &CHAT_INPUT_MOOD_ICONS[..4];
+        let overflow_moods = &CHAT_INPUT_MOOD_ICONS[4..];
+
+        h_flex()
+            .id("chat-input-mood-selector")
+            .gap_px()
+            .px_0p5()
+            .rounded_sm()
+            .border_1()
+            .border_color(cx.theme().colors().border)
+            .bg(cx.theme().colors().editor_background)
+            .items_center()
+            .children(visible_moods.iter().map(|mood| {
+                let is_text = mood.label == "Text";
+                div()
+                    .id(SharedString::from(format!("chat-input-mood-{}", mood.label)))
+                    .px_px()
+                    .py_px()
+                    .rounded_sm()
+                    .when(is_text, |this| {
+                        this.border_1()
+                            .border_color(cx.theme().colors().border_variant)
+                            .bg(cx.theme().colors().ghost_element_hover)
+                    })
+                    .cursor_pointer()
+                    .hover(|style| style.bg(cx.theme().colors().ghost_element_hover))
+                    .tooltip(Tooltip::text(mood.label))
+                    .child(
+                        Icon::new(mood.icon)
+                            .size(IconSize::XSmall)
+                            .color(if is_text { Color::Accent } else { Color::Muted }),
+                    )
+            }))
+            .child(
+                PopoverMenu::new("chat-input-mood-more-overflow")
+                    .trigger_with_tooltip(
+                        IconButton::new("chat-input-mood-more", IconName::Ellipsis)
+                            .icon_size(IconSize::XSmall)
+                            .icon_color(Color::Muted),
+                        Tooltip::text("More Modes"),
+                    )
+                    .anchor(Corner::TopRight)
+                    .offset(gpui::Point {
+                        x: px(0.0),
+                        y: px(2.0),
+                    })
+                    .menu(move |window, cx| {
+                        Some(ContextMenu::build(window, cx, |mut menu, _window, _cx| {
+                            menu = menu.header("More Modes");
+
+                            for mood in overflow_moods {
+                                menu = menu.item(
+                                    ContextMenuEntry::new(mood.label)
+                                        .icon(mood.icon)
+                                        .icon_color(Color::Muted)
+                                        .icon_size(IconSize::XSmall)
+                                        .handler(|_, _| {}),
+                                );
+                            }
+
+                            menu
+                        }))
+                    }),
+            )
     }
 
     fn render_message_queue_entries(
@@ -2902,6 +3166,7 @@ impl AcpThreadView {
         }
     }
 
+    #[allow(dead_code)]
     fn render_thinking_control(&self, cx: &mut Context<Self>) -> Option<AnyElement> {
         let thread = self.as_native_thread(cx)?.read(cx);
         let model = thread.model()?;
@@ -2975,6 +3240,7 @@ impl AcpThreadView {
         )
     }
 
+    #[allow(dead_code)]
     fn render_effort_selector(
         &self,
         supported_effort_levels: Vec<LanguageModelEffortLevel>,
@@ -3188,8 +3454,9 @@ impl AcpThreadView {
 
         PopoverMenu::new("add-context-menu")
             .trigger_with_tooltip(
-                IconButton::new("add-context", IconName::Plus)
+                IconButton::new("add-context", IconName::Attach)
                     .icon_size(IconSize::Small)
+                    .style(ButtonStyle::Tinted(TintColor::Accent))
                     .icon_color(Color::Muted),
                 {
                     move |_window, cx| {
@@ -3212,6 +3479,65 @@ impl AcpThreadView {
                 weak_self
                     .update(cx, |this, cx| this.build_add_context_menu(window, cx))
                     .ok()
+            })
+    }
+
+    fn render_target_selector(&self, cx: &Context<Self>) -> impl IntoElement {
+        let selected = self.selected_chat_target;
+        let menu_handle = self.target_selector_menu_handle.clone();
+        let weak_self = cx.weak_entity();
+
+        PopoverMenu::new("target-selector")
+            .trigger_with_tooltip(
+                ButtonLike::new("target-selector-trigger")
+                    .style(ButtonStyle::Tinted(TintColor::Accent))
+                    // .child(Icon::new(IconName::Sliders).size(IconSize::XSmall).color(Color::Accent))
+                    .child(Icon::new(selected.icon()).size(IconSize::XSmall).color(Color::Accent))
+                    .child(
+                        Icon::new(if menu_handle.is_deployed() {
+                            IconName::ChevronUp
+                        } else {
+                            IconName::ChevronDown
+                        })
+                        .size(IconSize::XSmall)
+                        .color(Color::Accent),
+                    ),
+                Tooltip::text(format!("Target: {}", selected.label())),
+            )
+            .with_handle(menu_handle)
+            .anchor(Corner::TopLeft)
+            .offset(gpui::Point {
+                x: px(0.0),
+                y: px(2.0),
+            })
+            .menu(move |window, cx| {
+                Some(ContextMenu::build(window, cx, |mut menu, _window, _cx| {
+                    menu = menu.header("Target Selector");
+
+                    for target in ChatTarget::all() {
+                        let is_selected = target == selected;
+                        menu.push_item(
+                            ContextMenuEntry::new(target.label())
+                                .icon(target.icon())
+                                .icon_color(Color::Muted)
+                                .icon_size(IconSize::XSmall)
+                                .toggleable(IconPosition::End, is_selected)
+                                .handler({
+                                    let weak_self = weak_self.clone();
+                                    move |_window, cx| {
+                                        weak_self
+                                            .update(cx, |this, cx| {
+                                                this.selected_chat_target = target;
+                                                cx.notify();
+                                            })
+                                            .ok();
+                                    }
+                                }),
+                        );
+                    }
+
+                    menu
+                }))
             })
     }
 
@@ -3341,6 +3667,7 @@ impl AcpThreadView {
         })
     }
 
+    #[allow(dead_code)]
     fn render_follow_toggle(&self, cx: &mut Context<Self>) -> impl IntoElement {
         let following = self.is_following(cx);
 
@@ -3826,37 +4153,6 @@ impl AcpThreadView {
             return self.render_generating(false, cx).into_any_element();
         }
 
-        let open_as_markdown = IconButton::new("open-as-markdown", IconName::FileMarkdown)
-            .shape(ui::IconButtonShape::Square)
-            .icon_size(IconSize::Small)
-            .icon_color(Color::Ignored)
-            .tooltip(Tooltip::text("Open Thread as Markdown"))
-            .on_click(cx.listener(move |this, _, window, cx| {
-                if let Some(workspace) = this.workspace.upgrade() {
-                    this.open_thread_as_markdown(workspace, window, cx)
-                        .detach_and_log_err(cx);
-                }
-            }));
-
-        let scroll_to_recent_user_prompt =
-            IconButton::new("scroll_to_recent_user_prompt", IconName::ForwardArrow)
-                .shape(ui::IconButtonShape::Square)
-                .icon_size(IconSize::Small)
-                .icon_color(Color::Ignored)
-                .tooltip(Tooltip::text("Scroll To Most Recent User Prompt"))
-                .on_click(cx.listener(move |this, _, _, cx| {
-                    this.scroll_to_most_recent_user_prompt(cx);
-                }));
-
-        let scroll_to_top = IconButton::new("scroll_to_top", IconName::ArrowUp)
-            .shape(ui::IconButtonShape::Square)
-            .icon_size(IconSize::Small)
-            .icon_color(Color::Ignored)
-            .tooltip(Tooltip::text("Scroll To Top"))
-            .on_click(cx.listener(move |this, _, _, cx| {
-                this.scroll_to_top(cx);
-            }));
-
         let show_stats = AgentSettings::get_global(cx).show_turn_stats;
         let last_turn_clock = show_stats
             .then(|| {
@@ -3888,7 +4184,7 @@ impl AcpThreadView {
             })
             .flatten();
 
-        let mut container = h_flex()
+        let container = h_flex()
             .w_full()
             .py_2()
             .px_5()
@@ -3909,102 +4205,10 @@ impl AcpThreadView {
                 },
             );
 
-        if AgentSettings::get_global(cx).enable_feedback
-            && self.thread.read(cx).connection().telemetry().is_some()
-        {
-            let feedback = self.thread_feedback.feedback;
-
-            let tooltip_meta = || {
-                SharedString::new(
-                    "Rating the thread sends all of your current conversation to the Zed team.",
-                )
-            };
-
-            container = container
-                    .child(
-                        IconButton::new("feedback-thumbs-up", IconName::ThumbsUp)
-                            .shape(ui::IconButtonShape::Square)
-                            .icon_size(IconSize::Small)
-                            .icon_color(match feedback {
-                                Some(ThreadFeedback::Positive) => Color::Accent,
-                                _ => Color::Ignored,
-                            })
-                            .tooltip(move |window, cx| match feedback {
-                                Some(ThreadFeedback::Positive) => {
-                                    Tooltip::text("Thanks for your feedback!")(window, cx)
-                                }
-                                _ => {
-                                    Tooltip::with_meta("Helpful Response", None, tooltip_meta(), cx)
-                                }
-                            })
-                            .on_click(cx.listener(move |this, _, window, cx| {
-                                this.handle_feedback_click(ThreadFeedback::Positive, window, cx);
-                            })),
-                    )
-                    .child(
-                        IconButton::new("feedback-thumbs-down", IconName::ThumbsDown)
-                            .shape(ui::IconButtonShape::Square)
-                            .icon_size(IconSize::Small)
-                            .icon_color(match feedback {
-                                Some(ThreadFeedback::Negative) => Color::Accent,
-                                _ => Color::Ignored,
-                            })
-                            .tooltip(move |window, cx| match feedback {
-                                Some(ThreadFeedback::Negative) => {
-                                    Tooltip::text(
-                                    "We appreciate your feedback and will use it to improve in the future.",
-                                )(window, cx)
-                                }
-                                _ => {
-                                    Tooltip::with_meta(
-                                        "Not Helpful Response",
-                                        None,
-                                        tooltip_meta(),
-                                        cx,
-                                    )
-                                }
-                            })
-                            .on_click(cx.listener(move |this, _, window, cx| {
-                                this.handle_feedback_click(ThreadFeedback::Negative, window, cx);
-                            })),
-                    );
-        }
-
-        if let Some(project) = self.project.upgrade()
-            && let Some(server_view) = self.server_view.upgrade()
-            && cx.has_flag::<AgentSharingFeatureFlag>()
-            && project.read(cx).client().status().borrow().is_connected()
-        {
-            let button = if self.is_imported_thread(cx) {
-                IconButton::new("sync-thread", IconName::ArrowCircle)
-                    .shape(ui::IconButtonShape::Square)
-                    .icon_size(IconSize::Small)
-                    .icon_color(Color::Ignored)
-                    .tooltip(Tooltip::text("Sync with source thread"))
-                    .on_click(cx.listener(move |this, _, window, cx| {
-                        this.sync_thread(project.clone(), server_view.clone(), window, cx);
-                    }))
-            } else {
-                IconButton::new("share-thread", IconName::ArrowUpRight)
-                    .shape(ui::IconButtonShape::Square)
-                    .icon_size(IconSize::Small)
-                    .icon_color(Color::Ignored)
-                    .tooltip(Tooltip::text("Share Thread"))
-                    .on_click(cx.listener(move |this, _, window, cx| {
-                        this.share_thread(window, cx);
-                    }))
-            };
-
-            container = container.child(button);
-        }
-
-        container
-            .child(open_as_markdown)
-            .child(scroll_to_recent_user_prompt)
-            .child(scroll_to_top)
-            .into_any_element()
+        container.into_any_element()
     }
 
+    #[allow(dead_code)]
     pub(crate) fn scroll_to_most_recent_user_prompt(&mut self, cx: &mut Context<Self>) {
         let entries = self.thread.read(cx).entries();
         if entries.is_empty() {
@@ -4033,6 +4237,7 @@ impl AcpThreadView {
         cx.notify();
     }
 
+    #[allow(dead_code)]
     fn handle_feedback_click(
         &mut self,
         feedback: ThreadFeedback,

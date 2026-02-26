@@ -42,7 +42,10 @@ pub fn acp_model_selector(
 }
 
 enum AcpModelPickerEntry {
-    Separator(SharedString),
+    Separator {
+        title: SharedString,
+        model_count: usize,
+    },
     Model(AgentModelInfo, bool),
 }
 
@@ -221,7 +224,7 @@ impl PickerDelegate for AcpModelPickerDelegate {
     ) -> bool {
         match self.filtered_entries.get(ix) {
             Some(AcpModelPickerEntry::Model(_, _)) => true,
-            Some(AcpModelPickerEntry::Separator(_)) | None => false,
+            Some(AcpModelPickerEntry::Separator { .. }) | None => false,
         }
     }
 
@@ -320,8 +323,12 @@ impl PickerDelegate for AcpModelPickerDelegate {
         cx: &mut Context<Picker<Self>>,
     ) -> Option<Self::ListItem> {
         match self.filtered_entries.get(ix)? {
-            AcpModelPickerEntry::Separator(title) => {
-                Some(ModelSelectorHeader::new(title, ix > 1).into_any_element())
+            AcpModelPickerEntry::Separator { title, model_count } => {
+                Some(
+                    ModelSelectorHeader::new(title, ix > 1)
+                        .model_count(*model_count)
+                        .into_any_element(),
+                )
             }
             AcpModelPickerEntry::Model(model_info, is_favorite) => {
                 let is_selected = Some(model_info) == self.selected_model.as_ref();
@@ -450,7 +457,10 @@ fn info_list_to_picker_entries(
 
     let has_favorites = !favorite_models.is_empty();
     if has_favorites {
-        entries.push(AcpModelPickerEntry::Separator("Favorite".into()));
+        entries.push(AcpModelPickerEntry::Separator {
+            title: "Favorite".into(),
+            model_count: favorite_models.len(),
+        });
         for model in favorite_models {
             entries.push(AcpModelPickerEntry::Model((*model).clone(), true));
         }
@@ -459,7 +469,10 @@ fn info_list_to_picker_entries(
     match model_list {
         AgentModelList::Flat(list) => {
             if has_favorites {
-                entries.push(AcpModelPickerEntry::Separator("All".into()));
+                entries.push(AcpModelPickerEntry::Separator {
+                    title: "All".into(),
+                    model_count: list.len(),
+                });
             }
             for model in list {
                 let is_favorite = favorites.contains(&model.id);
@@ -468,7 +481,10 @@ fn info_list_to_picker_entries(
         }
         AgentModelList::Grouped(index_map) => {
             for (group_name, models) in index_map {
-                entries.push(AcpModelPickerEntry::Separator(group_name.0));
+                entries.push(AcpModelPickerEntry::Separator {
+                    title: group_name.0,
+                    model_count: models.len(),
+                });
                 for model in models {
                     let is_favorite = favorites.contains(&model.id);
                     entries.push(AcpModelPickerEntry::Model(model, is_favorite));
@@ -623,7 +639,7 @@ mod tests {
             .iter()
             .map(|entry| match entry {
                 AcpModelPickerEntry::Model(info, _) => info.id.0.as_ref(),
-                AcpModelPickerEntry::Separator(s) => &s,
+                AcpModelPickerEntry::Separator { title, .. } => title.as_ref(),
             })
             .collect()
     }
@@ -671,7 +687,7 @@ mod tests {
 
         assert!(matches!(
             entries.first(),
-            Some(AcpModelPickerEntry::Separator(s)) if s == "Favorite"
+            Some(AcpModelPickerEntry::Separator { title, .. }) if title == "Favorite"
         ));
 
         let model_ids = get_entry_model_ids(&entries);
@@ -687,7 +703,7 @@ mod tests {
 
         assert!(matches!(
             entries.first(),
-            Some(AcpModelPickerEntry::Separator(s)) if s == "zed"
+            Some(AcpModelPickerEntry::Separator { title, .. }) if title == "zed"
         ));
     }
 
@@ -789,12 +805,12 @@ mod tests {
 
         assert!(matches!(
             entries.first(),
-            Some(AcpModelPickerEntry::Separator(s)) if s == "Favorite"
+            Some(AcpModelPickerEntry::Separator { title, .. }) if title == "Favorite"
         ));
 
         assert!(entries.iter().any(|e| matches!(
             e,
-            AcpModelPickerEntry::Separator(s) if s == "All"
+            AcpModelPickerEntry::Separator { title, .. } if title == "All"
         )));
     }
 

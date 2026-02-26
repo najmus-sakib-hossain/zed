@@ -4,6 +4,15 @@ inclusion: auto
 
 # Icon CLI Integration for Zed
 
+## Build and Quality Requirements
+
+- Always try to fix all clippy warnings and errors caused by your changes.
+- Validate changes with this low-resource command:
+
+```bash
+CARGO_BUILD_JOBS=1 CARGO_INCREMENTAL=1 CARGO_PROFILE_DEV_CODEGEN_UNITS=1 CARGO_PROFILE_DEV_BUILD_OVERRIDE_CODEGEN_UNITS=1 cargo run -p zed --locked
+```
+
 ## Overview
 
 The Zed codebase has an integrated `icon` CLI tool for downloading and managing SVG icons from 250+ icon packs (100,000+ icons total).
