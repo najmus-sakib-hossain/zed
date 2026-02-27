@@ -1,3 +1,7 @@
+
+
+Please make a  "pink"  version of this image and make sure to enhance that image for higher quality!!!
+
 # Ai Profile
 1. Agent
 2. Ask

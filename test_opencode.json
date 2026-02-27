@@ -1,0 +1,9 @@
+{
+  "model": "glm-5-free",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Say hello"
+    }
+  ]
+}

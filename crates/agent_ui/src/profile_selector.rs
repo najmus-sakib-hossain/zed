@@ -150,7 +150,7 @@ impl Focusable for ProfileSelector {
 impl Render for ProfileSelector {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         if !self.provider.profiles_supported(cx) {
-            return Button::new("tools-not-supported-button", "Tools Unsupported")
+            return Button::new("tools-not-supported-button", "N0")
                 .disabled(true)
                 .label_size(LabelSize::Small)
                 .color(Color::Muted)

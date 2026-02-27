@@ -5046,6 +5046,7 @@ impl ProjectPanel {
         let diagnostic_severity = details.diagnostic_severity;
         let item_colors = get_item_color(is_sticky, cx);
 
+        let canonical_path_for_tooltip = details.canonical_path.clone();
         let canonical_path = details
             .canonical_path
             .as_ref()
@@ -5177,22 +5178,26 @@ impl ProjectPanel {
                             .extension()
                             .and_then(|e| e.to_str())
                             .unwrap_or("");
-                        let is_media = matches!(
-                            ext,
-                            "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" | "ico"
-                                | "mp3" | "wav" | "ogg" | "flac" | "aac" | "mp4" | "avi"
-                                | "mkv" | "mov" | "webm"
-                        );
-                        if is_media {
-                            Some(format!("Media · {}", format_file_size(size)))
+                        if let Some(media_kind) = media_kind_from_extension(ext) {
+                            Some(format!("{} · {}", media_kind, format_file_size(size)))
                         } else {
-                            // Estimate lines of code from file size (rough: ~40 bytes per line)
-                            let estimated_lines = if size > 0 { size / 40 } else { 0 };
-                            Some(format!(
-                                "~{} lines · {}",
-                                estimated_lines,
-                                format_file_size(size)
-                            ))
+                            let (line_count, token_count, estimated) =
+                                line_and_token_counts(canonical_path_for_tooltip.as_deref(), size);
+                            if estimated {
+                                Some(format!(
+                                    "~{} lines · ~{} tokens · {}",
+                                    line_count,
+                                    token_count,
+                                    format_file_size(size)
+                                ))
+                            } else {
+                                Some(format!(
+                                    "{} lines · {} tokens · {}",
+                                    line_count,
+                                    token_count,
+                                    format_file_size(size)
+                                ))
+                            }
                         }
                     }
                 } else {
@@ -5614,10 +5619,19 @@ impl ProjectPanel {
                             .flex_none()
                     })
                     .child(if show_editor {
-                        h_flex().h_6().w_full().child(self.filename_editor.clone())
+                        h_flex()
+                            .h_6()
+                            .w_full()
+                            .flex_1()
+                            .min_w_0()
+                            .child(self.filename_editor.clone())
                     } else {
                         h_flex()
                             .h_6()
+                            .w_full()
+                            .flex_1()
+                            .min_w_0()
+                            .overflow_x_hidden()
                             .map(|this| match self.state.ancestors.get(&entry_id) {
                                 Some(folded_ancestors) => {
                                     this.children(self.render_folder_elements(
@@ -5638,14 +5652,21 @@ impl ProjectPanel {
                                 }
 
                                 None => this.child(
-                                    Label::new(file_name)
-                                        .single_line()
-                                        .color(filename_text_color)
-                                        .when(
-                                            settings.bold_folder_labels && kind.is_dir(),
-                                            |this| this.weight(FontWeight::SEMIBOLD),
-                                        )
-                                        .into_any_element(),
+                                    div()
+                                        .w_full()
+                                        .min_w_0()
+                                        .overflow_x_hidden()
+                                        .child(
+                                            Label::new(file_name)
+                                                .single_line()
+                                                .truncate()
+                                                .color(filename_text_color)
+                                                .when(
+                                                    settings.bold_folder_labels && kind.is_dir(),
+                                                    |this| this.weight(FontWeight::SEMIBOLD),
+                                                )
+                                                .into_any_element(),
+                                        ),
                                 ),
                             })
                     })
@@ -5721,6 +5742,9 @@ impl ProjectPanel {
                             "project_panel_path_component_{}_{index}",
                             entry_id.to_usize()
                         )))
+                        .max_w_full()
+                        .min_w_0()
+                        .overflow_x_hidden()
                         .when(index == 0, |this| this.ml_neg_0p5())
                         .px_0p5()
                         .rounded_xs()
@@ -5807,6 +5831,7 @@ impl ProjectPanel {
                         .child(
                             Label::new(component)
                                 .single_line()
+                                .truncate()
                                 .color(filename_text_color)
                                 .when(bold_folder_labels && !is_file, |this| {
                                     this.weight(FontWeight::SEMIBOLD)
@@ -7061,5 +7086,61 @@ fn format_file_size(bytes: u64) -> String {
         format!("{:.1} MB", bytes as f64 / (1024.0 * 1024.0))
     } else {
         format!("{:.1} GB", bytes as f64 / (1024.0 * 1024.0 * 1024.0))
+    }
+}
+
+fn media_kind_from_extension(extension: &str) -> Option<&'static str> {
+    let extension = extension.to_ascii_lowercase();
+    match extension.as_str() {
+        "png" | "jpg" | "jpeg" | "gif" | "bmp" | "svg" | "webp" | "ico" | "avif"
+        | "heic" | "heif" | "tif" | "tiff" => Some("Image"),
+        "mp3" | "wav" | "ogg" | "flac" | "aac" | "m4a" | "aiff" | "wma" => {
+            Some("Audio")
+        }
+        "mp4" | "avi" | "mkv" | "mov" | "webm" | "m4v" | "wmv" | "flv" => {
+            Some("Video")
+        }
+        "obj" | "fbx" | "gltf" | "glb" | "blend" | "dae" | "stl" | "3ds" => {
+            Some("3D Asset")
+        }
+        _ => None,
+    }
+}
+
+fn line_and_token_counts(canonical_path: Option<&Path>, file_size: u64) -> (u64, u64, bool) {
+    const MAX_TOKENIZED_BYTES: usize = 512 * 1024;
+
+    let estimated_lines = if file_size > 0 { file_size / 40 } else { 0 };
+    let estimated_tokens = if file_size > 0 { file_size / 4 } else { 0 };
+
+    let Some(path) = canonical_path else {
+        return (estimated_lines, estimated_tokens, true);
+    };
+
+    let Ok(bytes) = std::fs::read(path) else {
+        return (estimated_lines, estimated_tokens, true);
+    };
+
+    if bytes.is_empty() {
+        return (0, 0, false);
+    }
+
+    let line_count = bytes.iter().filter(|&&byte| byte == b'\n').count() as u64 + 1;
+
+    if bytes.len() > MAX_TOKENIZED_BYTES {
+        return (line_count, estimated_tokens, true);
+    }
+
+    let text = String::from_utf8_lossy(&bytes);
+    let messages = vec![tiktoken_rs::ChatCompletionRequestMessage {
+        role: "user".into(),
+        content: Some(text.into_owned()),
+        name: None,
+        function_call: None,
+    }];
+
+    match tiktoken_rs::num_tokens_from_messages("gpt-4o", &messages) {
+        Ok(token_count) => (line_count, token_count as u64, false),
+        Err(_) => (line_count, estimated_tokens, true),
     }
 }

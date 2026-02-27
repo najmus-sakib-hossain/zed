@@ -12941,6 +12941,7 @@ dependencies = [
  "telemetry",
  "tempfile",
  "theme",
+ "tiktoken-rs",
  "ui",
  "util",
  "workspace",
