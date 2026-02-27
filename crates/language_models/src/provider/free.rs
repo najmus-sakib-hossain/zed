@@ -29,7 +29,7 @@ static FREE_MODEL_DESCRIPTORS: &[FreeModelDescriptor] = &[
     // Pollinations model (1) — OpenAI-compatible
     FreeModelDescriptor {
         id: "openai-fast",
-        display_name: "OpenAI Fast (Pollinations)",
+        display_name: "OpenAI",
         api_url: POLLINATIONS_API_URL,
         api_kind: ApiKind::OpenAi,
         max_tokens: 131_000,
@@ -39,7 +39,7 @@ static FREE_MODEL_DESCRIPTORS: &[FreeModelDescriptor] = &[
     // mlvoca models (2) — Ollama /api/generate format
     FreeModelDescriptor {
         id: "tinyllama",
-        display_name: "TinyLlama (mlvoca)",
+        display_name: "TinyLlama",
         api_url: MLVOCA_API_URL,
         api_kind: ApiKind::OllamaGenerate,
         max_tokens: 2_048,
@@ -48,7 +48,7 @@ static FREE_MODEL_DESCRIPTORS: &[FreeModelDescriptor] = &[
     },
     FreeModelDescriptor {
         id: "deepseek-r1:1.5b",
-        display_name: "DeepSeek R1 1.5B (mlvoca)",
+        display_name: "DeepSeek",
         api_url: MLVOCA_API_URL,
         api_kind: ApiKind::OllamaGenerate,
         max_tokens: 16_384,
