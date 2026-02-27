@@ -143,14 +143,15 @@ impl LanguageModelPickerDelegate {
     ) -> Self {
         let on_model_changed = Arc::new(on_model_changed);
         let models = all_models(cx);
-        let entries = models.entries();
+        let collapsed_providers = HashSet::default();
+        let entries = models.entries_with_collapsed(&collapsed_providers);
 
         Self {
             on_model_changed,
             all_models: Arc::new(models),
             selected_index: Self::get_active_model_index(&entries, get_active_model(cx)),
             filtered_entries: entries,
-            collapsed_providers: HashSet::default(),
+            collapsed_providers,
             get_active_model: Arc::new(get_active_model),
             on_toggle_favorite: Arc::new(on_toggle_favorite),
             _authenticate_all_providers_task: Self::authenticate_all_providers(cx),
@@ -325,28 +326,42 @@ impl GroupedModels {
     }
 
     fn entries(&self) -> Vec<LanguageModelPickerEntry> {
+        self.entries_with_collapsed(&HashSet::default())
+    }
+
+    fn entries_with_collapsed(&self, collapsed_providers: &HashSet<SharedString>) -> Vec<LanguageModelPickerEntry> {
         let mut entries = Vec::new();
 
+        // Favorites come first if they exist
         if !self.favorites.is_empty() {
             entries.push(LanguageModelPickerEntry::Separator {
                 title: "Favorite".into(),
                 model_count: self.favorites.len(),
             });
-            for info in &self.favorites {
-                entries.push(LanguageModelPickerEntry::Model(info.clone()));
+            
+            let is_collapsed = collapsed_providers.contains(&SharedString::from("Favorite"));
+            if !is_collapsed {
+                for info in &self.favorites {
+                    entries.push(LanguageModelPickerEntry::Model(info.clone()));
+                }
             }
         }
 
-        // Free provider always comes right after favorites, before everything else.
+        // Free provider comes second (or first if no favorites)
         let free_provider_id = LanguageModelProviderId::new("free");
         if let Some(free_models) = self.all.get(&free_provider_id) {
             if !free_models.is_empty() {
+                let provider_name = free_models[0].model.provider_name().0;
                 entries.push(LanguageModelPickerEntry::Separator {
-                    title: free_models[0].model.provider_name().0,
+                    title: provider_name.clone(),
                     model_count: free_models.len(),
                 });
-                for info in free_models {
-                    entries.push(LanguageModelPickerEntry::Model(info.clone()));
+                
+                let is_collapsed = collapsed_providers.contains(&provider_name);
+                if !is_collapsed {
+                    for info in free_models {
+                        entries.push(LanguageModelPickerEntry::Model(info.clone()));
+                    }
                 }
             }
         }
@@ -356,8 +371,12 @@ impl GroupedModels {
                 title: "Recommended".into(),
                 model_count: self.recommended.len(),
             });
-            for info in &self.recommended {
-                entries.push(LanguageModelPickerEntry::Model(info.clone()));
+            
+            let is_collapsed = collapsed_providers.contains(&SharedString::from("Recommended"));
+            if !is_collapsed {
+                for info in &self.recommended {
+                    entries.push(LanguageModelPickerEntry::Model(info.clone()));
+                }
             }
         }
 
@@ -365,12 +384,17 @@ impl GroupedModels {
             if models.is_empty() || *provider_id == free_provider_id {
                 continue;
             }
+            let provider_name = models[0].model.provider_name().0;
             entries.push(LanguageModelPickerEntry::Separator {
-                title: models[0].model.provider_name().0,
+                title: provider_name.clone(),
                 model_count: models.len(),
             });
-            for info in models {
-                entries.push(LanguageModelPickerEntry::Model(info.clone()));
+            
+            let is_collapsed = collapsed_providers.contains(&provider_name);
+            if !is_collapsed {
+                for info in models {
+                    entries.push(LanguageModelPickerEntry::Model(info.clone()));
+                }
             }
         }
 
@@ -488,10 +512,7 @@ impl PickerDelegate for LanguageModelPickerDelegate {
         _cx: &mut Context<Picker<Self>>,
     ) -> bool {
         match self.filtered_entries.get(ix) {
-            Some(LanguageModelPickerEntry::Model(model_info)) => {
-                let provider_name = model_info.model.provider_name().0;
-                !self.collapsed_providers.contains(&provider_name)
-            }
+            Some(LanguageModelPickerEntry::Model(_)) => true,
             Some(LanguageModelPickerEntry::Separator { .. }) | None => false,
         }
     }
@@ -508,6 +529,17 @@ impl PickerDelegate for LanguageModelPickerDelegate {
     ) -> Task<()> {
         let all_models = self.all_models.clone();
         let active_model = (self.get_active_model)(cx);
+        let collapsed_providers = self.collapsed_providers.clone();
+
+        // Fast path: if query is empty, just rebuild entries without searching
+        if query.is_empty() {
+            self.filtered_entries = all_models.entries_with_collapsed(&collapsed_providers);
+            let new_index = Self::get_active_model_index(&self.filtered_entries, active_model);
+            self.selected_index = new_index;
+            // Return immediately - the picker will call matches_updated() which resets the list
+            return Task::ready(());
+        }
+
         let fg_executor = cx.foreground_executor();
         let bg_executor = cx.background_executor();
 
@@ -552,7 +584,7 @@ impl PickerDelegate for LanguageModelPickerDelegate {
 
         cx.spawn_in(window, async move |this, cx| {
             this.update_in(cx, |this, window, cx| {
-                this.delegate.filtered_entries = filtered_models.entries();
+                this.delegate.filtered_entries = filtered_models.entries_with_collapsed(&collapsed_providers);
                 // Finds the currently selected model in the list
                 let new_index =
                     Self::get_active_model_index(&this.delegate.filtered_entries, active_model);
@@ -596,7 +628,8 @@ impl PickerDelegate for LanguageModelPickerDelegate {
                     ModelSelectorHeader::new(title, ix > 1)
                         .model_count(*model_count)
                         .is_collapsed(is_collapsed)
-                        .on_toggle_collapse(cx.listener(move |picker, _, _window, cx| {
+                        .on_toggle_collapse(cx.listener(move |picker, _, window, cx| {
+                            // Toggle the collapsed state
                             if picker.delegate.collapsed_providers.contains(&title_clone) {
                                 picker.delegate.collapsed_providers.remove(&title_clone);
                             } else {
@@ -605,19 +638,16 @@ impl PickerDelegate for LanguageModelPickerDelegate {
                                     .collapsed_providers
                                     .insert(title_clone.clone());
                             }
-                            cx.notify();
+                            
+                            // Call update_matches to rebuild the list with new collapsed state
+                            // This will use the fast path if query is empty, or re-filter if there's a query
+                            let query = picker.query(cx);
+                            picker.update_matches(query, window, cx);
                         }))
                         .into_any_element(),
                 )
             }
             LanguageModelPickerEntry::Model(model_info) => {
-                // Check if this model's provider section is collapsed
-                let provider_name = model_info.model.provider_name().0;
-                if self.collapsed_providers.contains(&provider_name) {
-                    // Return a zero-height hidden element for collapsed models
-                    return Some(div().h(px(0.)).overflow_hidden().into_any_element());
-                }
-
                 let active_model = (self.get_active_model)(cx);
                 let active_provider_id = active_model.as_ref().map(|m| m.provider.id());
                 let active_model_id = active_model.map(|m| m.model.id());
@@ -635,7 +665,13 @@ impl PickerDelegate for LanguageModelPickerDelegate {
                     let model = model_info.model.clone();
                     let on_toggle_favorite = self.on_toggle_favorite.clone();
                     cx.listener(move |picker, _, window, cx| {
+                        // Toggle the favorite status
                         on_toggle_favorite(model.clone(), !is_favorite, cx);
+                        
+                        // Reload all models to get updated favorites
+                        picker.delegate.all_models = Arc::new(all_models(cx));
+                        
+                        // Refresh the picker to show updated state
                         picker.refresh(window, cx);
                     })
                 };

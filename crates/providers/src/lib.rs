@@ -6,4 +6,5 @@ pub mod pollinations;
 ///
 /// - Pollinations: 1 model (openai-fast)
 /// - mlvoca: 2 models (tinyllama, deepseek-r1:1.5b)
-pub const TOTAL_FREE_MODELS: usize = 3;
+/// - OpenCode: 3 models (trinity-large-preview-free, big-pickle, minimax-m2.5-free)
+pub const TOTAL_FREE_MODELS: usize = 6;

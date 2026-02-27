@@ -24,7 +24,10 @@ const POLLINATIONS_API_URL: &str = "https://text.pollinations.ai/openai";
 /// mlvoca API base URL (Ollama-compatible `/api/generate`, no key required).
 const MLVOCA_API_URL: &str = "https://mlvoca.com";
 
-/// Descriptors for all 3 free models.
+/// OpenCode Zen API URL (OpenAI-compatible, uses "public" as API key).
+const OPENCODE_API_URL: &str = "https://opencode.ai/zen/v1";
+
+/// Descriptors for all 6 free models.
 static FREE_MODEL_DESCRIPTORS: &[FreeModelDescriptor] = &[
     // Pollinations model (1) — OpenAI-compatible
     FreeModelDescriptor {
@@ -37,23 +40,51 @@ static FREE_MODEL_DESCRIPTORS: &[FreeModelDescriptor] = &[
         supports_tools: true,
     },
     // mlvoca models (2) — Ollama /api/generate format
+    // FreeModelDescriptor {
+    //     id: "tinyllama",
+    //     display_name: "TinyLlama",
+    //     api_url: MLVOCA_API_URL,
+    //     api_kind: ApiKind::OllamaGenerate,
+    //     max_tokens: 2_048,
+    //     max_output_tokens: 2_048,
+    //     supports_tools: false,
+    // },
+    // FreeModelDescriptor {
+    //     id: "deepseek-r1:1.5b",
+    //     display_name: "DeepSeek",
+    //     api_url: MLVOCA_API_URL,
+    //     api_kind: ApiKind::OllamaGenerate,
+    //     max_tokens: 16_384,
+    //     max_output_tokens: 8_192,
+    //     supports_tools: false,
+    // },
+    // OpenCode Zen models (3) — OpenAI-compatible with "public" API key
     FreeModelDescriptor {
-        id: "tinyllama",
-        display_name: "TinyLlama",
-        api_url: MLVOCA_API_URL,
-        api_kind: ApiKind::OllamaGenerate,
-        max_tokens: 2_048,
-        max_output_tokens: 2_048,
-        supports_tools: false,
+        id: "trinity-large-preview-free",
+        display_name: "Trinity Large",
+        api_url: OPENCODE_API_URL,
+        api_kind: ApiKind::OpenAi,
+        max_tokens: 131_072,
+        max_output_tokens: 131_072,
+        supports_tools: true,
     },
     FreeModelDescriptor {
-        id: "deepseek-r1:1.5b",
-        display_name: "DeepSeek",
-        api_url: MLVOCA_API_URL,
-        api_kind: ApiKind::OllamaGenerate,
-        max_tokens: 16_384,
-        max_output_tokens: 8_192,
-        supports_tools: false,
+        id: "big-pickle",
+        display_name: "Big Pickle",
+        api_url: OPENCODE_API_URL,
+        api_kind: ApiKind::OpenAi,
+        max_tokens: 200_000,
+        max_output_tokens: 128_000,
+        supports_tools: true,
+    },
+    FreeModelDescriptor {
+        id: "minimax-m2.5-free",
+        display_name: "MiniMax M2.5",
+        api_url: OPENCODE_API_URL,
+        api_kind: ApiKind::OpenAi,
+        max_tokens: 204_800,
+        max_output_tokens: 131_072,
+        supports_tools: true,
     },
 ];
 
@@ -193,7 +224,7 @@ struct FreeLanguageModel {
 }
 
 impl FreeLanguageModel {
-    /// Stream an OpenAI-compatible completion (used for Pollinations).
+    /// Stream an OpenAI-compatible completion (used for Pollinations and OpenCode).
     fn stream_openai(
         &self,
         request: open_ai::Request,
@@ -203,13 +234,18 @@ impl FreeLanguageModel {
     > {
         let http_client = self.http_client.clone();
         let api_url = self.descriptor.api_url.to_string();
+        let api_key = if api_url.contains("opencode.ai") {
+            "public"
+        } else {
+            "free"
+        };
 
         let future = self.request_limiter.stream(async move {
             let response = open_ai::stream_completion(
                 http_client.as_ref(),
                 PROVIDER_NAME.0.as_str(),
                 &api_url,
-                "free",
+                api_key,
                 request,
             )
             .await?;
@@ -469,10 +505,10 @@ impl Render for FreeConfigurationView {
                     .weight(FontWeight::BOLD),
             )
             .child(Label::new(
-                "These 3 models are completely free — no API key or sign-up required.",
+                "These 6 models are completely free — no API key or sign-up required.",
             ))
             .child(
-                Label::new("Powered by Pollinations.ai and mlvoca.com.")
+                Label::new("Powered by Pollinations.ai, mlvoca.com, and OpenCode Zen.")
                     .size(LabelSize::Small)
                     .color(Color::Muted),
             )

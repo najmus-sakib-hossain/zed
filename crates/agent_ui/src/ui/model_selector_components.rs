@@ -91,7 +91,7 @@ impl RenderOnce for ModelSelectorHeader {
                     })
                     .child(
                         Label::new(self.title)
-                            .size(LabelSize::Small)
+                            .size(LabelSize::Default)
                             .weight(gpui::FontWeight::SEMIBOLD)
                             .color(Color::Default),
                     )
@@ -103,7 +103,9 @@ impl RenderOnce for ModelSelectorHeader {
                                 this.child(
                                     div()
                                         .px_1()
-                                        .rounded_sm()
+                                        .rounded_full()
+                                        .border_1()
+                                        .border_color(cx.theme().colors().border)
                                         .bg(cx.theme().colors().ghost_element_hover)
                                         .child(
                                             Label::new(format!("{}", count))

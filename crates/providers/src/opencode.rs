@@ -10,11 +10,15 @@ pub const MODELS_DEV_API: &str = "https://models.dev/api.json";
 ///
 /// OpenCode Zen provides an OpenAI-compatible `chat/completions` endpoint and a public key
 /// for promotional access.
-pub const FREE_MODELS: [&str; 4] = [
-    "glm-5-free",
-    "minimax-m2.5-free",
-    "big-pickle",
+///
+/// These 3 models are verified working as of February 2026:
+/// - trinity-large-preview-free: 131K context, fast responses
+/// - big-pickle: 200K context, reasoning model
+/// - minimax-m2.5-free: 204K context, reasoning model
+pub const FREE_MODELS: [&str; 3] = [
     "trinity-large-preview-free",
+    "big-pickle",
+    "minimax-m2.5-free",
 ];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
