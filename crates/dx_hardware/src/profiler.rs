@@ -76,15 +76,15 @@ fn classify_tier(cpu_cores: usize, ram_bytes: u64, gpu: &GpuCapability) -> Devic
     let vram_gb = gpu.vram_bytes / 1_073_741_824;
 
     if vram_gb >= 24 && ram_gb >= 32 && cpu_cores >= 8 {
-        DeviceTier::Workstation
+        DeviceTier::Ultra
     } else if vram_gb >= 8 && ram_gb >= 16 && cpu_cores >= 6 {
-        DeviceTier::HighEnd
+        DeviceTier::High
     } else if ram_gb >= 8 && cpu_cores >= 4 {
-        DeviceTier::MidRange
+        DeviceTier::Mid
     } else if ram_gb >= 4 && cpu_cores >= 2 {
-        DeviceTier::LowEnd
+        DeviceTier::Low
     } else {
-        DeviceTier::Embedded
+        DeviceTier::UltraLow
     }
 }
 

@@ -154,7 +154,7 @@ impl TtsManager {
                         self.providers.get(pid).map(|p| {
                             let cost = p
                                 .cost_per_character()
-                                .map_or(u64::MAX, |c| c.as_microdollars());
+                                .map_or(u64::MAX, |c| c.0);
                             (pid.clone(), cost)
                         })
                     })

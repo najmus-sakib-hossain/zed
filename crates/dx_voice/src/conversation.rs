@@ -4,7 +4,7 @@
 //! voice conversation experience that feels like talking to a friend.
 
 use anyhow::Result;
-use dx_core::{LlmProvider, LlmRequest, Message, Role, TtsRequest};
+use dx_core::{LlmMessage, LlmProvider, LlmRequest, LlmRole, TtsRequest};
 use std::sync::Arc;
 
 use crate::stt_engine::SttEngine;
@@ -32,7 +32,7 @@ pub enum ConversationState {
 /// A single turn in the conversation.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct ConversationTurn {
-    pub role: Role,
+    pub role: LlmRole,
     pub text: String,
     pub audio_duration_seconds: Option<f64>,
     pub timestamp: std::time::SystemTime,
@@ -156,7 +156,7 @@ impl VoiceConversation {
 
         // Record user turn
         self.history.push(ConversationTurn {
-            role: Role::User,
+            role: LlmRole::User,
             text: transcription.text.clone(),
             audio_duration_seconds: Some(transcription.duration_seconds),
             timestamp: std::time::SystemTime::now(),
@@ -169,15 +169,18 @@ impl VoiceConversation {
             messages,
             max_tokens: Some(300),
             temperature: Some(0.7),
-            model: None,
+            model: String::new(),
+            top_p: None,
+            stop_sequences: Vec::new(),
+            stream: false,
         };
 
         let response = self.llm.complete(&llm_request).await?;
-        let assistant_text = response.text.clone();
+        let assistant_text = response.content.clone();
 
         // Record assistant turn
         self.history.push(ConversationTurn {
-            role: Role::Assistant,
+            role: LlmRole::Assistant,
             text: assistant_text.clone(),
             audio_duration_seconds: None,
             timestamp: std::time::SystemTime::now(),
@@ -210,11 +213,12 @@ impl VoiceConversation {
     }
 
     /// Build LLM message list from conversation history.
-    fn build_messages(&self) -> Vec<Message> {
+    fn build_messages(&self) -> Vec<LlmMessage> {
         let mut messages = Vec::new();
-        messages.push(Message {
-            role: Role::System,
+        messages.push(LlmMessage {
+            role: LlmRole::System,
             content: self.config.system_prompt.clone(),
+            images: Vec::new(),
         });
 
         // Limit to max_context_turns
@@ -225,9 +229,10 @@ impl VoiceConversation {
         };
 
         for turn in &self.history[start..] {
-            messages.push(Message {
-                role: turn.role,
+            messages.push(LlmMessage {
+                role: turn.role.clone(),
                 content: turn.text.clone(),
+                images: Vec::new(),
             });
         }
 

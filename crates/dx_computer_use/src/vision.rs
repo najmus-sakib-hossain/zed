@@ -1,7 +1,7 @@
 //! Vision analyzer — sends screenshots to vision LLMs for analysis.
 
 use anyhow::Result;
-use dx_core::{LlmProvider, LlmRequest, Message, Role};
+use dx_core::{LlmMessage, LlmProvider, LlmRequest, LlmRole};
 use std::sync::Arc;
 
 use crate::screenshot::ScreenCapture;
@@ -29,22 +29,27 @@ impl VisionAnalyzer {
 
         let request = LlmRequest {
             messages: vec![
-                Message {
-                    role: Role::System,
+                LlmMessage {
+                    role: LlmRole::System,
                     content: "You are a vision AI analyzing a screenshot. Describe the UI elements visible, their positions, and any text content. Be concise and structured.".into(),
+                    images: Vec::new(),
                 },
-                Message {
-                    role: Role::User,
+                LlmMessage {
+                    role: LlmRole::User,
                     content: "[Screenshot would be attached here as base64]".into(),
+                    images: Vec::new(),
                 },
             ],
             max_tokens: Some(500),
             temperature: Some(0.1),
-            model: None,
+            model: String::new(),
+            top_p: None,
+            stop_sequences: Vec::new(),
+            stream: false,
         };
 
         let response = provider.complete(&request).await?;
-        Ok(response.text)
+        Ok(response.content)
     }
 
     /// Find a specific UI element in the screenshot.
@@ -60,27 +65,32 @@ impl VisionAnalyzer {
 
         let request = LlmRequest {
             messages: vec![
-                Message {
-                    role: Role::System,
+                LlmMessage {
+                    role: LlmRole::System,
                     content: "You are a vision AI. Given a screenshot, find the specified UI element and return its center coordinates as JSON: {\"x\": <int>, \"y\": <int>}. If not found, return {\"x\": null, \"y\": null}.".into(),
+                    images: Vec::new(),
                 },
-                Message {
-                    role: Role::User,
+                LlmMessage {
+                    role: LlmRole::User,
                     content: format!(
                         "Find this element: {}\n[Screenshot attached]",
                         element_description
                     ),
+                    images: Vec::new(),
                 },
             ],
             max_tokens: Some(100),
             temperature: Some(0.0),
-            model: None,
+            model: String::new(),
+            top_p: None,
+            stop_sequences: Vec::new(),
+            stream: false,
         };
 
         let response = provider.complete(&request).await?;
 
         // Parse coordinates from response
-        if let Ok(coords) = serde_json::from_str::<ElementCoords>(&response.text) {
+        if let Ok(coords) = serde_json::from_str::<ElementCoords>(&response.content) {
             if let (Some(x), Some(y)) = (coords.x, coords.y) {
                 return Ok(Some((x, y)));
             }

@@ -1,7 +1,7 @@
 //! LLM tier — deep style analysis using an LLM (< 500ms, cloud).
 
 use anyhow::Result;
-use dx_core::{LlmProvider, LlmRequest, Message, Role};
+use dx_core::{LlmMessage, LlmProvider, LlmRequest, LlmRole};
 use std::sync::Arc;
 
 use crate::diagnostic::{DiagnosticSource, GrammarDiagnostic, GrammarSeverity, Span};
@@ -54,23 +54,28 @@ Return ONLY the JSON array, no other text. If no issues found, return []."#;
 
         let request = LlmRequest {
             messages: vec![
-                Message {
-                    role: Role::System,
+                LlmMessage {
+                    role: LlmRole::System,
                     content: system_prompt.into(),
+                    images: Vec::new(),
                 },
-                Message {
-                    role: Role::User,
+                LlmMessage {
+                    role: LlmRole::User,
                     content: text.into(),
+                    images: Vec::new(),
                 },
             ],
             max_tokens: Some(1000),
             temperature: Some(0.1),
-            model: None,
+            model: String::new(),
+            top_p: None,
+            stop_sequences: Vec::new(),
+            stream: false,
         };
 
         let response = provider.complete(&request).await?;
 
-        parse_llm_diagnostics(&response.text, text.len())
+        parse_llm_diagnostics(&response.content, text.len())
     }
 }
 
