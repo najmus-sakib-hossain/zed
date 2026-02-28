@@ -1,0 +1,28 @@
+[package]
+name = "dx_media"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "Media generation engine for DX — image, video, audio, music, 3D, documents"
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/dx_media.rs"
+doctest = false
+
+[dependencies]
+anyhow.workspace = true
+async-trait = "0.1"
+dx_core = { path = "../dx_core" }
+futures.workspace = true
+gpui.workspace = true
+http_client.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+smol.workspace = true
+util.workspace = true
