@@ -17,11 +17,11 @@ use anyhow::Result;
 use collections::{BTreeSet, HashMap, HashSet, VecDeque};
 use futures::{StreamExt, stream::FuturesUnordered};
 use gpui::{
-    Action, AnyElement, App, AsyncWindowContext, ClickEvent, ClipboardItem, Context, Corner, Div,
-    DragMoveEvent, Entity, EntityId, EventEmitter, ExternalPaths, FocusHandle, FocusOutEvent,
-    Focusable, KeyContext, MouseButton, NavigationDirection, Pixels, Point, PromptLevel, Render,
-    ScrollHandle, Subscription, Task, WeakEntity, WeakFocusHandle, Window, actions, anchored,
-    deferred, prelude::*,
+    Action, AnyElement, AnyView, App, AsyncWindowContext, ClickEvent, ClipboardItem, Context,
+    Corner, Div, DragMoveEvent, Entity, EntityId, EventEmitter, ExternalPaths, FocusHandle,
+    FocusOutEvent, Focusable, KeyContext, MouseButton, NavigationDirection, Pixels, Point,
+    PromptLevel, Render, ScrollHandle, Subscription, Task, WeakEntity, WeakFocusHandle, Window,
+    actions, anchored, deferred, prelude::*,
 };
 use itertools::Itertools;
 use language::{Capability, DiagnosticSeverity};
@@ -421,6 +421,9 @@ pub struct Pane {
     /// If a certain project item wants to get recreated with specific data, it can persist its data before the recreation here.
     pub project_item_restoration_data: HashMap<ProjectItemKind, Box<dyn Any + Send>>,
     welcome_page: Option<Entity<crate::welcome::WelcomePage>>,
+    /// When set, this view is displayed centered in the pane when no items are open.
+    /// Used by center_ai_mode to show the agent panel in the main workspace area.
+    center_ai_view: Option<AnyView>,
 
     pub in_center_group: bool,
 }
@@ -590,6 +593,7 @@ impl Pane {
             diagnostic_summary_update: Task::ready(()),
             project_item_restoration_data: HashMap::default(),
             welcome_page: None,
+            center_ai_view: None,
             in_center_group: false,
         }
     }
@@ -797,6 +801,12 @@ impl Pane {
 
     pub fn set_should_display_welcome_page(&mut self, should_display_welcome_page: bool) {
         self.should_display_welcome_page = should_display_welcome_page;
+    }
+
+    /// Sets the view to display centered in the pane when no items are open.
+    /// Pass `None` to clear and revert to the default welcome page / empty state.
+    pub fn set_center_ai_view(&mut self, view: Option<AnyView>) {
+        self.center_ai_view = view;
     }
 
     pub fn set_can_split(
@@ -4374,6 +4384,14 @@ impl Render for Pane {
                                 .overflow_hidden()
                                 .child(self.toolbar.clone())
                                 .child(item.to_any_view())
+                        } else if let Some(center_ai_view) = &self.center_ai_view {
+                            // Center AI mode: show agent panel centered in the workspace
+                            div.id("pane_placeholder")
+                                .v_flex()
+                                .size_full()
+                                .overflow_hidden()
+                                .bg(cx.theme().colors().editor_background)
+                                .child(center_ai_view.clone())
                         } else {
                             let placeholder = div
                                 .id("pane_placeholder")

@@ -528,6 +528,9 @@ pub struct AgentPanel {
     show_trust_workspace_message: bool,
     last_configuration_error_telemetry: Option<String>,
     on_boarding_upsell_dismissed: AtomicBool,
+    /// When true, the agent panel is being rendered centered in the workspace
+    /// (no files open). This triggers centered styling with max-width constraints.
+    pub is_centered: bool,
 }
 
 impl AgentPanel {
@@ -816,6 +819,7 @@ impl AgentPanel {
             show_trust_workspace_message: false,
             last_configuration_error_telemetry: None,
             on_boarding_upsell_dismissed: AtomicBool::new(OnboardingUpsell::dismissed()),
+            is_centered: false,
         };
 
         // Initial sync of agent servers from extensions

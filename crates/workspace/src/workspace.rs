@@ -1278,6 +1278,8 @@ pub struct Workspace {
     pane_history_timestamp: Arc<AtomicUsize>,
     bounds: Bounds<Pixels>,
     pub centered_layout: bool,
+    /// When true, the center pane is empty and the AI panel content should be displayed centered.
+    pub center_ai_mode: bool,
     bounds_save_task_queued: Option<Task<()>>,
     on_prompt_for_new_path: Option<PromptForNewPath>,
     on_prompt_for_open_path: Option<PromptForOpenPath>,
@@ -1681,6 +1683,7 @@ impl Workspace {
             // This data will be incorrect, but it will be overwritten by the time it needs to be used.
             bounds: Default::default(),
             centered_layout: false,
+            center_ai_mode: true,
             bounds_save_task_queued: None,
             on_prompt_for_new_path: None,
             on_prompt_for_open_path: None,
@@ -2011,6 +2014,9 @@ impl Workspace {
         dock.update(cx, |dock, cx| {
             dock.add_panel(panel, self.weak_self.clone(), window, cx)
         });
+
+        // Re-evaluate center AI mode after adding a panel (agent panel may now be available)
+        self.update_center_ai_mode(cx);
     }
 
     pub fn remove_panel<T: Panel>(
@@ -3272,9 +3278,49 @@ impl Workspace {
         self.active_pane().read(cx).active_item()
     }
 
+    /// Returns whether center AI mode is active (no files open in center pane).
+    pub fn is_center_ai_mode(&self) -> bool {
+        self.center_ai_mode
+    }
+
+    /// Updates `center_ai_mode` based on whether the active pane has any items.
+    /// When no items are open, center AI mode activates to show the agent panel
+    /// in the center of the workspace.
+    pub fn update_center_ai_mode(&mut self, cx: &mut Context<Self>) {
+        let all_panes_empty = self.panes.iter().all(|pane| pane.read(cx).items_len() == 0);
+        let new_mode = all_panes_empty;
+        if self.center_ai_mode != new_mode {
+            self.center_ai_mode = new_mode;
+
+            // Set/clear the center_ai_view on the active pane
+            let agent_view = if new_mode {
+                self.find_agent_panel_view(cx)
+            } else {
+                None
+            };
+
+            let active_pane = self.active_pane.clone();
+            active_pane.update(cx, |pane, _cx| {
+                pane.set_center_ai_view(agent_view);
+            });
+
+            cx.notify();
+        }
+    }
+
     pub fn active_item_as<I: 'static>(&self, cx: &App) -> Option<Entity<I>> {
         let item = self.active_item(cx)?;
         item.to_any_view().downcast::<I>().ok()
+    }
+
+    /// Finds the agent panel AnyView from any dock by its persistent name.
+    fn find_agent_panel_view(&self, cx: &App) -> Option<AnyView> {
+        for dock in [&self.right_dock, &self.left_dock, &self.bottom_dock] {
+            if let Some(view) = dock.read(cx).find_panel_by_name("AgentPanel") {
+                return Some(view);
+            }
+        }
+        None
     }
 
     fn active_project_path(&self, cx: &App) -> Option<ProjectPath> {
@@ -4604,6 +4650,7 @@ impl Workspace {
                 cx.emit(Event::ItemAdded {
                     item: item.boxed_clone(),
                 });
+                self.update_center_ai_mode(cx);
             }
             pane::Event::Split { direction, mode } => {
                 match mode {
@@ -4673,6 +4720,7 @@ impl Workspace {
                 cx.emit(Event::ItemRemoved {
                     item_id: item.item_id(),
                 });
+                self.update_center_ai_mode(cx);
             }
             pane::Event::Focus => {
                 window.invalidate_character_coordinates();

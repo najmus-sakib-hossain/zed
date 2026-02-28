@@ -670,6 +670,14 @@ impl Dock {
         self.panel_entries.len()
     }
 
+    /// Find a panel by its persistent name and return its AnyView.
+    pub fn find_panel_by_name(&self, name: &str) -> Option<AnyView> {
+        self.panel_entries
+            .iter()
+            .find(|entry| entry.panel.persistent_name() == name)
+            .map(|entry| entry.panel.to_any())
+    }
+
     pub fn activate_panel(&mut self, panel_ix: usize, window: &mut Window, cx: &mut Context<Self>) {
         if Some(panel_ix) != self.active_panel_index {
             if let Some(active_panel) = self.active_panel_entry() {

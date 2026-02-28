@@ -2602,19 +2602,28 @@ impl ThreadView {
 
         let editor_bg_color = cx.theme().colors().editor_background;
         let editor_expanded = self.editor_expanded;
+        let is_centered = self
+            .workspace
+            .upgrade()
+            .map_or(false, |ws| ws.read(cx).is_center_ai_mode());
 
         v_flex()
             .on_action(cx.listener(Self::expand_message_editor))
             .w_full()
             .p_2()
-            // .pt_2()
-            // .pl_2()
-            // .pb_2()
-            // .pr_0()
             .gap_2()
             .border_t_1()
             .border_color(cx.theme().colors().border)
             .bg(editor_bg_color)
+            // Center AI mode: rounded input with shadow and border
+            .when(is_centered, |this| {
+                this.rounded_xl()
+                    .border_1()
+                    .border_color(cx.theme().colors().border_variant)
+                    .shadow_md()
+                    .mx_2()
+                    .mb_2()
+            })
             .when(editor_expanded, |this| {
                 this.h(vh(0.8, window)).size_full().justify_between()
             })

@@ -8,11 +8,11 @@
 ## Phase A: Core UI Shell
 
 ### Part 1: Center AI Panel + Rounded Input [IN PROGRESS]
-- [ ] Add `center_ai_mode` state to `Workspace` struct
-- [ ] Modify `Workspace::render()` to show AgentPanel centered when no files open
-- [ ] Add `is_centered` prop to `AgentPanel` render path
-- [ ] Style chat input: `max_w(680px)`, `rounded_xl()`, `border_1()`, `shadow_md()`, `mx_auto()`
-- [ ] Wire file open/close events to toggle `center_ai_mode`
+- [x] Add `center_ai_mode` state to `Workspace` struct
+- [x] Modify `Workspace::render()` to show AgentPanel centered when no files open
+- [x] Add `is_centered` prop to `AgentPanel` render path
+- [x] Style chat input: `max_w(680px)`, `rounded_xl()`, `border_1()`, `shadow_md()`, `mx_auto()`
+- [x] Wire file open/close events to toggle `center_ai_mode`
 - [ ] Build and verify
 
 ### Part 2: Six AI Profiles [QUEUED]
