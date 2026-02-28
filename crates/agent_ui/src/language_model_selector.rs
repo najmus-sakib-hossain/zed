@@ -325,6 +325,7 @@ impl GroupedModels {
         }
     }
 
+    #[allow(dead_code)]
     fn entries(&self) -> Vec<LanguageModelPickerEntry> {
         self.entries_with_collapsed(&HashSet::default())
     }

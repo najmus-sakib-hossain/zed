@@ -1,16 +1,17 @@
 use anyhow::{anyhow, Result};
 use collections::HashMap;
-use futures::{future::BoxFuture, FutureExt, StreamExt};
-use gpui::{App, AppContext, AsyncApp, Context, Entity, Task};
-use http_client::{AsyncBody, HttpClient, Method, Request as HttpRequest};
+use futures::{future::BoxFuture, AsyncReadExt, FutureExt};
+use gpui::{App, AsyncApp, Entity, Task, Window, AnyView};
+use http_client::{HttpClient, Method};
 use language_model::{
-    AuthenticateError, LanguageModel, LanguageModelCompletionEvent, LanguageModelId,
-    LanguageModelName, LanguageModelProvider, LanguageModelProviderId,
-    LanguageModelProviderName, LanguageModelProviderState, LanguageModelRequest, Role,
+    AuthenticateError, IconOrSvg, LanguageModel, LanguageModelCompletionError,
+    LanguageModelCompletionEvent, LanguageModelId, LanguageModelName, LanguageModelProvider,
+    LanguageModelProviderId, LanguageModelProviderName, LanguageModelProviderState,
+    LanguageModelRequest, LanguageModelToolChoice,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use ui::IconName;
+use ui::{IconName, prelude::*};
 
 const MODELS_DEV_API_URL: &str = "https://models.dev/api.json";
 
@@ -65,21 +66,23 @@ pub struct Modalities {
 /// Fetches and caches provider data from models.dev
 pub struct ModelsDevRegistry {
     http_client: Arc<dyn HttpClient>,
-    providers: Arc<parking_lot::RwLock<HashMap<String, ModelsDevProvider>>>,
+    providers: Arc<std::sync::RwLock<HashMap<String, ModelsDevProvider>>>,
 }
 
 impl ModelsDevRegistry {
     pub fn new(http_client: Arc<dyn HttpClient>) -> Self {
         Self {
             http_client,
-            providers: Arc::new(parking_lot::RwLock::new(HashMap::new())),
+            providers: Arc::new(std::sync::RwLock::new(HashMap::default())),
         }
     }
 
     /// Fetch providers from models.dev API
     pub async fn fetch_providers(&self) -> Result<HashMap<String, ModelsDevProvider>> {
-        let request = HttpRequest::get(MODELS_DEV_API_URL)
-            .redirect_policy(http_client::RedirectPolicy::FollowAll);
+        let request = http_client::Request::builder()
+            .method(Method::GET)
+            .uri(MODELS_DEV_API_URL)
+            .body(Default::default())?;
 
         let mut response = self
             .http_client
@@ -94,23 +97,24 @@ impl ModelsDevRegistry {
             ));
         }
 
-        let body = response.body_mut().read_to_string().await?;
+        let mut body = String::new();
+        response.body_mut().read_to_string(&mut body).await?;
         let providers: HashMap<String, ModelsDevProvider> = serde_json::from_str(&body)?;
 
         // Cache the providers
-        *self.providers.write() = providers.clone();
+        *self.providers.write().unwrap() = providers.clone();
 
         Ok(providers)
     }
 
     /// Get cached providers
     pub fn get_providers(&self) -> HashMap<String, ModelsDevProvider> {
-        self.providers.read().clone()
+        self.providers.read().unwrap().clone()
     }
 
     /// Get a specific provider by ID
     pub fn get_provider(&self, id: &str) -> Option<ModelsDevProvider> {
-        self.providers.read().get(id).cloned()
+        self.providers.read().unwrap().get(id).cloned()
     }
 }
 
@@ -161,18 +165,26 @@ impl LanguageModelProviderState for ModelsDevLanguageModelProvider {
 
 impl LanguageModelProvider for ModelsDevLanguageModelProvider {
     fn id(&self) -> LanguageModelProviderId {
-        LanguageModelProviderId::new(&self.provider_data.id)
+        LanguageModelProviderId::from(self.provider_data.id.clone())
     }
 
     fn name(&self) -> LanguageModelProviderName {
-        LanguageModelProviderName::new(&self.provider_data.name)
+        LanguageModelProviderName::from(self.provider_data.name.clone())
     }
 
-    fn icon(&self) -> ui::IconOrSvg {
-        ui::IconOrSvg::Icon(IconName::AiOpenAiCompat)
+    fn icon(&self) -> IconOrSvg {
+        IconOrSvg::Icon(IconName::AiOpenAiCompat)
     }
 
-    fn provided_models(&self, cx: &AppContext) -> Vec<Arc<dyn LanguageModel>> {
+    fn default_model(&self, _cx: &App) -> Option<Arc<dyn LanguageModel>> {
+        None
+    }
+
+    fn default_fast_model(&self, _cx: &App) -> Option<Arc<dyn LanguageModel>> {
+        None
+    }
+
+    fn provided_models(&self, _cx: &App) -> Vec<Arc<dyn LanguageModel>> {
         self.provider_data
             .models
             .values()
@@ -197,11 +209,11 @@ impl LanguageModelProvider for ModelsDevLanguageModelProvider {
             .collect()
     }
 
-    fn is_authenticated(&self, cx: &AppContext) -> bool {
+    fn is_authenticated(&self, cx: &App) -> bool {
         self.get_api_key(cx).is_some()
     }
 
-    fn authenticate(&self, cx: &mut AppContext) -> Task<Result<(), AuthenticateError>> {
+    fn authenticate(&self, cx: &mut App) -> Task<Result<(), AuthenticateError>> {
         if self.is_authenticated(cx) {
             Task::ready(Ok(()))
         } else {
@@ -209,7 +221,12 @@ impl LanguageModelProvider for ModelsDevLanguageModelProvider {
         }
     }
 
-    fn configuration_view(&self, cx: &mut gpui::Window, _: &mut App) -> gpui::AnyView {
+    fn configuration_view(
+        &self,
+        _target_agent: language_model::ConfigurationViewTargetAgent,
+        _window: &mut Window,
+        cx: &mut App,
+    ) -> AnyView {
         cx.new(|_cx| ModelsDevConfigurationView {
             provider_name: self.name(),
             env_vars: self.provider_data.env.clone(),
@@ -217,7 +234,7 @@ impl LanguageModelProvider for ModelsDevLanguageModelProvider {
         .into()
     }
 
-    fn reset_credentials(&self, _cx: &mut AppContext) -> Task<Result<()>> {
+    fn reset_credentials(&self, _cx: &mut App) -> Task<Result<()>> {
         Task::ready(Ok(()))
     }
 }
@@ -226,8 +243,11 @@ struct ModelsDevLanguageModel {
     provider_id: LanguageModelProviderId,
     provider_name: LanguageModelProviderName,
     model_data: ModelsDevModel,
+    #[allow(dead_code)]
     api_url: Option<String>,
+    #[allow(dead_code)]
     http_client: Arc<dyn HttpClient>,
+    #[allow(dead_code)]
     api_key_provider: Arc<dyn Fn(&App) -> Option<String> + Send + Sync>,
 }
 
@@ -252,45 +272,65 @@ impl LanguageModel for ModelsDevLanguageModel {
         format!("models_dev/{}/{}", self.provider_id.0, self.model_data.id)
     }
 
-    fn max_token_count(&self) -> usize {
-        self.model_data.limit.context as usize
+    fn max_token_count(&self) -> u64 {
+        self.model_data.limit.context
     }
 
-    fn max_output_tokens(&self) -> Option<u32> {
-        Some(self.model_data.limit.output as u32)
+    fn max_output_tokens(&self) -> Option<u64> {
+        Some(self.model_data.limit.output)
+    }
+
+    fn supports_images(&self) -> bool {
+        self.model_data
+            .modalities
+            .as_ref()
+            .map(|m| m.input.iter().any(|i| i.contains("image")))
+            .unwrap_or(false)
+    }
+
+    fn supports_tools(&self) -> bool {
+        self.model_data.tool_call
+    }
+
+    fn supports_tool_choice(&self, _choice: LanguageModelToolChoice) -> bool {
+        self.model_data.tool_call
     }
 
     fn count_tokens(
         &self,
         request: LanguageModelRequest,
-        _cx: &AppContext,
-    ) -> BoxFuture<'static, Result<usize>> {
+        _cx: &App,
+    ) -> BoxFuture<'static, Result<u64>> {
         // Simple token estimation
         let text = request
             .messages
             .iter()
             .map(|msg| msg.content.len())
             .sum::<usize>();
-        async move { Ok(text / 4) }.boxed()
+        async move { Ok((text / 4) as u64) }.boxed()
     }
 
     fn stream_completion(
         &self,
-        request: LanguageModelRequest,
+        _request: LanguageModelRequest,
         _cx: &AsyncApp,
-    ) -> BoxFuture<'static, Result<futures::stream::BoxStream<'static, Result<LanguageModelCompletionEvent>>>>
-    {
+    ) -> BoxFuture<
+        'static,
+        Result<
+            futures::stream::BoxStream<
+                'static,
+                Result<LanguageModelCompletionEvent, LanguageModelCompletionError>,
+            >,
+            LanguageModelCompletionError,
+        >,
+    > {
         // This is a placeholder - actual implementation would use OpenAI-compatible API
         async move {
-            Err(anyhow!(
+            Err(LanguageModelCompletionError::Other(anyhow!(
                 "Streaming not yet implemented for models.dev providers"
-            ))
+            )))
         }
         .boxed()
-    }
-
-    fn use_any_tool(&self) -> bool {
-        self.model_data.tool_call
     }
 }
 
@@ -300,17 +340,15 @@ struct ModelsDevConfigurationView {
 }
 
 impl gpui::Render for ModelsDevConfigurationView {
-    fn render(&mut self, _window: &mut gpui::Window, cx: &mut gpui::Context<Self>) -> impl gpui::IntoElement {
-        use gpui::prelude::*;
-        
-        ui::v_flex()
+    fn render(&mut self, _window: &mut gpui::Window, _cx: &mut gpui::Context<Self>) -> impl gpui::IntoElement {
+        v_flex()
             .gap_2()
-            .child(ui::Label::new(format!(
+            .child(Label::new(format!(
                 "Configure {} by setting environment variable:",
                 self.provider_name.0
             )))
             .children(self.env_vars.iter().map(|var| {
-                ui::Label::new(var.clone()).color(ui::Color::Muted)
+                Label::new(var.clone()).color(Color::Muted)
             }))
     }
 }

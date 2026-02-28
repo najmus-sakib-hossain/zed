@@ -22,6 +22,7 @@ const PROVIDER_NAME: LanguageModelProviderName = LanguageModelProviderName::new(
 const POLLINATIONS_API_URL: &str = "https://text.pollinations.ai/openai";
 
 /// mlvoca API base URL (Ollama-compatible `/api/generate`, no key required).
+#[allow(dead_code)]
 const MLVOCA_API_URL: &str = "https://mlvoca.com";
 
 /// OpenCode Zen API URL (OpenAI-compatible, uses "public" as API key).
@@ -91,6 +92,7 @@ static FREE_MODEL_DESCRIPTORS: &[FreeModelDescriptor] = &[
 #[derive(Debug, Clone, Copy)]
 enum ApiKind {
     OpenAi,
+    #[allow(dead_code)]
     OllamaGenerate,
 }
 
