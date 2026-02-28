@@ -56,6 +56,13 @@ members = [
     "crates/dev_container",
     "crates/diagnostics",
     "crates/docs_preprocessor",
+    "crates/dx_computer_use",
+    "crates/dx_core",
+    "crates/dx_daemon",
+    "crates/dx_grammar",
+    "crates/dx_hardware",
+    "crates/dx_media",
+    "crates/dx_voice",
     "crates/edit_prediction",
     "crates/edit_prediction_cli",
     "crates/edit_prediction_context",
@@ -173,6 +180,7 @@ members = [
     "crates/settings_ui",
     "crates/shell_command_parser",
     "crates/sidebar",
+    "crates/social_sharing",
     "crates/snippet",
     "crates/snippet_provider",
     "crates/snippets_ui",
@@ -310,6 +318,13 @@ deepseek = { path = "crates/deepseek" }
 derive_refineable = { path = "crates/refineable/derive_refineable" }
 dev_container = { path = "crates/dev_container" }
 diagnostics = { path = "crates/diagnostics" }
+dx_computer_use = { path = "crates/dx_computer_use" }
+dx_core = { path = "crates/dx_core" }
+dx_daemon = { path = "crates/dx_daemon" }
+dx_grammar = { path = "crates/dx_grammar" }
+dx_hardware = { path = "crates/dx_hardware" }
+dx_media = { path = "crates/dx_media" }
+dx_voice = { path = "crates/dx_voice" }
 editor = { path = "crates/editor" }
 encoding_selector = { path = "crates/encoding_selector" }
 etw_tracing = { path = "crates/etw_tracing" }
@@ -422,6 +437,7 @@ shell_command_parser = { path = "crates/shell_command_parser" }
 snippet = { path = "crates/snippet" }
 snippet_provider = { path = "crates/snippet_provider" }
 snippets_ui = { path = "crates/snippets_ui" }
+social_sharing = { path = "crates/social_sharing" }
 sqlez = { path = "crates/sqlez" }
 sqlez_macros = { path = "crates/sqlez_macros" }
 story = { path = "crates/story" }

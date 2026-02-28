@@ -100,11 +100,11 @@ impl ResourceMonitor {
         let latest = self.latest();
 
         match self.current_tier {
-            DeviceTier::Embedded | DeviceTier::LowEnd => {
+            DeviceTier::UltraLow | DeviceTier::Low => {
                 avg_cpu > 0.7
                     || latest.map_or(false, |s| s.ram_fraction() > 0.8)
             }
-            DeviceTier::MidRange => {
+            DeviceTier::Mid => {
                 avg_cpu > 0.85
                     || latest.map_or(false, |s| s.ram_fraction() > 0.85)
             }
