@@ -1,3 +1,45 @@
+Previously Zed code editor was revolving around code editing and little bit of ai but from now on as we are forking it and making it our DX, we will revolve around UI and AI generation related. The code editor thing will still be there but we will introduce the AI generative UI system now. The plan is to make our UI as elegant as possible and also we should not only create dummy UI; we should make all the UI changes functional. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Please make a  "pink"  version of this image and make sure to enhance that image for higher quality!!!

@@ -1,3 +1,7 @@
+Now get this: You do something like an agent loop. Currently the money I am or the logic of the prompt is that if you stop then it will charge me more so you come up with a checklist that I can click on options to interact with you, right? Don't ask me a question and end. Whenever you need my clarification just show options that I can select. Ok:
+
+Currently we are working on updating the UI of our Zed GPUI code editor. And we are planning on how the UI should look like. I have added this screenshot in this chat. Please tell me what the UI design system or elements you can see so that we can discuss making it better. 
+
 Building a file explorer ("DX") using **Rust** and **Zed's GPUI** framework places you in a completely different performance league compared to the "Files" app on Windows.
 
 The "Files" app is built on **C# and WinUI 3 (Windows App SDK)**. While feature-rich and beautiful, it suffers from the inherent overhead of the .NET runtime, garbage collection, and the heavy WinUI rendering pipeline.
