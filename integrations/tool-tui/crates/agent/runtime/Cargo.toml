@@ -1,0 +1,46 @@
+[package]
+name = "dx-agent-runtime"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX Agent LLM runtime - multi-provider abstraction with streaming, failover, and cost tracking"
+
+[dependencies]
+dx-agent-protocol = { path = "../protocol" }
+dx-agent-sessions = { path = "../sessions" }
+
+# Async runtime
+tokio = { version = "1.42", features = ["full"] }
+async-trait = "0.1"
+futures-util = "0.3"
+
+# HTTP client for LLM APIs
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Utilities
+tracing = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.0", features = ["v4"] }
+dashmap = "6.1"
+parking_lot = "0.12"
+bytes = "1.9"
+base64 = "0.22"
+
+# Tokenizer approximation
+tiktoken-rs = "0.6"
+
+[dev-dependencies]
+tokio = { version = "1.42", features = ["full", "test-util"] }
+
+[lints]
+workspace = true

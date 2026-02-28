@@ -1,0 +1,70 @@
+# Sample TOML file for dx-check testing
+#
+# This file demonstrates TOML formatting and linting capabilities.
+
+[package]
+name = "sample-project"
+version = "1.0.0"
+edition = "2021"
+authors = ["Developer <dev@example.com>"]
+description = "A sample project for testing dx-check"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/example/sample-project"
+keywords = ["sample", "testing", "dx-check"]
+categories = ["development-tools"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
+anyhow = "1.0"
+thiserror = "1.0"
+
+[dev-dependencies]
+proptest = "1.0"
+criterion = "0.5"
+
+[features]
+default = ["std"]
+std = []
+async = ["tokio"]
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[[bin]]
+name = "sample"
+path = "src/main.rs"
+
+[[example]]
+name = "basic"
+path = "examples/basic.rs"
+
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.dependencies]
+log = "0.4"
+env_logger = "0.10"
+
+# Custom configuration section
+[tool.dx-check]
+enabled = true
+rules = ["recommended"]
+ignore = ["target/", "node_modules/"]
+
+[tool.dx-check.format]
+indent_width = 4
+line_width = 100
+quote_style = "double"
+
+[tool.dx-check.lint]
+severity = "warn"
+auto_fix = false

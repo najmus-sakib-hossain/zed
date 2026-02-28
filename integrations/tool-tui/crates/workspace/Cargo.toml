@@ -1,0 +1,49 @@
+[package]
+name = "dx-workspace"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Universal development environment configuration for dx ecosystem"
+keywords = ["workspace", "configuration", "development", "environment", "dx"]
+categories = ["development-tools", "config", "filesystem"]
+
+[dependencies]
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# Hashing for cache
+blake3 = "1.5"
+
+# File system operations
+walkdir = "2.5"
+memmap2 = "0.9"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Path handling
+pathdiff = "0.2"
+
+# Terminal output
+console = "0.15"
+
+# Internal dx crates
+# dx-serializer = { path = "../dx-serializer" }
+
+[dev-dependencies]
+tempfile = "3.10"
+
+[features]
+default = []
+# Enable SIMD acceleration for bulk generation
+simd = []
+# Enable all cloud IDE generators
+cloud-ide = []

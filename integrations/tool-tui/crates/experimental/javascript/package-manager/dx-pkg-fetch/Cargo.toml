@@ -1,0 +1,13 @@
+[package]
+name = "dx-pkg-fetch"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+dx-pkg-registry = { path = "../dx-pkg-registry" }
+tokio = { version = "1.35", features = ["full"] }
+futures = "0.3"
+thiserror = "2.0"

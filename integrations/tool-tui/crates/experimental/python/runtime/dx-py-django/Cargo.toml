@@ -1,0 +1,44 @@
+[package]
+name = "dx-py-django"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Django compatibility layer for DX-Py - C extension support for Django dependencies"
+
+[dependencies]
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Fast JSON parsing
+simd-json = { workspace = true }
+
+# Regex for parsing
+regex = { workspace = true }
+
+# Once cell for lazy initialization
+once_cell = { workspace = true }
+
+# Password hashing
+argon2 = "0.5"
+bcrypt = "0.15"
+
+# Crypto primitives
+sha2 = "0.10"
+pbkdf2 = { version = "0.12", features = ["simple"] }
+hmac = "0.12"
+
+# Base64 encoding
+base64 = "0.22"
+
+# Random number generation
+getrandom = "0.2"
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }

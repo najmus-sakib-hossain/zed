@@ -1,0 +1,14 @@
+[package]
+name = "live-frame-dedup"
+version.workspace = true
+edition.workspace = true
+description = "Live stream frame deduplication — 80% savings by dropping redundant frames"
+
+[dependencies]
+dx-core = { workspace = true }
+image = { workspace = true }
+blake3 = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

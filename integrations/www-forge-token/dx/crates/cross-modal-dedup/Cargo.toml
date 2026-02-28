@@ -1,0 +1,12 @@
+[package]
+name = "cross-modal-dedup"
+version.workspace = true
+edition.workspace = true
+description = "Cross-modal redundancy elimination — removes duplicate content across modalities"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

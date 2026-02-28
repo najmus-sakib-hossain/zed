@@ -1,0 +1,29 @@
+[package]
+name = "dx-py-flask"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Flask framework compatibility layer for DX-Py runtime"
+
+[dependencies]
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Regex for URL routing
+regex = { workspace = true }
+
+# Once cell for lazy initialization
+once_cell = { workspace = true }
+
+# UUID for request IDs
+uuid = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }

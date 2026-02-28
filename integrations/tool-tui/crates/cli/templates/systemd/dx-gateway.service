@@ -1,0 +1,43 @@
+[Unit]
+Description=DX Gateway Service
+Documentation=https://dx.dev/docs
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dx
+Group=dx
+ExecStart=/usr/local/bin/dx gateway start --port 8787
+ExecStop=/usr/local/bin/dx gateway stop
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=0
+TimeoutStopSec=30
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/dx /var/log/dx
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+# Resource limits
+MemoryMax=256M
+CPUQuota=50%
+TasksMax=32
+
+# Environment
+Environment="DX_GATEWAY_PORT=8787"
+Environment="DX_GATEWAY_HOST=0.0.0.0"
+Environment="DX_DATA_DIR=/var/lib/dx"
+EnvironmentFile=-/etc/dx/gateway.env
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dx-gateway
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,1364 @@
+{
+  "name": "dx",
+  "displayName": "DX",
+  "description": "The unified DX ecosystem extension - Serializer, Forge daemon integration, dx-check linting, and tool orchestration",
+  "version": "0.0.1",
+  "repository": "https://github.com/manfromexistence/dx",
+  "license": "MIT",
+  "publisher": "essence",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Formatters",
+    "Themes",
+    "Other"
+  ],
+  "keywords": [
+    "dx",
+    "linter",
+    "check",
+    "serializer",
+    "forge",
+    "tools",
+    "orchestration",
+    "format",
+    "llm",
+    "token-efficient"
+  ],
+  "icon": "media/logo.png",
+  "activationEvents": [
+    "onStartupFinished",
+    "onFileSystem:dxlens",
+    "onFileSystem:dxhuman",
+    "onFileSystem:markdownhuman",
+    "onLanguage:dx-serializer",
+    "onLanguage:dx-markdown",
+    "onLanguage:dx-www-component",
+    "onLanguage:dx-www-page",
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact",
+    "workspaceContains:**/*.sr",
+    "workspaceContains:**/*.md",
+    "workspaceContains:**/*.human",
+    "workspaceContains:**/*.machine",
+    "workspaceContains:**/*.cp",
+    "workspaceContains:**/*.pg",
+    "workspaceContains:dx",
+    "onCommand:dx.refreshFromDisk",
+    "onCommand:dx.forceSave",
+    "onCommand:dx.showDenseView",
+    "onCommand:dx.formatDocument",
+    "onCommand:dx.setColorTheme",
+    "onCommand:dxm.convertToHuman",
+    "onCommand:dxm.convertToLlm",
+    "onCommand:dxm.toggleTableStyle",
+    "onCommand:sr.convertToHuman",
+    "onCommand:sr.convertToLlm",
+    "onCommand:sr.showTokens",
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "dx-serializer",
+        "aliases": [
+          "DX Serializer"
+        ],
+        "extensions": [
+          ".sr",
+          ".llm",
+          ".human",
+          ".machine"
+        ],
+        "filenames": [
+          "dx"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./media/dx-file-extension-light.png",
+          "dark": "./media/dx-file-extension-dark.png"
+        }
+      },
+      {
+        "id": "dx-markdown",
+        "aliases": [
+          "DX Markdown"
+        ],
+        "extensions": [
+          ".md"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./media/dx-file-extension-light.png",
+          "dark": "./media/dx-file-extension-dark.png"
+        }
+      },
+      {
+        "id": "dx-www-component",
+        "aliases": [
+          "DX WWW Component",
+          "DX Component"
+        ],
+        "extensions": [
+          ".cp"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./media/dx-file-extension-light.png",
+          "dark": "./media/dx-file-extension-dark.png"
+        }
+      },
+      {
+        "id": "dx-www-page",
+        "aliases": [
+          "DX WWW Page",
+          "DX Page"
+        ],
+        "extensions": [
+          ".pg"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./media/dx-file-extension-light.png",
+          "dark": "./media/dx-file-extension-dark.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "dx-serializer",
+        "scopeName": "source.dx-serializer",
+        "path": "./syntaxes/dx-serializer.tmLanguage.json"
+      },
+      {
+        "language": "dx-markdown",
+        "scopeName": "source.dx-markdown",
+        "path": "./syntaxes/dx-markdown.tmLanguage.json"
+      },
+      {
+        "language": "dx-www-component",
+        "scopeName": "source.dx-www",
+        "path": "./syntaxes/dx-www.tmLanguage.json"
+      },
+      {
+        "language": "dx-www-page",
+        "scopeName": "source.dx-www",
+        "path": "./syntaxes/dx-www.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "DX (Light)",
+        "uiTheme": "vs",
+        "path": "./themes/dx-light.json"
+      },
+      {
+        "label": "DX (Dark)",
+        "uiTheme": "vs-dark",
+        "path": "./themes/dx-dark.json"
+      },
+      {
+        "label": "DX Markdown",
+        "uiTheme": "vs-dark",
+        "path": "./themes/dx-markdown-theme.json"
+      }
+    ],
+    "iconThemes": [
+      {
+        "id": "dx-file-icon-theme",
+        "label": "DX File Icons",
+        "path": "./themes/icons/dx-file-icon-theme.json"
+      }
+    ],
+    "productIconThemes": [
+      {
+        "id": "dx-product-icons",
+        "label": "DX Product Icons",
+        "path": "./themes/product-icons/dx-product-icon-theme.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "dx.setColorTheme",
+        "title": "DX: Set Color Theme",
+        "icon": "$(symbol-color)"
+      },
+      {
+        "command": "dx.refreshFromDisk",
+        "title": "DX: Refresh from Disk",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "dx.forceSave",
+        "title": "DX: Force Save"
+      },
+      {
+        "command": "dx.showDenseView",
+        "title": "DX: Show Dense View"
+      },
+      {
+        "command": "dx.formatDocument",
+        "title": "DX: Format Document"
+      },
+      {
+        "command": "dx.forge.start",
+        "title": "DX: Start Forge Daemon",
+        "icon": "$(play)"
+      },
+      {
+        "command": "dx.forge.stop",
+        "title": "DX: Stop Forge Daemon",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "dx.forge.restart",
+        "title": "DX: Restart Forge Daemon",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "dx.forge.status",
+        "title": "DX: Show Forge Status",
+        "icon": "$(info)"
+      },
+      {
+        "command": "dx.tools.list",
+        "title": "DX: Show Tool List",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "dx.forge.changes",
+        "title": "DX: Show File Changes",
+        "icon": "$(git-compare)"
+      },
+      {
+        "command": "dx.forge.gitStatus",
+        "title": "DX: Show Git Status",
+        "icon": "$(git-branch)"
+      },
+      {
+        "command": "dx.forge.syncGit",
+        "title": "DX: Sync Forge with Git",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "dx.check.lint",
+        "title": "DX Check: Lint Current File",
+        "icon": "$(check)"
+      },
+      {
+        "command": "dx.check.lintWorkspace",
+        "title": "DX Check: Lint Workspace",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "dx.check.fix",
+        "title": "DX Check: Fix Current File",
+        "icon": "$(wand)"
+      },
+      {
+        "command": "dx.check.fixWorkspace",
+        "title": "DX Check: Fix All Files in Workspace",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "dx.check.showRules",
+        "title": "DX Check: Show Rules",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "dx.check.restart",
+        "title": "DX Check: Restart Language Server",
+        "icon": "$(debug-restart)"
+      },
+      {
+        "command": "dxm.convertToHuman",
+        "title": "DXM: Convert to Human Format",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "dxm.convertToLlm",
+        "title": "DXM: Convert to LLM Format",
+        "icon": "$(file-binary)"
+      },
+      {
+        "command": "dxm.toggleTableStyle",
+        "title": "DXM: Toggle Table Style (Unicode/ASCII)",
+        "icon": "$(table)"
+      },
+      {
+        "command": "sr.convertToHuman",
+        "title": "SR: Convert to Human Format",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "sr.convertToLlm",
+        "title": "SR: Convert to LLM Format",
+        "icon": "$(file-binary)"
+      },
+      {
+        "command": "sr.showTokens",
+        "title": "SR: Show Token Comparison",
+        "icon": "$(symbol-number)"
+      },
+      {
+        "command": "sr.benchmark",
+        "title": "SR: Run Benchmark",
+        "icon": "$(dashboard)"
+      },
+      {
+        "command": "dx.togglePhantomMode",
+        "title": "DX: Toggle Phantom Mode",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "dx.enablePhantomMode",
+        "title": "DX: Enable Phantom Mode",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "dx.disablePhantomMode",
+        "title": "DX: Disable Phantom Mode",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "dx.clearCache",
+        "title": "DX: Clear Binary Cache",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "dx.generateCache",
+        "title": "DX: Generate Cache for Current File",
+        "icon": "$(database)"
+      },
+      {
+        "command": "dx.showTokenPanel",
+        "title": "DX: Show Token Count (All Models)",
+        "icon": "$(symbol-number)"
+      },
+      {
+        "command": "dx.showTokenDetails",
+        "title": "DX: Show Token Details",
+        "icon": "$(symbol-number)"
+      },
+      {
+        "command": "dx.showUniversalTokenPanel",
+        "title": "DX: Show Token Count (All Models)",
+        "icon": "$(symbol-number)"
+      },
+      {
+        "command": "dx.openSectionFolder",
+        "title": "DX: Open Section Config Folder",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "dx.style.showCSSViewer",
+        "title": "DX Style: Show CSS Viewer",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "dx.generator.generate",
+        "title": "DX: Generate from Template",
+        "icon": "$(file-add)"
+      },
+      {
+        "command": "dx.generator.generateFromContext",
+        "title": "Generate from Template",
+        "icon": "$(file-add)"
+      },
+      {
+        "command": "dx.generator.listTemplates",
+        "title": "DX: List Templates",
+        "icon": "$(list-unordered)"
+      },
+      {
+        "command": "dx.generator.refreshTemplates",
+        "title": "DX: Refresh Templates",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "dx.generator.searchTemplates",
+        "title": "DX: Search Templates",
+        "icon": "$(search)"
+      },
+      {
+        "command": "dx.generator.showStats",
+        "title": "DX: Show Generator Stats",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "dx.driven.init",
+        "title": "DX Driven: Initialize",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dx.driven.sync",
+        "title": "DX Driven: Sync Rules",
+        "icon": "$(sync)"
+      },
+      {
+        "command": "dx.driven.validate",
+        "title": "DX Driven: Validate Rules",
+        "icon": "$(check)"
+      },
+      {
+        "command": "dx.driven.refresh",
+        "title": "DX Driven: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "dx.driven.specInit",
+        "title": "DX Driven: Create Spec",
+        "icon": "$(new-file)"
+      },
+      {
+        "command": "dx.driven.hooksCreate",
+        "title": "DX Driven: Create Hook",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dx.driven.steeringCreate",
+        "title": "DX Driven: Create Steering File",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dx.dcp.startServer",
+        "title": "DX DCP: Start Server",
+        "icon": "$(play)"
+      },
+      {
+        "command": "dx.dcp.stopServer",
+        "title": "DX DCP: Stop Server",
+        "icon": "$(debug-stop)"
+      },
+      {
+        "command": "dx.dcp.refresh",
+        "title": "DX DCP: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "dx.dcp.registerTool",
+        "title": "DX DCP: Register Tool",
+        "icon": "$(add)"
+      },
+      {
+        "command": "dx.dcp.invokeTool",
+        "title": "DX DCP: Invoke Tool",
+        "icon": "$(play)"
+      },
+      {
+        "command": "dx.dcp.runBenchmarks",
+        "title": "DX DCP: Run Benchmarks",
+        "icon": "$(dashboard)"
+      },
+      {
+        "command": "dx.dcp.showMcpStatus",
+        "title": "DX DCP: Show MCP Compatibility",
+        "icon": "$(info)"
+      },
+      {
+        "command": "dx.dcp.showInfo",
+        "title": "DX DCP: Show Info",
+        "icon": "$(info)"
+      },
+      {
+        "command": "dx.www.newProject",
+        "title": "DX WWW: New Project",
+        "icon": "$(folder-opened)"
+      },
+      {
+        "command": "dx.www.newComponent",
+        "title": "DX WWW: New Component",
+        "icon": "$(symbol-class)"
+      },
+      {
+        "command": "dx.www.newRoute",
+        "title": "DX WWW: New Route",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "dx.www.newApi",
+        "title": "DX WWW: New API Route",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "dx.www.newComponentFromContext",
+        "title": "New Component",
+        "icon": "$(symbol-class)"
+      },
+      {
+        "command": "dx.www.newRouteFromContext",
+        "title": "New Route",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "dx.www.newApiFromContext",
+        "title": "New API Route",
+        "icon": "$(plug)"
+      },
+      {
+        "command": "dx.www.refresh",
+        "title": "DX WWW: Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "dx.format.showHuman",
+        "title": "DX: Show Human Format",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "dx.format.showLlm",
+        "title": "DX: Show LLM Format",
+        "icon": "$(symbol-number)"
+      },
+      {
+        "command": "dx.format.showMachine",
+        "title": "DX: Show Machine Format",
+        "icon": "$(file-binary)"
+      },
+      {
+        "command": "dx.export.showMenu",
+        "title": "DX: Export to...",
+        "icon": "$(export)"
+      },
+      {
+        "command": "dx.export.toToon",
+        "title": "DX: Export to TOON"
+      },
+      {
+        "command": "dx.export.toJson",
+        "title": "DX: Export to JSON"
+      },
+      {
+        "command": "dx.export.toJsonCompact",
+        "title": "DX: Export to JSON (Compact)"
+      },
+      {
+        "command": "dx.export.toYaml",
+        "title": "DX: Export to YAML"
+      },
+      {
+        "command": "dx.export.toToml",
+        "title": "DX: Export to TOML"
+      },
+      {
+        "command": "dx.export.toCsv",
+        "title": "DX: Export to CSV"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "dx.refreshFromDisk",
+          "when": "resourceExtname == .sr || resourceFilename == dx || resourceExtname == .md || resourceScheme == dxlens || resourceScheme == dxhuman || resourceScheme == dxmhuman",
+          "group": "navigation"
+        },
+        {
+          "command": "dx.format.showHuman",
+          "when": "editorLangId == dx-markdown || editorLangId == dx-serializer || resourceExtname == .sr || resourceFilename == dx || resourceExtname == .md",
+          "group": "navigation"
+        },
+        {
+          "command": "dx.format.showLlm",
+          "when": "editorLangId == dx-markdown || editorLangId == dx-serializer || resourceExtname == .sr || resourceFilename == dx || resourceExtname == .md",
+          "group": "navigation"
+        },
+        {
+          "command": "dx.format.showMachine",
+          "when": "editorLangId == dx-markdown || editorLangId == dx-serializer || resourceExtname == .sr || resourceFilename == dx || resourceExtname == .md",
+          "group": "navigation"
+        },
+        {
+          "command": "sr.convertToHuman",
+          "when": "resourceExtname == .sr",
+          "group": "navigation"
+        },
+        {
+          "command": "sr.showTokens",
+          "when": "resourceExtname == .sr",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "dx.generator.generateFromContext",
+          "group": "1_modification@1"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "dx.www.newComponentFromContext",
+          "when": "explorerResourceIsFolder",
+          "group": "dx@1"
+        },
+        {
+          "command": "dx.www.newRouteFromContext",
+          "when": "explorerResourceIsFolder && resourceFilename =~ /^(pages|routes|app)$/",
+          "group": "dx@2"
+        },
+        {
+          "command": "dx.www.newApiFromContext",
+          "when": "explorerResourceIsFolder && resourceFilename =~ /^(api|apis)$/",
+          "group": "dx@3"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "dx.www.refresh",
+          "when": "view == dx.wwwView",
+          "group": "navigation"
+        },
+        {
+          "command": "dx.www.newProject",
+          "when": "view == dx.wwwView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "type": "webview",
+          "id": "dx.hologramView",
+          "name": "DXM Preview",
+          "when": "resourceExtname == .dxm"
+        },
+        {
+          "id": "dx.drivenView",
+          "name": "Driven",
+          "icon": "$(robot)"
+        },
+        {
+          "id": "dx.generatorView",
+          "name": "Generator",
+          "icon": "$(file-code)"
+        },
+        {
+          "id": "dx.dcpView",
+          "name": "DCP",
+          "icon": "$(plug)"
+        },
+        {
+          "id": "dx.wwwView",
+          "name": "DX WWW",
+          "icon": "$(globe)"
+        }
+      ]
+    },
+    "configurationDefaults": {
+      "files.associations": {
+        "*.md": "dx-markdown",
+        "*.sr": "dx-serializer",
+        "dx": "dx-serializer",
+        "*.human": "dx-serializer",
+        "*.machine": "dx-serializer",
+        "*.toml": "dx-serializer"
+      },
+      "[dx-serializer]": {
+        "editor.formatOnSave": true,
+        "editor.wordWrap": "on"
+      },
+      "[dx-markdown]": {
+        "editor.formatOnSave": false,
+        "editor.wordWrap": "on"
+      },
+      "editor.tokenColorCustomizations": {
+        "textMateRules": [
+          {
+            "scope": "support.type.property-name.dx",
+            "settings": {
+              "foreground": "#f05b8d"
+            }
+          },
+          {
+            "scope": "string.quoted.double.dx",
+            "settings": {
+              "foreground": "#58c760"
+            }
+          },
+          {
+            "scope": "string.unquoted.dx",
+            "settings": {
+              "foreground": "#58c760"
+            }
+          },
+          {
+            "scope": "string.other.link.dx",
+            "settings": {
+              "foreground": "#58c760"
+            }
+          },
+          {
+            "scope": "markup.underline.link.dx",
+            "settings": {
+              "foreground": "#58c760"
+            }
+          },
+          {
+            "scope": "constant.numeric.dx",
+            "settings": {
+              "foreground": "#62a6ff"
+            }
+          },
+          {
+            "scope": "constant.numeric.version.dx",
+            "settings": {
+              "foreground": "#62a6ff"
+            }
+          },
+          {
+            "scope": "constant.language.boolean.dx",
+            "settings": {
+              "foreground": "#62a6ff"
+            }
+          },
+          {
+            "scope": "constant.language.null.dx",
+            "settings": {
+              "foreground": "#62a6ff"
+            }
+          },
+          {
+            "scope": "entity.name.tag.dx",
+            "settings": {
+              "foreground": "#62a6ff"
+            }
+          },
+          {
+            "scope": "comment.line.double-slash.dx",
+            "settings": {
+              "foreground": "#a1a1a1",
+              "fontStyle": "italic"
+            }
+          },
+          {
+            "scope": "string.quoted.single.dx",
+            "settings": {
+              "foreground": "#58c760"
+            }
+          },
+          {
+            "scope": "variable.other.reference.dx",
+            "settings": {
+              "foreground": "#d4a656"
+            }
+          },
+          {
+            "scope": "punctuation.separator.pipe.dx",
+            "settings": {
+              "foreground": "#808080"
+            }
+          },
+          {
+            "scope": "punctuation.separator.key-value.dx",
+            "settings": {
+              "foreground": "#808080"
+            }
+          },
+          {
+            "scope": "keyword.control.context.dx",
+            "settings": {
+              "foreground": "#c586c0"
+            }
+          },
+          {
+            "scope": "keyword.control.reference.dx",
+            "settings": {
+              "foreground": "#d4a656"
+            }
+          },
+          {
+            "scope": "keyword.control.section.dx",
+            "settings": {
+              "foreground": "#c586c0"
+            }
+          },
+          {
+            "scope": "markup.heading.1.dx-markdown",
+            "settings": {
+              "foreground": "#4EC9B0",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.heading.2.dx-markdown",
+            "settings": {
+              "foreground": "#569CD6",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.heading.3.dx-markdown",
+            "settings": {
+              "foreground": "#C586C0",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.heading.4.dx-markdown",
+            "settings": {
+              "foreground": "#DCDCAA",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.heading.5.dx-markdown",
+            "settings": {
+              "foreground": "#CE9178",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.heading.6.dx-markdown",
+            "settings": {
+              "foreground": "#9CDCFE",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "entity.name.section.dx-markdown",
+            "settings": {
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "punctuation.definition.heading.dx-markdown",
+            "settings": {
+              "foreground": "#858585",
+              "fontStyle": ""
+            }
+          },
+          {
+            "scope": "markup.bold.dx-markdown",
+            "settings": {
+              "foreground": "#F97583",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "punctuation.definition.bold.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "markup.italic.dx-markdown",
+            "settings": {
+              "foreground": "#FFAB70",
+              "fontStyle": "italic"
+            }
+          },
+          {
+            "scope": "punctuation.definition.italic.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "markup.strikethrough.dx-markdown",
+            "settings": {
+              "foreground": "#6A737D",
+              "fontStyle": "strikethrough"
+            }
+          },
+          {
+            "scope": "punctuation.definition.strikethrough.dx-markdown",
+            "settings": {
+              "foreground": "#6A737D"
+            }
+          },
+          {
+            "scope": "markup.inline.raw.dx-markdown",
+            "settings": {
+              "foreground": "#F97583",
+              "background": "#2D2D30"
+            }
+          },
+          {
+            "scope": "markup.raw.inline.dx-markdown",
+            "settings": {
+              "foreground": "#F97583"
+            }
+          },
+          {
+            "scope": "punctuation.definition.raw.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "markup.fenced_code.block.dx-markdown",
+            "settings": {
+              "foreground": "#D4D4D4"
+            }
+          },
+          {
+            "scope": "markup.raw.block.dx-markdown",
+            "settings": {
+              "foreground": "#D4D4D4"
+            }
+          },
+          {
+            "scope": "entity.name.function.dx-markdown",
+            "settings": {
+              "foreground": "#4EC9B0",
+              "fontStyle": "italic"
+            }
+          },
+          {
+            "scope": "punctuation.definition.code.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "string.other.link.title.dx-markdown",
+            "settings": {
+              "foreground": "#9CDCFE"
+            }
+          },
+          {
+            "scope": "markup.underline.link.dx-markdown",
+            "settings": {
+              "foreground": "#569CD6",
+              "fontStyle": "underline"
+            }
+          },
+          {
+            "scope": "markup.underline.link.image.dx-markdown",
+            "settings": {
+              "foreground": "#FFAB70",
+              "fontStyle": "underline"
+            }
+          },
+          {
+            "scope": "punctuation.definition.link.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "punctuation.definition.image.dx-markdown",
+            "settings": {
+              "foreground": "#FFAB70",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "string.other.link.description.dx-markdown",
+            "settings": {
+              "foreground": "#FFAB70"
+            }
+          },
+          {
+            "scope": "constant.other.reference.link.dx-markdown",
+            "settings": {
+              "foreground": "#C586C0"
+            }
+          },
+          {
+            "scope": "markup.list.unnumbered.dx-markdown",
+            "settings": {
+              "foreground": "#D4D4D4"
+            }
+          },
+          {
+            "scope": "markup.list.numbered.dx-markdown",
+            "settings": {
+              "foreground": "#D4D4D4"
+            }
+          },
+          {
+            "scope": "punctuation.definition.list.dx-markdown",
+            "settings": {
+              "foreground": "#569CD6",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.checkbox.dx-markdown",
+            "settings": {
+              "foreground": "#4EC9B0",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.list.task.dx-markdown",
+            "settings": {
+              "foreground": "#D4D4D4"
+            }
+          },
+          {
+            "scope": "markup.quote.dx-markdown",
+            "settings": {
+              "foreground": "#6A9955",
+              "fontStyle": "italic"
+            }
+          },
+          {
+            "scope": "punctuation.definition.quote.dx-markdown",
+            "settings": {
+              "foreground": "#6A9955",
+              "fontStyle": "bold"
+            }
+          },
+          {
+            "scope": "markup.table.dx-markdown",
+            "settings": {
+              "foreground": "#D4D4D4"
+            }
+          },
+          {
+            "scope": "punctuation.separator.table.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "markup.table.separator.dx-markdown",
+            "settings": {
+              "foreground": "#569CD6"
+            }
+          },
+          {
+            "scope": "meta.separator.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "constant.character.emoji.dx-markdown",
+            "settings": {
+              "foreground": "#FFCC66"
+            }
+          },
+          {
+            "scope": "entity.name.tag.html.dx-markdown",
+            "settings": {
+              "foreground": "#569CD6"
+            }
+          },
+          {
+            "scope": "entity.name.tag.yaml.dx-markdown",
+            "settings": {
+              "foreground": "#569CD6"
+            }
+          },
+          {
+            "scope": "punctuation.definition.frontmatter.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          },
+          {
+            "scope": "string.unquoted.yaml.dx-markdown",
+            "settings": {
+              "foreground": "#CE9178"
+            }
+          },
+          {
+            "scope": "punctuation.separator.key-value.dx-markdown",
+            "settings": {
+              "foreground": "#858585"
+            }
+          }
+        ]
+      }
+    },
+    "configuration": {
+      "title": "DX",
+      "properties": {
+        "dx.validateBeforeSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Validate syntax before saving .dx files"
+        },
+        "dx.autoSaveGracePeriod": {
+          "type": "number",
+          "default": 2000,
+          "minimum": 500,
+          "maximum": 10000,
+          "description": "Grace period in milliseconds after last keystroke before auto-save"
+        },
+        "dx.indentSize": {
+          "type": "number",
+          "enum": [
+            2,
+            4
+          ],
+          "default": 2,
+          "description": "Indent size for human-readable format (2 or 4 spaces)"
+        },
+        "dx.keyPadding": {
+          "type": "number",
+          "default": 20,
+          "minimum": 10,
+          "maximum": 50,
+          "description": "Minimum padding width for keys in formatted output"
+        },
+        "dx.formatOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically format .dx files on save"
+        },
+        "dx.formatDelayAfterAutoSave": {
+          "type": "number",
+          "default": 1500,
+          "description": "Additional delay (ms) before formatting when VS Code auto-save is enabled. Prevents formatting while typing."
+        },
+        "dx.tokenCounter.showFileSize": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show file size alongside token count in status bar"
+        },
+        "dx.showDensePreview": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show dense format preview on hover"
+        },
+        "dx.forge.autoConnect": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically connect to Forge daemon on startup"
+        },
+        "dx.forge.port": {
+          "type": "number",
+          "default": 9876,
+          "description": "Port for Forge daemon WebSocket connection"
+        },
+        "dx.forge.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show Forge daemon status in status bar"
+        },
+        "dx.forge.executablePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the forge-cli executable. Leave empty to auto-detect from workspace or PATH."
+        },
+        "dx.check.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable dx-check linting"
+        },
+        "dx.check.executablePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the dx-check executable. Leave empty to auto-detect from workspace or PATH."
+        },
+        "dx.check.lintOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run linting when files are saved"
+        },
+        "dx.check.lintOnType": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run linting as you type (with debounce)"
+        },
+        "dx.check.lintDelay": {
+          "type": "number",
+          "default": 300,
+          "minimum": 100,
+          "maximum": 2000,
+          "description": "Delay in milliseconds before linting after typing stops"
+        },
+        "dx.check.autoFix": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically apply safe fixes on save"
+        },
+        "dx.check.showDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show linting diagnostics in the Problems panel"
+        },
+        "dx.check.rulesDir": {
+          "type": "string",
+          "default": "",
+          "description": "Path to custom rules directory. Leave empty to use default."
+        },
+        "dx.tableStyle": {
+          "type": "string",
+          "enum": [
+            "unicode",
+            "ascii"
+          ],
+          "default": "unicode",
+          "description": "Table rendering style: unicode (box-drawing) or ascii (pipe tables)"
+        },
+        "dx.phantomMode.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Phantom Mode to hide shadow .md files that have corresponding .dxm files"
+        },
+        "dx.cache.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic binary cache generation for .dxm files"
+        },
+        "dx.explosion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable DX Explosion effects when typing"
+        },
+        "dx.explosion.cyclePresets": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically cycle through all explosion presets"
+        },
+        "dx.explosion.preset": {
+          "type": "string",
+          "enum": [
+            "particles",
+            "fireworks",
+            "flames",
+            "magic",
+            "simple-rift",
+            "exploding-rift"
+          ],
+          "default": "fireworks",
+          "description": "Explosion preset (when cyclePresets is false)"
+        },
+        "dx.explosion.comboThreshold": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Keystrokes before explosions activate (0 = always)"
+        },
+        "dx.explosion.comboTimeout": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "Seconds before combo resets (0 = never)"
+        },
+        "dx.explosion.shake.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable screen shaking effect"
+        },
+        "dx.hologramView.mode": {
+          "type": "string",
+          "enum": [
+            "preview",
+            "split",
+            "off"
+          ],
+          "default": "preview",
+          "description": "Hologram View display mode: preview (side panel), split (split editor), or off (disabled)"
+        },
+        "dx.style.outputPath": {
+          "type": "string",
+          "default": "dist/styles.css",
+          "description": "Path to the generated CSS output file for dx-style"
+        },
+        "dx.style.autoGrouping.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable automatic grouping of classnames when it reduces overall class attribute length"
+        },
+        "dx.style.autoGrouping.minSavings": {
+          "type": "number",
+          "default": 10,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Minimum character savings required to apply auto-grouping"
+        },
+        "dx.style.inlineExpansion.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable inline expansion of grouped classnames on cursor line"
+        },
+        "dx.generator.templatePaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            ".dx/templates"
+          ],
+          "description": "Paths to search for templates"
+        },
+        "dx.generator.enableTriggers": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable trigger-based generation (e.g., //gen:component)"
+        },
+        "dx.generator.triggerPatterns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string",
+                "description": "Regex pattern to match (e.g., //gen:(\\w+))"
+              },
+              "templateId": {
+                "type": "string",
+                "description": "Template ID to invoke"
+              }
+            }
+          },
+          "default": [
+            {
+              "pattern": "//gen:(\\w+)",
+              "templateId": "$1"
+            }
+          ],
+          "description": "Trigger patterns for automatic generation"
+        },
+        "dx.generator.showTokenSavings": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show token savings in status bar after generation"
+        },
+        "dx.generator.enableHoverPreview": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show preview of generated output on hover over triggers"
+        },
+        "dx.generator.autoRefresh": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically refresh template list when templates change"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run esbuild-base -- --production",
+    "compile": "npm run esbuild-base",
+    "esbuild-base": "node esbuild.js",
+    "esbuild-watch": "node esbuild.js --watch",
+    "watch": "npm run esbuild-watch",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "node package-extension.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@types/ws": "^8.18.1",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/test-electron": "^2.3.8",
+    "esbuild": "^0.27.2",
+    "eslint": "^8.55.0",
+    "fast-check": "^3.14.0",
+    "typescript": "^5.3.2"
+  },
+  "dependencies": {
+    "@anthropic-ai/tokenizer": "^0.0.4",
+    "gpt-tokenizer": "^3.4.0",
+    "js-tiktoken": "^1.0.21",
+    "reactive-vscode": "^1.0.0-beta.2",
+    "vscode-languageclient": "^9.0.1",
+    "ws": "^8.14.0"
+  }
+}

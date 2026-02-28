@@ -1,0 +1,199 @@
+
+# Implementation Plan: DX vs Bun Comparative Benchmarks
+
+## Overview
+
+This implementation plan creates a comprehensive benchmark suite comparing the DX JavaScript toolchain against Bun. The suite will be implemented primarily in PowerShell (for Windows compatibility) with bash equivalents, using JavaScript for test fixtures.
+
+## Tasks
+
+- Set up benchmark suite structure and core utilities
+- 1.1 Create directory structure for benchmark suite
+- Create `benchmarks/dx-vs-bun/` with subdirectories for lib, suites, results, reports
+- Create placeholder files for main scripts
+- Requirements: 8.1, 8.2
+- 1.2 Implement statistics library (`lib/stats.ps1`)
+- Implement `Get-Stats` function (min, max, mean, median, stddev)
+- Implement `Remove-Outliers` using IQR method
+- Implement `Get-ConfidenceInterval` with t-distribution
+- Implement `Compare-Results` for winner determination
+- Requirements: 1.5, 9.5, 9.6
+- 1.3 Write property tests for statistics library
+- Property 1: Statistics Calculation Correctness
+- Property 6: Confidence Interval Calculation
+- Validates: Requirements 1.5, 9.5
+- 1.4 Implement reporter library (`lib/reporter.ps1`)
+- Implement `New-MarkdownReport` for human-readable output
+- Implement `New-JsonReport` for machine-readable output
+- Implement `New-AsciiChart` for visual comparisons
+- Requirements: 7.1, 7.3, 14.1, 14.2
+- 1.5 Write property tests for reporter
+- Property 7: JSON Output Validity
+- Validates: Requirements 14.6
+- Implement main benchmark runner
+- 2.1 Create main runner script (`run-all.ps1`)
+- Implement tool detection (DX, Bun)
+- Implement DX build automation
+- Implement suite orchestration
+- Implement system info collection
+- Requirements: 8.2, 8.4, 7.4
+- 2.2 Write property tests for runner
+- Property 2: Minimum Runs Guarantee
+- Property 3: Warmup Exclusion
+- Property 9: Benchmark Isolation
+- Validates: Requirements 1.4, 1.6, 9.3
+- Checkpoint
+- Core infrastructure complete
+- Ensure statistics and reporter tests pass
+- Verify runner can detect tools and build DX
+- Implement runtime benchmark suite
+- 4.1 Create runtime fixtures
+- Create `fibonacci.js` for CPU-intensive benchmark
+- Create `json-parse.js` for JSON operations
+- Create `async-concurrent.js` for async benchmarks
+- Create `memory-stress.js` for memory benchmarks
+- Create `hello.js`, `hello.ts` for startup benchmarks
+- Requirements: 1.1, 1.2, 1.3, 2.3, 2.4, 2.5
+- 4.2 Implement runtime benchmark script (`suites/runtime/bench.ps1`)
+- Implement CPU benchmark (fibonacci)
+- Implement startup time benchmarks (cold/warm)
+- Implement memory usage benchmarks
+- Implement JSON parsing benchmark
+- Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.6, 3.1, 3.2, 3.3, 3.5
+- 4.3 Write property tests for runtime benchmarks
+- Property 4: Speedup Calculation Correctness
+- Validates: Requirements 7.2
+- Implement package manager benchmark suite
+- 5.1 Create package manager fixtures
+- Create small project fixture (3 deps: lodash, axios, express)
+- Create large project fixture (50+ deps)
+- Pin all dependency versions
+- Requirements: 4.3, 4.4, 8.6
+- 5.2 Implement package manager benchmark script (`suites/package-manager/bench.ps1`)
+- Implement cold install benchmark
+- Implement warm install benchmark
+- Measure download vs extraction time separately
+- Requirements: 4.1, 4.2, 4.5
+- Implement bundler benchmark suite
+- 6.1 Create bundler fixtures
+- Create small project (5 files)
+- Create medium project (50 files)
+- Create large project (150 files)
+- Include tree-shaking test case
+- Requirements: 5.1, 5.2, 5.3, 5.5
+- 6.2 Implement bundler benchmark script (`suites/bundler/bench.ps1`)
+- Implement cold bundle benchmark
+- Implement warm bundle benchmark
+- Measure output bundle sizes
+- Compare tree-shaking effectiveness
+- Requirements: 5.4, 5.6
+- Checkpoint
+- Core tool benchmarks complete
+- Ensure runtime, package manager, and bundler benchmarks work
+- Verify results are collected correctly
+- Implement test runner benchmark suite
+- 8.1 Create test runner fixtures
+- Create small test suite (50 tests)
+- Create medium test suite (150 tests)
+- Create large test suite (300 tests)
+- Include snapshot tests and mock tests
+- Requirements: 10.2, 10.3, 10.4, 10.6, 10.7
+- 8.2 Implement test runner benchmark script (`suites/test-runner/bench.ps1`)
+- Implement test discovery benchmark
+- Implement test execution benchmarks (small/medium/large)
+- Measure parallelization efficiency
+- Calculate tests per second (TPS)
+- Requirements: 10.1, 10.5, 10.8
+- Implement project manager benchmark suite
+- 9.1 Create monorepo fixtures
+- Create 10-package monorepo
+- Create 50-package monorepo
+- Create 100-package monorepo
+- Include task dependencies between packages
+- Requirements: 11.1, 11.7
+- 9.2 Implement project manager benchmark script (`suites/project-manager/bench.ps1`)
+- Implement workspace discovery benchmark
+- Implement task graph construction benchmark
+- Implement affected detection benchmark
+- Implement cache hit/miss benchmarks
+- Requirements: 11.2, 11.3, 11.4, 11.5, 11.6
+- Implement compatibility layer benchmark suite
+- 10.1 Create compatibility fixtures
+- Create fs benchmark script (readFile, writeFile, readdir, stat)
+- Create path benchmark script (join, resolve, parse)
+- Create crypto benchmark script (hash, randomBytes, randomUUID)
+- Create http benchmark script (server, requests)
+- Create EventEmitter benchmark script
+- Create Buffer benchmark script
+- Create Web API benchmark script (fetch, TextEncoder, URL)
+- Requirements: 12.1, 12.2, 12.3, 12.4, 12.5, 12.6, 12.7, 12.8
+- 10.2 Implement compatibility benchmark script (`suites/compatibility/bench.ps1`)
+- Run all compatibility benchmarks
+- Collect and aggregate results
+- Requirements: 12.1-12.8
+- Checkpoint
+- All benchmark suites complete
+- Ensure all 6 benchmark suites run successfully
+- Verify results format is consistent
+- Implement end-to-end workflow benchmarks
+- 12.1 Create workflow fixtures
+- Create sample project for fresh setup workflow
+- Create sample project for dev iteration workflow
+- Requirements: 13.1, 13.2
+- 12.2 Implement workflow benchmark script (`suites/workflows/bench.ps1`)
+- Implement fresh project setup benchmark
+- Implement development iteration benchmark
+- Implement CI pipeline simulation benchmark
+- Implement monorepo affected build benchmark
+- Track cumulative memory and time
+- Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6
+- [-] 13. Implement comprehensive reporting
+- 13.1 Enhance reporter with category summaries
+- Add category winner determination
+- Add percentage difference calculations
+- Add overall recommendations
+- Requirements: 14.3, 14.4, 14.5
+- 13.2 Write property tests for category reporting
+- Property 5: Winner Determination with Statistical Significance
+- Property 10: Category Structure Completeness
+- Validates: Requirements 9.6, 14.3, 14.4
+- 13.3 Generate final report template
+- Create RESULTS.md template with all sections
+- Include methodology notes
+- Include system requirements
+- Requirements: 14.1, 14.7
+- Create bash equivalents for Unix systems
+- 14.1 Port main runner to bash (`run-all.sh`)
+- Port tool detection and build logic
+- Port suite orchestration
+- Requirements: 8.5
+- 14.2 Port statistics library to bash (`lib/stats.sh`)
+- Port all statistical functions
+- Requirements: 8.5
+- Final checkpoint
+- Complete benchmark suite
+- Run full benchmark suite on Windows
+- Run full benchmark suite on Unix (if available)
+- Verify all reports are generated correctly
+- Ensure all property tests pass
+- Note: Requires DX runtime built (`cargo build
+- release
+- p dx-js-runtime`) and Bun installed (`//bun.sh`)
+- Documentation and cleanup
+- 16.1 Create README for benchmark suite
+- Document prerequisites
+- Document usage instructions
+- Document interpreting results
+- Requirements: 8.1
+- 16.2 Add system load detection
+- Implement CPU load check before benchmarks
+- Add warning if system is under heavy load
+- Requirements: 9.4
+
+## Notes
+
+- All tasks including property-based tests are required
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- PowerShell is the primary implementation language for Windows compatibility
+- Bash scripts provide Unix/Linux/macOS support

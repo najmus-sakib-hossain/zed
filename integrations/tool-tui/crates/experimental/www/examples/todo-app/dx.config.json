@@ -1,0 +1,10 @@
+{
+    "entry": "src/App.tsx",
+    "output": "dist",
+    "runtime": "auto",
+    "features": {
+        "ssr": false,
+        "hydration": false,
+        "treeShaking": true
+    }
+}

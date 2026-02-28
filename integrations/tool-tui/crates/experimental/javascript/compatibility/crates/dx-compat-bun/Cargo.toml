@@ -1,0 +1,68 @@
+[package]
+name = "dx-compat-bun"
+version = "0.0.1"
+edition = "2021"
+description = "Bun-specific APIs compatibility layer for DX"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# HTTP server
+hyper = { version = "1.5", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
+http-body-util = "0.1"
+http = "1.1"
+
+# TLS - using native-tls to avoid aws-lc-sys build issues on Windows
+# native-tls uses SChannel on Windows, SecureTransport on macOS, OpenSSL on Linux
+native-tls = "0.2"
+tokio-native-tls = "0.3"
+
+# Async runtime
+tokio = { version = "1.41", features = ["full"] }
+futures = "0.3"
+
+# Binary data
+bytes = "1.9"
+
+# Memory-mapped I/O
+memmap2 = "0.9"
+
+# Hashing
+wyhash = "0.5"
+crc32fast = "1.4"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+# SHA hashing
+sha2 = "0.10"
+sha1 = "0.10"
+md-5 = "0.10"
+
+# Encoding
+base64 = "0.22"
+
+# Random
+rand = "0.8"
+murmur3 = "0.5"
+cityhash-rs = "1.0"
+
+# Password hashing
+argon2 = "0.5"
+bcrypt = "0.15"
+
+# Compression
+flate2 = "1.0"
+brotli = "6.0"
+zstd = "0.13"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "2.0"
+
+[dev-dependencies]
+proptest = "1.4"
+tempfile = "3.14"
+tokio = { version = "1.41", features = ["full", "test-util"] }
+criterion = { version = "0.5", features = ["html_reports"] }

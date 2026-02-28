@@ -1,0 +1,18 @@
+[package]
+name = "response-cache"
+version.workspace = true
+edition.workspace = true
+description = "Persistent disk response cache — 100% savings per cross-session hit"
+
+[dependencies]
+dx-core = { workspace = true }
+blake3 = { workspace = true }
+redb = { workspace = true }
+zstd = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+async-trait = { workspace = true }
+semantic-cache = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

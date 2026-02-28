@@ -1,0 +1,106 @@
+[workspace]
+members = [
+    ".",
+    "crates/dx-compat-node",
+    "crates/dx-compat-web",
+    "crates/dx-compat-bun",
+    "crates/dx-compat-sqlite",
+    "crates/dx-compat-s3",
+    "crates/dx-compat-ffi",
+    "crates/dx-compat-shell",
+    "crates/dx-compat-compile",
+    "crates/dx-compat-hmr",
+    "crates/dx-compat-plugin",
+    "crates/dx-compat-macro",
+    "crates/dx-compat-html",
+]
+
+# Force rustls to use ring backend instead of aws-lc-rs to avoid NASM/cmake requirement on Windows
+[workspace.dependencies]
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+
+[package]
+name = "dx-js-compatibility"
+version = "0.0.1"
+edition = "2021"
+authors = ["DX Team"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dx-www/dx-www-runtime"
+description = "Bun API compatibility layer for DX runtime"
+keywords = ["bun", "nodejs", "compatibility", "runtime", "javascript"]
+categories = ["development-tools", "web-programming"]
+
+[features]
+default = ["node-core", "web-core", "bun-core"]
+
+# Core compatibility layers
+node-core = ["dep:dx-compat-node"]
+web-core = ["dep:dx-compat-web"]
+bun-core = ["dep:dx-compat-bun"]
+
+# Extended Bun features
+bun-sqlite = ["dep:dx-compat-sqlite"]
+bun-s3 = ["dep:dx-compat-s3"]
+bun-ffi = ["dep:dx-compat-ffi"]
+bun-shell = ["dep:dx-compat-shell"]
+
+# Build and development features
+compile = ["dep:dx-compat-compile"]
+hmr = ["dep:dx-compat-hmr"]
+plugins = ["dep:dx-compat-plugin"]
+macros = ["dep:dx-compat-macro"]
+html-rewriter = ["dep:dx-compat-html"]
+
+# Full feature set
+full = [
+    "node-core",
+    "web-core", 
+    "bun-core",
+    "bun-sqlite",
+    "bun-s3",
+    "bun-ffi",
+    "bun-shell",
+    "compile",
+    "hmr",
+    "plugins",
+    "macros",
+    "html-rewriter",
+]
+
+[dependencies]
+# Sub-crates (optional based on features)
+dx-compat-node = { path = "crates/dx-compat-node", optional = true }
+dx-compat-web = { path = "crates/dx-compat-web", optional = true }
+dx-compat-bun = { path = "crates/dx-compat-bun", optional = true }
+dx-compat-sqlite = { path = "crates/dx-compat-sqlite", optional = true }
+dx-compat-s3 = { path = "crates/dx-compat-s3", optional = true }
+dx-compat-ffi = { path = "crates/dx-compat-ffi", optional = true }
+dx-compat-shell = { path = "crates/dx-compat-shell", optional = true }
+dx-compat-compile = { path = "crates/dx-compat-compile", optional = true }
+dx-compat-hmr = { path = "crates/dx-compat-hmr", optional = true }
+dx-compat-plugin = { path = "crates/dx-compat-plugin", optional = true }
+dx-compat-macro = { path = "crates/dx-compat-macro", optional = true }
+dx-compat-html = { path = "crates/dx-compat-html", optional = true }
+
+# Common dependencies
+thiserror = "2.0"
+
+[dev-dependencies]
+proptest = "1.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+tokio = { version = "1.41", features = ["rt-multi-thread", "macros"] }
+tempfile = "3.14"
+bytes = "1.5"
+futures = "0.3"
+dx-compat-compile = { path = "crates/dx-compat-compile" }
+dx-compat-macro = { path = "crates/dx-compat-macro" }
+dx-compat-hmr = { path = "crates/dx-compat-hmr" }
+dx-compat-plugin = { path = "crates/dx-compat-plugin" }
+dx-compat-sqlite = { path = "crates/dx-compat-sqlite" }
+dx-compat-html = { path = "crates/dx-compat-html" }
+parking_lot = "0.12"
+
+[[bench]]
+name = "compatibility_bench"
+harness = false
+required-features = []

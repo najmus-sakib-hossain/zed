@@ -1,0 +1,21 @@
+[package]
+name = "dx-py-cache"
+description = "Reactive Bytecode Cache for DX-Py-Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+memmap2.workspace = true
+blake3.workspace = true
+dashmap.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+notify.workspace = true
+crossbeam.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+tempfile.workspace = true

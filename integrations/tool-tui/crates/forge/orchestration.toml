@@ -1,0 +1,32 @@
+# Forge Orchestration Configuration
+# Forge only controls WHEN to run tools, not WHAT they do
+
+[orchestration]
+version = "0.0.1"
+description = "Simple tool coordinator - tools configure themselves"
+
+# Global settings
+parallel_execution = false
+fail_fast = true
+
+# Traffic branch safety
+[traffic]
+enabled = true
+# Tools decide their own traffic rules
+# Forge just enforces: Green=auto, Yellow=prompt, Red=block
+
+# Watcher configuration
+[watcher]
+enabled = true
+debounce_ms = 100
+# Watches entire repository, tools decide what to process
+
+# Storage
+[storage]
+blob_dir = ".dx/forge/objects"
+r2_bucket = "dx-forge-production"
+
+# Simple settings - tools handle their own complexity
+[settings]
+max_concurrent_tools = 4
+tool_timeout_seconds = 60

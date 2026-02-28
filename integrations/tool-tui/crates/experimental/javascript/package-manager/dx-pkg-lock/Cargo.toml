@@ -1,0 +1,17 @@
+[package]
+name = "dx-pkg-lock"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+memmap2 = "0.9"
+bytemuck = { version = "1.14", features = ["derive"] }
+thiserror = "2.0"
+sha2 = "0.10"
+base64 = "0.22"
+
+[dev-dependencies]
+tempfile = "3.8"

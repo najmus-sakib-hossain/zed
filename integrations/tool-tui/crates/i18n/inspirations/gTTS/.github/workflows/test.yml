@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'gtts/**'
+      - 'pyproject.toml'
+
+  push:
+    # Creates a status check for the main branch
+    # (so the badge on the README can show
+    # the status of the main branch)
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Unit
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[tests]
+
+      - name: Unit Tests
+        run: pytest -v --cov=gtts --cov-report=xml
+        env:
+          # TODO: Test all langs on release branch
+          TEST_LANGS: en
+
+      - name: Upload Coverage Report
+        if: github.event_name == 'pull_request'
+        uses: codecov/codecov-action@v5.3.1

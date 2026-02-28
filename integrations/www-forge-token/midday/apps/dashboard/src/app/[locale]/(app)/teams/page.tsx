@@ -1,0 +1,89 @@
+import { Button } from "@midday/ui/button";
+import { Icons } from "@midday/ui/icons";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { SelectTeamTable } from "@/components/tables/select-team/table";
+import { TeamInvites } from "@/components/team-invites";
+import { UserMenu } from "@/components/user-menu";
+import { getQueryClient, HydrateClient, trpc } from "@/trpc/server";
+
+export const metadata: Metadata = {
+  title: "Teams | Midday",
+};
+
+export default async function Teams() {
+  const queryClient = getQueryClient();
+  const teams = await queryClient.fetchQuery(trpc.team.list.queryOptions());
+  const invites = await queryClient.fetchQuery(
+    trpc.team.invitesByEmail.queryOptions(),
+  );
+
+  const user = await queryClient.fetchQuery(trpc.user.me.queryOptions());
+
+  // If no teams and no invites, redirect to onboarding
+  if (!teams?.length && !invites?.length) {
+    redirect("/onboarding");
+  }
+
+  return (
+    <HydrateClient>
+      <header className="w-full absolute left-0 right-0 flex justify-between items-center">
+        <div className="p-6">
+          <Link href="/">
+            <Icons.LogoSmall className="h-6 w-auto" />
+          </Link>
+        </div>
+
+        <div className="mr-6 mt-4">
+          <UserMenu onlySignOut />
+        </div>
+      </header>
+
+      <div className="flex min-h-screen justify-center items-center overflow-hidden p-6 md:p-0">
+        <div className="relative z-20 m-auto flex w-full max-w-[480px] flex-col">
+          <div>
+            <div className="text-center">
+              <h1 className="text-lg lg:text-xl mb-2 font-serif">
+                Welcome, {user?.fullName?.split(" ").at(0)}
+              </h1>
+              {invites?.length > 0 ? (
+                <p className="text-[#878787] text-sm mb-8">
+                  Join a team you’ve been invited to or create a new one.
+                </p>
+              ) : (
+                <p className="text-[#878787] text-sm mb-8">
+                  Select a team or create a new one.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* If there are teams, show them */}
+          {teams?.length && (
+            <>
+              <span className="text-sm text-[#878787] mb-4">Teams</span>
+              <div className="max-h-[260px] overflow-y-auto">
+                <SelectTeamTable data={teams} />
+              </div>
+            </>
+          )}
+
+          {/* If there are invites, show them */}
+          {invites?.length > 0 && <TeamInvites />}
+
+          <div className="text-center mt-12 border-t-[1px] border-border pt-6 w-full relative border-dashed">
+            <span className="absolute left-1/2 -translate-x-1/2 text-sm text-[#878787] bg-background -top-3 px-4">
+              Or
+            </span>
+            <Link href="/onboarding" className="w-full">
+              <Button className="w-full mt-2" variant="outline">
+                Create team
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </HydrateClient>
+  );
+}

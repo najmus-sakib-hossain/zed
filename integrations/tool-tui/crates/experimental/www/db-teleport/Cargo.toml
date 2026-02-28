@@ -1,0 +1,50 @@
+[package]
+name = "dx-www-db-teleport"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Reactive database caching with zero-copy binary responses"
+repository.workspace = true
+keywords = ["cache", "database", "postgres", "reactive", "zero-copy"]
+categories = ["caching", "database"]
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+# Database
+deadpool-postgres = { version = "0.14", optional = true }
+tokio-postgres = { version = "0.7", optional = true }
+
+# Async runtime
+tokio = { version = "1.0", features = [
+    "sync",
+    "time",
+    "rt",
+    "macros",
+], optional = true }
+futures = { version = "0.3", optional = true }
+
+# Concurrent data structures
+dashmap = "6.0"
+
+# Hashing
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+# Error handling
+thiserror = "2.0"
+
+# Logging
+tracing = "0.1"
+
+# Serialization (for binary responses)
+dx-www-reactor = { path = "../reactor" }
+
+[features]
+default = ["postgres"]
+postgres = ["deadpool-postgres", "tokio-postgres", "tokio", "futures"]
+
+[dev-dependencies]
+tokio = { version = "1.0", features = ["full"] }
+proptest = "1.4"

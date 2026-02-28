@@ -1,0 +1,21 @@
+[package]
+name = "dx-py-gc"
+description = "Lock-Free Parallel Garbage Collector for DX-Py-Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+crossbeam.workspace = true
+rayon.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "gc_benchmarks"
+harness = false

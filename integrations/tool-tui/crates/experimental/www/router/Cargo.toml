@@ -1,0 +1,33 @@
+[package]
+name = "dx-www-router"
+version = "1.0.0"
+edition = "2024"
+authors = ["DX Team <team@dx-www.dev>"]
+license = "MIT OR Apache-2.0"
+description = "File-based router for DX-WWW framework"
+repository = "https://github.com/dx-www/dx-www"
+rust-version = "1.85"
+
+[dependencies]
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+
+# Error handling
+thiserror = "1.0"
+
+# Path matching
+regex = "1.10"
+
+# File system
+walkdir = "2.5"
+
+# Hashing for route IDs
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+[dev-dependencies]
+proptest = "1.4"
+tempfile = "3.10"
+
+[features]
+default = []
+wasm = []

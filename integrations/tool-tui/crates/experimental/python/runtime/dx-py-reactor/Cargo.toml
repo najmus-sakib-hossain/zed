@@ -1,0 +1,48 @@
+[package]
+name = "dx-py-reactor"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Platform-native async I/O reactor for DX-Py-Runtime (io_uring/kqueue/IOCP)"
+
+[dependencies]
+# Core dependencies
+dashmap.workspace = true
+parking_lot.workspace = true
+bitflags.workspace = true
+thiserror.workspace = true
+crossbeam.workspace = true
+num_cpus.workspace = true
+
+# Atomic waker for futures
+atomic-waker = "1.1"
+
+# Futures support
+futures = "0.3"
+
+# Platform-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+io-uring = "0.6"
+libc = "0.2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+libc = "0.2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "0.52", features = [
+    "Win32_Foundation",
+    "Win32_System_IO",
+    "Win32_Networking_WinSock",
+    "Win32_System_Threading",
+] }
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile.workspace = true
+criterion.workspace = true
+tokio = { version = "1.0", features = ["rt", "time", "macros"] }
+
+[[bench]]
+name = "reactor_benchmarks"
+harness = false

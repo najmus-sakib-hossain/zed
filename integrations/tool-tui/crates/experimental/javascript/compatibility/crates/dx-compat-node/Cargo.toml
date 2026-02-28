@@ -1,0 +1,83 @@
+[package]
+name = "dx-compat-node"
+version = "0.0.1"
+edition = "2021"
+description = "Node.js API compatibility layer for DX"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.41", features = ["fs", "io-util", "sync", "time", "process", "macros", "net"] }
+futures = "0.3"
+
+# Binary data handling
+bytes = "1.9"
+zerocopy = { version = "0.8", features = ["derive"] }
+
+# Base64 encoding
+base64 = "0.22"
+
+# Memory-mapped I/O
+memmap2 = "0.9"
+
+# File watching
+notify = "6.1"
+
+# Error handling
+thiserror = "2.0"
+
+# Concurrency
+parking_lot = "0.12"
+
+# Hashing for crypto
+sha2 = "0.10"
+sha1 = "0.10"
+md-5 = "0.10"
+hmac = "0.12"
+pbkdf2 = "0.12"
+
+# Encryption
+aes = "0.8"
+cbc = "0.1"
+ctr = "0.9"
+chacha20poly1305 = "0.10"
+
+# Key derivation
+scrypt = "0.11"
+
+# RSA key generation and signing
+rsa = "0.9"
+
+# Elliptic curve cryptography
+p256 = { version = "0.13", features = ["ecdsa"] }
+p384 = { version = "0.13", features = ["ecdsa"] }
+
+# Signature traits
+signature = "2.2"
+ecdsa = "0.16"
+
+# Random
+rand = "0.8"
+getrandom = "0.2"
+
+# HTTP (for node:http)
+http = "1.1"
+http-body-util = "0.1"
+hyper = { version = "1.5", features = ["full"] }
+hyper-util = { version = "0.1", features = ["full"] }
+# TLS support - using ring backend for better portability (v0.21 uses ring exclusively)
+rustls = { version = "0.21", default-features = false }
+rustls-pemfile = "1.0"
+tokio-rustls = "0.24"
+tokio-stream = { version = "0.1", features = ["sync"] }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+
+# Platform-specific
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+proptest = "1.4"
+tempfile = "3.14"
+tokio = { version = "1.41", features = ["full", "test-util"] }

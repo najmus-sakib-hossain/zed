@@ -1,0 +1,12 @@
+[package]
+name = "embedding-compress"
+version.workspace = true
+edition.workspace = true
+description = "Near-duplicate retrieval deduplication — 30-50% savings on RAG"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

@@ -1,0 +1,21 @@
+[workspace]
+
+[package]
+name = "dx-py-compability"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = "Python runtime detection, uv configuration compatibility, and platform support for dx-py"
+
+[dependencies]
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+dirs = "5.0"
+lru = "0.12"
+regex = "1.10"
+
+[dev-dependencies]
+proptest = "1.4"
+tempfile = "3.10"

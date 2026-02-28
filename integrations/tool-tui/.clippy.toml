@@ -1,0 +1,30 @@
+# Clippy Configuration for dx-www-runtime
+# Note: Clippy doesn't support per-lint configuration in clippy.toml
+# Use #[allow(clippy::lint_name)] attributes or Cargo.toml for lint configuration
+# This file is for clippy-specific settings only
+
+# Cognitive complexity threshold
+cognitive-complexity-threshold = 30
+
+# Documentation note:
+# To configure lint levels, add to Cargo.toml:
+# [lints.clippy]
+# perf = "deny"
+# correctness = "deny"
+# style = "warn"
+# Or use #![warn(clippy::perf)] in lib.rs/main.rs
+
+# Safety-related lint configuration notes:
+# The following lints should be enabled in production crates via Cargo.toml or lib.rs:
+#
+# [lints.clippy]
+# undocumented_unsafe_blocks = "warn"  # Require SAFETY comments on unsafe blocks
+# unwrap_used = "warn"                  # Discourage .unwrap() in production code
+# expect_used = "warn"                  # Discourage .expect() in production code (use proper error handling)
+# panic = "warn"                        # Discourage panic!() in production code
+#
+# Or in lib.rs/main.rs:
+# #![warn(clippy::undocumented_unsafe_blocks)]
+# #![warn(clippy::unwrap_used)]
+#
+# Test modules should use #[cfg_attr(test, allow(clippy::unwrap_used))] to allow unwrap in tests

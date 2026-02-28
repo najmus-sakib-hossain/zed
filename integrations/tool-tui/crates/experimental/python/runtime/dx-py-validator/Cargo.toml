@@ -1,0 +1,32 @@
+[package]
+name = "dx-py-validator"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Framework validation system for DX-Py - runs real-world test suites"
+
+[dependencies]
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+
+# Async runtime
+tokio = { version = "1.35", features = ["full", "process"] }
+
+# Chrono for timestamps
+chrono = { workspace = true }
+
+# Regex for parsing test output
+regex = { workspace = true }
+
+# Once cell for lazy initialization
+once_cell = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }

@@ -1,0 +1,3 @@
+npx @google/gemini-cli
+winget install GitHub.Copilot
+curl -fsSL https://cli.kiro.dev/install | bash

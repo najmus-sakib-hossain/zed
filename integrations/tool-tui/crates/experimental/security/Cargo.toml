@@ -1,0 +1,44 @@
+[package]
+name = "dx-security"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Binary-level security scanner with SIMD acceleration and cryptographic attestation"
+
+[lints]
+workspace = true
+
+[dependencies]
+# Workspace dependencies
+dx-serializer = { workspace = true }
+markdown = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+ed25519-dalek = { workspace = true }
+blake3 = { workspace = true }
+memmap2 = { workspace = true }
+xxhash-rust = { version = "0.8", features = ["xxh64"] }
+walkdir = "2.5"
+
+[dev-dependencies]
+proptest = "1.4"
+criterion = "0.5"
+tempfile = "3.10"
+
+[features]
+default = []
+parallel = ["rayon"]
+
+[dependencies.rayon]
+version = "1.10"
+optional = true
+
+[[bench]]
+name = "scanner"
+harness = false

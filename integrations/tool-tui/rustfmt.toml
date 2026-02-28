@@ -1,0 +1,24 @@
+# Rust Style Guide Configuration
+# Based on the Rust Style Guide (Stable features only)
+
+# Maximum line width
+max_width = 100
+
+# Indentation
+tab_spaces = 4
+hard_tabs = false
+
+# Edition
+edition = "2024"
+
+# Use
+use_small_heuristics = "Default"
+use_field_init_shorthand = true
+use_try_shorthand = true
+
+# Misc
+reorder_imports = true
+reorder_modules = true
+remove_nested_parens = true
+chain_width = 80
+fn_call_width = 80

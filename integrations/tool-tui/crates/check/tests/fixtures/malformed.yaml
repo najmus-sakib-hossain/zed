@@ -1,0 +1,6 @@
+name: broken
+version: 1.0.0
+  invalid_indent: true
+dependencies:
+- item1
+  - item2

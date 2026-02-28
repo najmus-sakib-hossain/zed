@@ -1,0 +1,124 @@
+{
+  "fonts": [
+    {
+      "id": "macos-modern",
+      "src": [
+        {
+          "path": "./fonts/vscode.woff",
+          "format": "woff"
+        }
+      ],
+      "weight": "normal",
+      "style": "normal"
+    },
+    {
+      "id": "intellij-icons",
+      "src": [
+        {
+          "path": "./fonts/intellij-icons.woff",
+          "format": "woff"
+        }
+      ],
+      "weight": "normal",
+      "style": "normal"
+    }
+  ],
+  "iconDefinitions": {
+    "explorer-view-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e000"
+    },
+    "search-view-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e001"
+    },
+    "run-view-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e002"
+    },
+    "source-control-view-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e003"
+    },
+    "extensions-view-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e004"
+    },
+    "remote-explorer-view-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e005"
+    },
+    "settings-view-bar-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e006"
+    },
+    "accounts-view-bar-icon": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e007"
+    },
+    "folding-expanded": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e008"
+    },
+    "folding-collapsed": {
+      "fontId": "macos-modern",
+      "fontCharacter": "\\e009"
+    },
+    "symbol-class": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E800"
+    },
+    "symbol-struct": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E801"
+    },
+    "symbol-function": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E802"
+    },
+    "symbol-enum": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E803"
+    },
+    "symbol-method": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E804"
+    },
+    "symbol-interface": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E805"
+    },
+    "symbol-property": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E806"
+    },
+    "symbol-variable": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E807"
+    },
+    "symbol-constant": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E808"
+    },
+    "symbol-type-parameter": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E809"
+    },
+    "symbol-field": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E802"
+    },
+    "symbol-parameter": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E806"
+    },
+    "symbol-enum-member": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E803"
+    },
+    "symbol-module": {
+      "fontId": "intellij-icons",
+      "fontCharacter": "\\E804"
+    }
+  }
+}

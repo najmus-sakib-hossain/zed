@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editor + Next.js Preview Tutorial</title>
+    <style>
+      * { box-sizing: border-box; }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #0a0a0a;
+        color: #eee;
+        min-height: 100vh;
+      }
+
+      h1 { color: #fff; margin-bottom: 10px; }
+      h1 span {
+        background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .subtitle { color: #888; margin-bottom: 20px; }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        height: calc(100vh - 140px);
+      }
+
+      .panel {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #333;
+      }
+
+      .panel-title { font-weight: bold; color: #fff; }
+
+      .file-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+      }
+
+      .file-tab {
+        padding: 5px 10px;
+        background: #333;
+        border: none;
+        border-radius: 4px;
+        color: #888;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: 'Monaco', 'Menlo', monospace;
+      }
+
+      .file-tab.active {
+        background: #22c55e;
+        color: white;
+      }
+
+      .file-tab:hover:not(.active) { background: #444; }
+
+      textarea {
+        flex: 1;
+        background: #111;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 12px;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-size: 13px;
+        color: #eee;
+        resize: none;
+        line-height: 1.5;
+        tab-size: 2;
+      }
+
+      textarea:focus { outline: none; border-color: #22c55e; }
+
+      .actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        align-items: center;
+      }
+
+      button {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+
+      button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      #start-btn { background: #22c55e; color: white; }
+      #start-btn:hover:not(:disabled) { background: #16a34a; }
+
+      #save-btn { background: #3b82f6; color: white; }
+      #save-btn:hover:not(:disabled) { background: #2563eb; }
+
+      .save-hint {
+        font-size: 11px;
+        color: #666;
+        margin-left: auto;
+      }
+
+      .preview-frame {
+        flex: 1;
+        border: none;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .preview-placeholder {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #111;
+        border-radius: 8px;
+        color: #666;
+        text-align: center;
+        padding: 20px;
+      }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #333;
+      }
+      .status-dot.running { background: #22c55e; }
+      .status-dot.starting {
+        background: #f59e0b;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
+      .hmr-toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #22c55e;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 13px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s, transform 0.3s;
+        z-index: 1000;
+      }
+      .hmr-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .console-output {
+        margin-top: 10px;
+        background: #111;
+        border-radius: 8px;
+        padding: 8px 10px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 11px;
+        max-height: 120px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        color: #888;
+      }
+      .console-output .hmr { color: #22c55e; font-weight: bold; }
+      .console-output .error { color: #ef4444; }
+
+      .security-note {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #1e3a5f20;
+        border: 1px solid #3b82f640;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        color: #93c5fd;
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>
+      <span>Editor</span> + Next.js Preview
+      <span class="security-note">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Same-origin demo (see docs for cross-origin setup)
+      </span>
+    </h1>
+    <p class="subtitle">
+      Edit files, save with Ctrl/Cmd+S, and see live HMR updates in the preview
+    </p>
+
+    <div class="hmr-toast" id="hmr-toast">HMR Updated</div>
+
+    <div class="container">
+      <!-- Left: Editor -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Editor</span>
+          <div class="status">
+            <div class="status-dot" id="status-dot"></div>
+            <span id="status-text">Ready</span>
+          </div>
+        </div>
+
+        <div class="file-tabs" id="file-tabs"></div>
+
+        <textarea id="editor" placeholder="Select a file to edit..."></textarea>
+
+        <div class="actions">
+          <button id="start-btn">Start Preview</button>
+          <button id="save-btn" disabled>Save</button>
+          <span class="save-hint">Ctrl/Cmd+S to save</span>
+        </div>
+      </div>
+
+      <!-- Right: Preview -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Preview</span>
+          <button id="refresh-btn" style="padding: 4px 8px; font-size: 12px; background: #333; color: #ccc;">Refresh</button>
+        </div>
+
+        <div class="preview-placeholder" id="preview-placeholder">
+          <div style="font-size: 48px; margin-bottom: 10px;">N</div>
+          <div>Click <strong>"Start Preview"</strong> to launch the Next.js dev server</div>
+        </div>
+
+        <iframe id="preview-frame" class="preview-frame" style="display: none;"></iframe>
+
+        <div class="console-output" id="console"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { VirtualFS } from '../src/index.ts';
+      import { NextDevServer } from '../src/frameworks/next-dev-server.ts';
+      import { getServerBridge } from '../src/server-bridge.ts';
+
+      // ── State ──
+      let vfs, devServer, devServerUrl;
+      let currentFile = '/app/page.tsx';
+
+      // ── DOM refs ──
+      const editor = document.getElementById('editor');
+      const fileTabs = document.getElementById('file-tabs');
+      const startBtn = document.getElementById('start-btn');
+      const saveBtn = document.getElementById('save-btn');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      const previewFrame = document.getElementById('preview-frame');
+      const placeholder = document.getElementById('preview-placeholder');
+      const hmrToast = document.getElementById('hmr-toast');
+      const consoleEl = document.getElementById('console');
+
+      // ── Files we can edit ──
+      const files = [
+        { path: '/app/page.tsx', label: 'page.tsx' },
+        { path: '/app/layout.tsx', label: 'layout.tsx' },
+        { path: '/app/about/page.tsx', label: 'about/page.tsx' },
+        { path: '/app/globals.css', label: 'globals.css' },
+      ];
+
+      // ── Logging ──
+      function log(msg, cls = '') {
+        const line = document.createElement('div');
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+        if (cls) line.className = cls;
+        consoleEl.appendChild(line);
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+      }
+
+      function showHmrToast() {
+        hmrToast.classList.add('show');
+        setTimeout(() => hmrToast.classList.remove('show'), 2000);
+      }
+
+      // ── Step 1: Create VFS with project files ──
+      function setupFiles() {
+        vfs = new VirtualFS();
+
+        vfs.writeFileSync('/package.json', JSON.stringify({
+          name: 'editor-tutorial',
+          version: '1.0.0',
+          dependencies: { next: '^14.0.0', react: '^18.2.0', 'react-dom': '^18.2.0' },
+        }, null, 2));
+
+        vfs.mkdirSync('/app', { recursive: true });
+        vfs.mkdirSync('/app/about', { recursive: true });
+
+        vfs.writeFileSync('/app/layout.tsx', `export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
+      <body style={{ margin: 0, fontFamily: 'system-ui, sans-serif', background: '#fafafa' }}>
+        <nav style={{ background: '#111', color: '#fff', padding: '12px 24px', display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <strong>My App</strong>
+          <a href="/" style={{ color: '#aaa', textDecoration: 'none' }}>Home</a>
+          <a href="/about" style={{ color: '#aaa', textDecoration: 'none' }}>About</a>
+        </nav>
+        <main style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px' }}>
+          {children}
+        </main>
+      </body>
+    </html>
+  );
+}
+`);
+
+        vfs.writeFileSync('/app/page.tsx', `'use client';
+import { useState } from 'react';
+
+export default function Home() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <h1 style={{ fontSize: '2rem', marginBottom: 8 }}>Welcome!</h1>
+      <p style={{ color: '#666', marginBottom: 24 }}>
+        This is a Next.js app running entirely in the browser.
+        Edit this file and press Ctrl/Cmd+S to see HMR in action.
+      </p>
+      <div style={{ background: '#fff', borderRadius: 12, padding: 24, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
+        <p style={{ fontSize: '3rem', textAlign: 'center', margin: '8px 0' }}>{count}</p>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+          <button onClick={() => setCount(c => c - 1)} style={{ padding: '8px 20px', borderRadius: 6, border: '1px solid #ddd', background: '#fff', cursor: 'pointer', fontSize: 16 }}>-</button>
+          <button onClick={() => setCount(c => c + 1)} style={{ padding: '8px 20px', borderRadius: 6, border: 'none', background: '#22c55e', color: '#fff', cursor: 'pointer', fontSize: 16 }}>+</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+`);
+
+        vfs.writeFileSync('/app/about/page.tsx', `export default function About() {
+  return (
+    <div>
+      <h1 style={{ fontSize: '2rem', marginBottom: 8 }}>About</h1>
+      <p style={{ color: '#666', lineHeight: 1.7 }}>
+        This demo shows how to build a file editor with a live Next.js preview
+        using almostnode. The preview runs in an iframe and updates via HMR
+        when you save a file.
+      </p>
+      <div style={{ marginTop: 24, padding: 16, background: '#e8f5e9', borderRadius: 8 }}>
+        <strong>Tip:</strong> For production use, run the preview iframe on a different
+        origin (e.g., a subdomain) to isolate untrusted code from your app's cookies,
+        localStorage, and DOM.
+      </div>
+    </div>
+  );
+}
+`);
+
+        vfs.writeFileSync('/app/globals.css', `* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #fafafa;
+  color: #222;
+}
+
+a { color: #22c55e; }
+a:hover { text-decoration: underline; }
+`);
+      }
+
+      // ── Step 2: Render file tabs ──
+      function renderTabs() {
+        fileTabs.innerHTML = files.map(f =>
+          `<button class="file-tab${f.path === currentFile ? ' active' : ''}" data-path="${f.path}">${f.label}</button>`
+        ).join('');
+      }
+
+      function loadFile(path) {
+        try {
+          editor.value = vfs.readFileSync(path, 'utf8');
+          currentFile = path;
+          renderTabs();
+        } catch (e) {
+          log('Error loading ' + path + ': ' + e.message, 'error');
+        }
+      }
+
+      // ── Step 3: Save file → triggers HMR ──
+      function saveFile() {
+        if (!vfs || !currentFile) return;
+        vfs.writeFileSync(currentFile, editor.value);
+        log('Saved: ' + currentFile);
+      }
+
+      // ── Step 4: Start dev server + preview ──
+      async function startPreview() {
+        startBtn.disabled = true;
+        statusDot.className = 'status-dot starting';
+        statusText.textContent = 'Starting...';
+        log('Starting Next.js dev server...');
+
+        try {
+          // Create dev server
+          devServer = new NextDevServer(vfs, { port: 3003, root: '/' });
+          devServer.start(); // Start file watching for HMR
+
+          // Initialize Service Worker bridge
+          const bridge = getServerBridge();
+          await bridge.initServiceWorker();
+          log('Service Worker ready');
+
+          // Register server and get URL
+          bridge.registerServer(devServer, 3003);
+          devServerUrl = bridge.getServerUrl(3003) + '/';
+          log('Dev server URL: ' + devServerUrl);
+
+          // Listen for HMR updates
+          devServer.on('hmr-update', (update) => {
+            log('HMR update: ' + update.path, 'hmr');
+            showHmrToast();
+          });
+
+          // Show iframe
+          placeholder.style.display = 'none';
+          previewFrame.style.display = 'block';
+
+          // Set HMR target when iframe loads
+          previewFrame.onload = () => {
+            if (previewFrame.contentWindow) {
+              devServer.setHMRTarget(previewFrame.contentWindow);
+            }
+          };
+
+          previewFrame.src = devServerUrl;
+          saveBtn.disabled = false;
+
+          statusDot.className = 'status-dot running';
+          statusText.textContent = 'Running';
+          log('Preview started! Edit a file and save to see HMR.');
+        } catch (e) {
+          statusDot.className = 'status-dot';
+          statusText.textContent = 'Error';
+          log('Failed to start: ' + e.message, 'error');
+          console.error(e);
+          startBtn.disabled = false;
+        }
+      }
+
+      // ── Event listeners ──
+      fileTabs.addEventListener('click', (e) => {
+        if (e.target.classList.contains('file-tab')) {
+          loadFile(e.target.dataset.path);
+        }
+      });
+
+      startBtn.addEventListener('click', startPreview);
+      saveBtn.addEventListener('click', saveFile);
+
+      refreshBtn.addEventListener('click', () => {
+        if (devServerUrl) {
+          previewFrame.onload = () => {
+            if (devServer && previewFrame.contentWindow) {
+              devServer.setHMRTarget(previewFrame.contentWindow);
+            }
+          };
+          previewFrame.src = devServerUrl + '?t=' + Date.now();
+        }
+      });
+
+      editor.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+          e.preventDefault();
+          saveFile();
+        }
+      });
+
+      // ── Init ──
+      setupFiles();
+      renderTabs();
+      loadFile(currentFile);
+      log('Files loaded. Click "Start Preview" to launch.');
+    </script>
+  </body>
+</html>

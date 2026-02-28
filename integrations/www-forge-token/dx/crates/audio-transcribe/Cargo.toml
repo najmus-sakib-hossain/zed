@@ -1,0 +1,15 @@
+[package]
+name = "audio-transcribe"
+version.workspace = true
+edition.workspace = true
+description = "Speech-to-text transcription — 95-99.6% savings vs audio tokens"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+tokio = { workspace = true, features = ["process"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

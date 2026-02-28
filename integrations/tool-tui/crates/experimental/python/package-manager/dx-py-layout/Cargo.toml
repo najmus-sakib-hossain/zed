@@ -1,0 +1,23 @@
+[package]
+name = "dx-py-layout"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "O(1) virtual environment layout cache for DX-Py package manager"
+
+[dependencies]
+dx-py-core = { path = "../dx-py-core" }
+dx-py-store = { path = "../dx-py-store" }
+thiserror.workspace = true
+bytemuck.workspace = true
+blake3.workspace = true
+memmap2.workspace = true
+dashmap.workspace = true
+hex.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+junction.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile.workspace = true

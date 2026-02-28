@@ -1,0 +1,24 @@
+[package]
+name = "dx-www-dom"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Binary DOM operations with zero-copy element manipulation"
+keywords = ["wasm", "web", "dom", "dx", "zero-copy"]
+categories = ["wasm", "web-programming"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+web-sys.workspace = true
+bytemuck.workspace = true
+once_cell.workspace = true
+dx-www-core.workspace = true
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook.workspace = true

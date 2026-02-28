@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DX Style Playground - All Features</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <!-- Header -->
+    <header class="max-w-6xl mx-auto mb-2">
+        <h1 class="text-4xl font-bold text-gray-900 mb-2">DX Style Playground</h1>
+        <p class="text-lg text-gray-600">Testing all production features</p>
+    </header>
+
+    <main class="max-w-6xl mx-auto space-y-10">
+        <!-- 1. Basic Utilities -->
+        <section class="@brsp(bg-white rounded-lg shadow-md p-6)">
+            <h2 class="@tfmt(text-2xl font-bold mb-4 text-gray-800)">1. Basic Utilities</h2>
+            <div class="flex items-center justify-between p-4 bg-blue-500 text-white rounded">
+                <span class="font-semibold">Flexbox Layout</span>
+                <span class="text-sm">flex items-center justify-between</span>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mt-4">
+                <div class="p-4 bg-red-500 text-white text-center rounded">Grid 1</div>
+                <div class="p-4 bg-green-500 text-white text-center rounded">Grid 2</div>
+                <div class="p-4 bg-purple-500 text-white text-center rounded">Grid 3</div>
+            </div>
+        </section>
+
+        <!-- 2. Animations -->
+        <section class="brsp">
+            <h2 class="tfmt">2. Programmatic Animations</h2>
+            <div class="space-y-4">
+                <div class="animate-fade-in p-4 bg-indigo-100 rounded">
+                    <strong>Fade In:</strong> animate-fade-in
+                </div>
+                <div class="animate-slide-up-500ms p-4 bg-pink-100 rounded">
+                    <strong>Slide Up:</strong> animate-slide-up-500ms
+                </div>
+                <div class="animate-bounce-ease-in-out p-4 bg-yellow-100 rounded">
+                    <strong>Bounce:</strong> animate-bounce-ease-in-out
+                </div>
+                <div class="animate-pulse-1s-infinite p-4 bg-green-100 rounded">
+                    <strong>Pulse Infinite:</strong> animate-pulse-1s-infinite
+                </div>
+                <div class="animate-fade-in+slide-up p-4 bg-blue-100 rounded">
+                    <strong>Composed:</strong> animate-fade-in+slide-up
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Arbitrary Values -->
+        <section class="brsp">
+            <h2 class="tfmt">3. Arbitrary Values</h2>
+            <div class="space-y-4">
+                <div class="w-[calc(100%-40px)] h-[100px] bg-[#ff5500] text-white p-4 rounded">
+                    <strong>Custom Width & Color:</strong> w-[calc(100%-40px)] bg-[#ff5500]
+                </div>
+                <div class="p-[2rem] bg-[linear-gradient(to_right,#667eea,#764ba2)] text-white rounded">
+                    <strong>Gradient:</strong> bg-[linear-gradient(to_right,#667eea,#764ba2)]
+                </div>
+                <div class="grid cols-[repeat(4,1fr)] gap-[15px]">
+                    <div class="p-4 bg-gray-200 rounded text-center">1</div>
+                    <div class="p-4 bg-gray-300 rounded text-center">2</div>
+                    <div class="p-4 bg-gray-400 rounded text-center">3</div>
+                    <div class="p-4 bg-gray-500 rounded text-center text-white">4</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Auto-Grouping Test -->
+        <section class="brsp">
+            <h2 class="tfmt">4. Auto-Grouping (Repeated Patterns)</h2>
+            <p class="text-sm text-gray-600 mb-4">These patterns repeat 3+ times and should be auto-grouped:</p>
+            <div class="@fijpb(flex items-center justify-center p-4 bg-blue-500 text-white rounded mb-2)">
+                Pattern 1
+            </div>
+            <div class="fijpb">
+                Pattern 2
+            </div>
+            <div class="fijpb">
+                Pattern 3
+            </div>
+            <div class="flex items-center justify-center p-4 bg-blue-500 text-white rounded">
+                Pattern 4
+            </div>
+        </section>
+
+        <!-- 5. Responsive Design -->
+        <section class="brsp">
+            <h2 class="tfmt">5. Responsive Breakpoints</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="p-4 bg-teal-500 text-white rounded">
+                    <strong>Responsive:</strong> grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+                </div>
+                <div class="p-4 bg-cyan-500 text-white rounded">
+                    Adapts to screen size
+                </div>
+                <div class="p-4 bg-sky-500 text-white rounded">
+                    Mobile, Tablet, Desktop
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. States & Variants -->
+        <section class="brsp">
+            <h2 class="tfmt">6. Interactive States</h2>
+            <div class="space-y-4">
+                <button class="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 active:bg-blue-800 transition-colors">
+                    Hover & Active States
+                </button>
+                <button class="px-6 py-3 bg-green-600 text-white rounded focus:ring-4 focus:ring-green-300 transition-all">
+                    Focus Ring
+                </button>
+                <div class="p-4 bg-gray-100 rounded hover:shadow-lg transition-shadow cursor-pointer">
+                    Hover for Shadow
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Typography -->
+        <section class="brsp">
+            <h2 class="tfmt">7. Typography</h2>
+            <div class="space-y-2">
+                <p class="text-xs text-gray-600">Extra Small Text (text-xs)</p>
+                <p class="text-sm text-gray-700">Small Text (text-sm)</p>
+                <p class="text-base text-gray-800">Base Text (text-base)</p>
+                <p class="text-lg text-gray-900">Large Text (text-lg)</p>
+                <p class="text-xl font-semibold text-gray-900">Extra Large (text-xl font-semibold)</p>
+                <p class="text-2xl font-bold text-gray-900">2XL Bold (text-2xl font-bold)</p>
+            </div>
+        </section>
+
+        <!-- 8. Spacing & Sizing -->
+        <section class="brsp">
+            <h2 class="tfmt">8. Spacing & Sizing</h2>
+            <div class="space-y-4">
+                <div class="p-2 bg-orange-200 rounded">Padding 2 (p-2)</div>
+                <div class="p-4 bg-orange-300 rounded">Padding 4 (p-4)</div>
+                <div class="p-6 bg-orange-400 rounded text-white">Padding 6 (p-6)</div>
+                <div class="p-8 bg-orange-500 rounded text-white">Padding 8 (p-8)</div>
+            </div>
+            <div class="mt-6 space-x-4 flex">
+                <div class="w-16 h-16 bg-purple-500 rounded"></div>
+                <div class="w-24 h-24 bg-purple-600 rounded"></div>
+                <div class="w-32 h-32 bg-purple-700 rounded"></div>
+            </div>
+        </section>
+
+        <!-- 9. Colors & Opacity -->
+        <section class="brsp">
+            <h2 class="tfmt">9. Colors & Opacity</h2>
+            <div class="grid grid-cols-5 gap-2">
+                <div class="h-20 bg-red-500 rounded"></div>
+                <div class="h-20 bg-yellow-500 rounded"></div>
+                <div class="h-20 bg-green-500 rounded"></div>
+                <div class="h-20 bg-blue-500 rounded"></div>
+                <div class="h-20 bg-purple-500 rounded"></div>
+            </div>
+            <div class="mt-4 grid grid-cols-5 gap-2">
+                <div class="h-20 bg-red-500 opacity-25 rounded"></div>
+                <div class="h-20 bg-yellow-500 opacity-50 rounded"></div>
+                <div class="h-20 bg-green-500 opacity-75 rounded"></div>
+                <div class="h-20 bg-blue-500 opacity-90 rounded"></div>
+                <div class="h-20 bg-purple-500 opacity-100 rounded"></div>
+            </div>
+        </section>
+
+        <!-- 10. Borders & Shadows -->
+        <section class="brsp">
+            <h2 class="tfmt">10. Borders & Shadows</h2>
+            <div class="@ggg(grid grid-cols-3 gap-4)">
+                <div class="p-4 border-2 border-gray-300 rounded">
+                    border-2
+                </div>
+                <div class="p-4 border-4 border-blue-500 rounded">
+                    border-4 border-blue-500
+                </div>
+                <div class="p-4 border-8 border-red-500 rounded-lg">
+                    border-8 rounded-lg
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-4 gap-4">
+                <div class="p-4 bg-white shadow-sm rounded">shadow-sm</div>
+                <div class="p-4 bg-white shadow rounded">shadow</div>
+                <div class="p-4 bg-white shadow-md rounded">shadow-md</div>
+                <div class="p-4 bg-white shadow-lg rounded">shadow-lg</div>
+            </div>
+        </section>
+
+        <!-- 11. Transforms -->
+        <section class="brsp">
+            <h2 class="tfmt">11. Transforms</h2>
+            <div class="flex space-x-8 items-center justify-center p-8">
+                <div class="w-20 h-20 bg-pink-500 rounded rotate-45"></div>
+                <div class="w-20 h-20 bg-pink-500 rounded scale-125"></div>
+                <div class="w-20 h-20 bg-pink-500 rounded -rotate-12"></div>
+                <div class="w-20 h-20 bg-pink-500 rounded skew-y-6"></div>
+            </div>
+        </section>
+
+        <!-- 12. Filters & Effects -->
+        <section class="brsp">
+            <h2 class="tfmt">12. Filters & Effects</h2>
+            <div class="ggg">
+                <div class="p-4 bg-blue-500 text-white rounded blur-sm">
+                    blur-sm
+                </div>
+                <div class="p-4 bg-green-500 text-white rounded brightness-125">
+                    brightness-125
+                </div>
+                <div class="p-4 bg-purple-500 text-white rounded contrast-150">
+                    contrast-150
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-6xl mx-auto mt-12 pt-8 border-t border-gray-200">
+        <p class="text-center text-gray-600 font-bold underline italic opacity-75 tracking-wide">
+            DX Style - Binary-first CSS engine • All features tested • TESTING OPTIMIZATIONS
+        </p>
+    </footer>
+</body>
+</html>

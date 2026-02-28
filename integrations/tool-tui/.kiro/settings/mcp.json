@@ -1,0 +1,43 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-fetch"
+      ],
+      "env": {},
+      "disabled": false,
+      "autoApprove": [],
+      "disabledTools": []
+    },
+    "DX": {
+      "command": "bun",
+      "args": [
+        "run",
+        "--cwd",
+        "mcp",
+        "src/server.ts"
+      ],
+      "env": {
+        "DX_WORKSPACE": ".."
+      },
+      "disabled": false,
+      "autoApprove": [
+        "screenshot_preview",
+        "attach_latest_screenshot",
+        "list_windows",
+        "screenshot_window"
+      ],
+      "disabledTools": []
+    }
+  },
+  "powers": {
+    "mcpServers": {
+      "power-figma-figma": {
+        "url": "https://mcp.figma.com/mcp",
+        "disabled": false,
+        "disabledTools": []
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+# Source files (dist is published instead)
+# Keep src for source maps and TypeScript users who want to see source
+
+# Development
+.git
+.github
+.vscode
+.idea
+
+# Tests
+tests/
+e2e/
+*.test.ts
+*.spec.ts
+vitest.config.*
+playwright.config.*
+
+# Examples and demos
+examples/
+*.html
+
+# Config files
+.eslintrc*
+.prettierrc*
+tsconfig.json
+tsconfig.build.json
+vite.config.js
+vite.lib.config.js
+vite.sandbox.config.js
+
+# Misc
+.DS_Store
+*.log
+npm-debug.log*
+.env*
+coverage/
+.nyc_output/
+
+# Lock files (consumers use their own)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

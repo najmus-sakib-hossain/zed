@@ -1,0 +1,19 @@
+[package]
+name = "dx-compat-hmr"
+version = "0.0.1"
+edition = "2021"
+description = "Hot Module Replacement for DX"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+notify = "6.1"
+petgraph = "0.6"
+tokio = { version = "1.41", features = ["sync", "time"] }
+tokio-tungstenite = "0.24"
+thiserror = "2.0"
+parking_lot = "0.12"
+
+[dev-dependencies]
+proptest = "1.4"
+tempfile = "3.14"
+tokio = { version = "1.41", features = ["full", "test-util"] }

@@ -1,0 +1,12 @@
+{
+  "name": "dx-test-benchmarks",
+  "version": "1.0.0",
+  "description": "Benchmark tests for DX Test Runner",
+  "scripts": {
+    "test": "bun test",
+    "test:bun": "bun test",
+    "test:dx": "../target/release/dx-test",
+    "bench": "../bench.sh"
+  },
+  "devDependencies": {}
+}

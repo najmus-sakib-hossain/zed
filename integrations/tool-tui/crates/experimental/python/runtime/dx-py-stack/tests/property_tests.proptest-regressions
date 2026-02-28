@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 27374fca5e788ca0f96317d11b2982c73098f9f57af51bf608d6becdda18e1c0 # shrinks to tuple_offsets = [64], list_offsets = [64]

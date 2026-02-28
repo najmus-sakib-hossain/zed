@@ -1,0 +1,28 @@
+{
+  "name": "@midday/inbox",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./connector": "./src/connector.ts",
+    "./errors": "./src/errors.ts",
+    "./utils": "./src/utils.ts"
+  },
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test --exit src"
+  },
+  "dependencies": {
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "@midday/db": "workspace:*",
+    "@midday/encryption": "workspace:*",
+    "@midday/supabase": "workspace:*",
+    "@midday/utils": "workspace:*",
+    "googleapis": "^168.0.0",
+    "zod": "catalog:"
+  }
+}

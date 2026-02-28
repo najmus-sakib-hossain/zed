@@ -1,0 +1,144 @@
+# ============================================================================
+# PERFORMANCE CRITICAL: Largest/most frequent patterns first
+# ============================================================================
+
+# Build artifacts (largest directories - check first)
+/target/
+**/target/
+node_modules/
+**/node_modules/
+
+# Large model files (>100MB - skip immediately)
+models/*.bin
+models/*.safetensors
+models/ggml-*.bin
+models/whisper-*.safetensors
+*.bin
+*.gguf
+
+# Large binary files (Git LFS candidates)
+*.tar.gz
+*.lib
+binaryen.tar.gz
+binaryen-version_119/lib/*.lib
+
+# Large executables and binaries
+crates/python/playground/uv.exe
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Large JSON files
+crates/icon/inspirations/icon-sets/json/fluent-emoji.json
+crates/icon/inspirations/icon-sets/json/*.json
+
+# WASM outputs (frequently generated)
+**/pkg/
+pkg_*/
+*.wasm
+*_bg.wasm
+*_bg.wasm.d.ts
+wasm-pack.log
+
+# Python cache (many small files)
+__pycache__/
+**/__pycache__/
+*.py[cod]
+**/.venv/
+venv/
+env/
+.Python
+
+# ============================================================================
+# Standard ignores
+# ============================================================================
+
+# Rust
+**/*.rs.bk
+*.pdb
+
+# Cargo.lock in library crates (keep in binary crates)
+crates/*/Cargo.lock
+!crates/check/Cargo.lock
+!crates/dx/Cargo.lock
+!crates/cli/Cargo.lock
+
+# Environment files (keep examples)
+.env
+.env.*
+!.env.example
+
+# Development artifacts and progress tracking
+**/PHASE*.md
+**/TASKLIST.md
+**/PROGRESS.md
+**/*_COMPLETE.md
+**/*_STATUS.md
+**/PLANNING.md
+
+# DX generated files
+**/.dx/**/*.llm
+**/.dx/**/*.machine
+
+# MCP screenshot output (generated)
+**/.dx/mcp/
+
+# Build outputs
+/dist/
+/build/
+**/generated/
+
+# Property-based testing regressions
+**/proptest-regressions/
+
+# Logs
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.idea/
+*.swp
+*.swo
+*~
+**/.idx/
+**/.gitpod.yml
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dependencies
+bower_components/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+error.log
+
+# Debug
+debug/
+!crates/www/debug/
+*.dSYM/
+
+# Benchmarks
+benchmarks/node_modules/
+benchmarks/*.json
+!benchmarks/benchmark-results.json
+
+playground/benchmark-test/node_modules/
+playground/package-manager/*/node_modules/
+playground/package-manager/*/bun.lockb
+binaryen-version_119
+searxng/

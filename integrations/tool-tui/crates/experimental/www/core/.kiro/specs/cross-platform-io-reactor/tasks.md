@@ -1,0 +1,187 @@
+
+# Implementation Plan: Cross-Platform I/O Reactor
+
+## Overview
+
+This implementation plan creates the `dx-reactor` crate with cross-platform I/O backends (io_uring, kqueue, IOCP), HBTP binary protocol, memory teleportation, and compiler-inlined middleware. The implementation follows an incremental approach, building foundational components first and then integrating them.
+
+## Tasks
+
+- Set up dx-reactor crate structure
+- Create `crates/dx-reactor/` directory structure
+- Create `Cargo.toml` with platform-specific dependencies
+- Create module structure: `io/`, `protocol/`, `memory/`, `middleware/`
+- Define feature flags for optional backends
+- Requirements: 1.1, 1.6
+- -Implement core reactor traits and types
+- 2.1 Define Reactor trait and associated types-Create `src/io/mod.rs` with Reactor trait
+- Define `ReactorConfig`, `Completion`, `Interest`, `IoHandle` types
+- Implement platform type aliases using conditional compilation
+- Requirements: 1.1, 1.6
+- 2.2 Write property test for worker count configuration-Property 8: Worker Count Configuration
+- Validates: Requirements 5.2
+- -Implement io_uring backend (Linux)
+- 3.1 Create UringReactor structure-Create `src/io/uring.rs` with UringReactor struct
+- Implement `is_available()` function for kernel version detection
+- Implement `new()` with SQPOLL and buffer registration support
+- Requirements: 2.1, 2.2, 2.5, 2.7
+- 3.2 Implement Reactor trait for UringReactor-Implement `register()`, `submit()`, `wait()`, `submit_and_wait()`
+- Implement multishot receive and zero-copy send helpers
+- Requirements: 2.3, 2.4, 2.6
+- [ ]* 3.3 Write unit tests for UringReactor-Test SQPOLL configuration
+- Test buffer registration
+- Test multishot receive
+- Requirements: 2.1, 2.2, 2.3, 2.4
+- -Implement kqueue backend (macOS/BSD)
+- 4.1 Create KqueueReactor structure-Create `src/io/kqueue.rs` with KqueueReactor struct
+- Implement `new()` with configurable event capacity
+- Requirements: 3.1, 3.3
+- 4.2 Implement Reactor trait for KqueueReactor-Implement `register_read()`, `register_write()` helpers
+- Implement batch event submission and retrieval
+- Handle edge-triggered events correctly
+- Requirements: 3.2, 3.4, 3.5
+- [ ]* 4.3 Write unit tests for KqueueReactor-Test read/write event registration
+- Test batch operations
+- Test timeout configuration
+- Requirements: 3.1, 3.2, 3.3
+- -Implement IOCP backend (Windows)
+- 5.1 Create IocpReactor structure-Create `src/io/iocp.rs` with IocpReactor struct
+- Implement `new()` with completion port creation
+- Implement `associate()` for handle association
+- Requirements: 4.1
+- 5.2 Implement Reactor trait for IocpReactor-Implement async file read with OVERLAPPED
+- Implement async socket recv with WSARecv
+- Implement batch completion retrieval
+- Requirements: 4.2, 4.3, 4.4, 4.5, 4.6
+- [ ]* 5.3 Write unit tests for IocpReactor-Test completion port creation
+- Test async file operations
+- Test async socket operations
+- Requirements: 4.1, 4.2, 4.3
+- -Checkpoint
+- Ensure all reactor backends compile
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement HBTP protocol
+- 7.1 Define HBTP opcodes and header-Create `src/protocol/hbtp.rs`
+- Define `HbtpOpcode` enum with all opcodes
+- Define `HbtpHeader` struct (8 bytes, packed)
+- Define `HbtpFlags` bitflags
+- Requirements: 6.1, 6.2
+- [ ]* 7.2 Write property test for HBTP header size invariant-Property 1: HBTP Header Size Invariant
+- Validates: Requirements 6.2
+- 7.3 Implement HBTP message serialization-Implement `HbtpHeader::from_bytes()` and `to_bytes()`
+- Implement compression support with zstd
+- Implement encryption support with ChaCha20
+- Requirements: 6.3, 6.4
+- [ ]* 7.4 Write property test for HBTP message round-trip-Property 2: HBTP Message Round-Trip
+- Validates: Requirements 6.3, 6.4, 6.6
+- 7.5 Implement HBTP protocol handler-Create `HbtpProtocol` struct with route handlers
+- Implement O(1) route lookup using array indexing
+- Implement `process()` method for message handling
+- Requirements: 6.5
+- [ ]* 7.6 Write property test for HBTP route lookup O(1)-Property 3: HBTP Route Lookup O(1)
+- Validates: Requirements 6.5
+- -Implement memory teleportation
+- 8.1 Define Teleportable trait and layout-Create `src/memory/teleport.rs`
+- Define `Teleportable` trait with SIZE, ALIGN constants
+- Define `TeleportLayout` struct for compile-time verification
+- Requirements: 7.5
+- 8.2 Implement TeleportBuffer-Implement `write<T>()` with correct alignment
+- Implement `write_slice<T>()` for arrays
+- Implement `write_string()` with string table
+- Implement `finalize()` to get final bytes
+- Requirements: 7.1, 7.2
+- 8.3 Implement TeleportReader-Implement `read<T>()` returning reference (zero-copy)
+- Implement `read_slice<T>()` for arrays
+- Implement `read_string()` using string table
+- Requirements: 7.3
+- [ ]* 8.4 Write property test for teleportation round-trip-Property 4: Teleportation Round-Trip
+- Validates: Requirements 7.1, 7.2, 7.4
+- -Checkpoint
+- Ensure protocol and teleportation work
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement compiler-inlined middleware
+- 10.1 Define Middleware trait-Create `src/middleware/cim.rs`
+- Define `Middleware` trait with `before()` and `after()` hooks
+- Define `MiddlewareResult` and `MiddlewareError` types
+- Requirements: 8.1
+- 10.2 Implement dx_middleware! macro-Create macro for compile-time middleware chain generation
+- Implement before hooks in order
+- Implement after hooks in reverse order
+- Support short-circuiting in before hooks
+- Requirements: 8.2, 8.3, 8.4
+- [ ]* 10.3 Write property test for middleware after hook order-Property 5: Middleware After Hook Order
+- Validates: Requirements 8.3
+- 10.4 Implement built-in middleware-Implement `AuthMiddleware` for JWT verification
+- Implement `TimingMiddleware` for request timing
+- Implement `RateLimitMiddleware` with per-core counters
+- Implement `CorsMiddleware` with compile-time origins
+- Requirements: 8.1, 8.5
+- -Implement thread-per-core architecture
+- 11.1 Create DxReactor and ReactorBuilder-Create `src/lib.rs` with DxReactor struct
+- Implement ReactorBuilder with fluent API
+- Implement `build()` to create reactor
+- Requirements: 5.1, 5.2
+- 11.2 Implement CoreState and worker threads-Create `CoreState` struct with per-core reactor and queue
+- Implement thread spawning with CPU affinity
+- Implement `ignite()` to start all workers
+- Requirements: 5.3, 5.4
+- 11.3 Implement work-stealing-Implement `LocalQueue` with work-stealing support
+- Implement stealing logic for underloaded cores
+- Requirements: 5.5
+- [ ]* 11.4 Write unit tests for thread-per-core-Test worker count configuration
+- Test CPU affinity
+- Test work-stealing behavior
+- Requirements: 5.1, 5.2, 5.3, 5.5
+- -Implement database teleport cache
+- 12.1 Create DbTeleport structure-Create `src/cache/db_teleport.rs` (or separate crate)
+- Define `DbTeleport`, `CacheEntry`, `CacheKey` structs
+- Implement connection pool integration
+- Requirements: 9.1
+- 12.2 Implement query registration and caching-Implement `register_query()` with table dependencies
+- Implement `execute_and_cache()` for cache population
+- Implement `get_cached()` for O(1) lookup
+- Requirements: 9.2, 9.4
+- [ ]* 12.3 Write property test for cache lookup O(1)-Property 6: Cache Lookup O(1)
+- Validates: Requirements 9.4
+- 12.4 Implement cache invalidation-Set up PostgreSQL LISTEN for table changes
+- Implement `process_notifications()` for invalidation
+- Implement cache size limits
+- Requirements: 9.3, 9.5
+- -Checkpoint
+- Ensure all components integrate
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement cross-platform testing
+- 14.1 Create cross-platform test suite-Create integration tests for binary format compatibility
+- Test that binary formats are identical across platforms
+- Requirements: 10.4
+- [ ]* 14.2 Write property test for binary format compatibility-Property 7: Binary Format Cross-Platform Compatibility
+- Validates: Requirements 10.4
+- 14.3 Create platform-specific CI configuration-Add GitHub Actions workflow for Linux, macOS, Windows
+- Configure test matrix for all platforms
+- Add code coverage reporting
+- Requirements: 10.1, 10.2, 10.3, 10.5, 10.6
+- -Wire dx-reactor into dx-www
+- 15.1 Update dx-www Cargo.toml-Add dx-reactor dependency
+- Configure feature flags for backends
+- Requirements: 1.1
+- 15.2 Integrate reactor with dev server-Update `dev_server.rs` to use dx-reactor
+- Replace tokio I/O with reactor-based I/O
+- Requirements: 1.2, 1.3, 1.4, 1.5
+- [ ]* 15.3 Write integration tests for dx-www with reactor-Test compilation pipeline with reactor
+- Test hot reload with reactor
+- Requirements: 10.3, 10.6
+- -Final checkpoint
+- Full test suite
+- Ensure all tests pass, ask the user if questions arise.
+
+## Notes
+
+- Tasks marked with `*` are optional and can be skipped for faster MVP
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
+- Platform-specific code uses conditional compilation (`#[cfg(...)]`)
+- The io_uring backend requires the `io-uring` crate
+- The kqueue backend uses `libc` directly
+- The IOCP backend uses `windows-sys` crate

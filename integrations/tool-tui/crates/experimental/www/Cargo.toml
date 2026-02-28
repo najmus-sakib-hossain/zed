@@ -1,0 +1,132 @@
+[workspace]
+resolver = "2"
+members = [
+    "a11y",
+    "auth",
+    "benchmarks",
+    "binary",
+    "build",
+    "cache",
+    "client",
+    "client-tiny",
+    "core",
+    "db",
+    "db-teleport",
+    "debug",
+    "demo",
+    "dom",
+    "dx-www",
+    "error",
+    "fallback",
+    "form",
+    "framework-core",
+    "guard",
+    "interaction",
+    "morph",
+    "observability",
+    "offline",
+    "packet",
+    "print",
+    "query",
+    "reactor",
+    "router",
+    "rtl",
+    "sched",
+    "server",
+    "state",
+    "sync",
+    "tests",
+]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2024"
+authors = ["DX Team <team@dx-www.dev>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dx-www/dx-www"
+rust-version = "1.85"
+
+[workspace.dependencies]
+# Internal crates
+dx-www-a11y = { path = "a11y" }
+dx-www-auth = { path = "auth" }
+dx-www-binary = { path = "binary" }
+dx-www-build = { path = "build" }
+dx-www-cache = { path = "cache" }
+dx-www-client = { path = "client" }
+dx-www-client-tiny = { path = "client-tiny" }
+dx-www-compiler = { path = "core" }
+dx-www-core = { path = "framework-core" }
+dx-www-db = { path = "db" }
+dx-www-db-teleport = { path = "db-teleport" }
+dx-www-debug = { path = "debug" }
+dx-www-dom = { path = "dom" }
+dx-www-error = { path = "error" }
+dx-www-fallback = { path = "fallback" }
+dx-www-form = { path = "form" }
+dx-www-framework-core = { path = "framework-core" }
+dx-www-guard = { path = "guard" }
+dx-www-interaction = { path = "interaction" }
+dx-www-morph = { path = "morph" }
+dx-www-observability = { path = "observability" }
+dx-www-offline = { path = "offline" }
+dx-www-packet = { path = "packet" }
+dx-www-print = { path = "print" }
+dx-www-query = { path = "query" }
+dx-www-reactor = { path = "reactor" }
+dx-www-rtl = { path = "rtl" }
+dx-www-sched = { path = "sched" }
+dx-www-server = { path = "server" }
+dx-www-state = { path = "state" }
+dx-www-sync = { path = "sync" }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Cryptography
+ed25519-dalek = { version = "2.1", features = ["rand_core", "serde"] }
+blake3 = "1.8"
+argon2 = "0.5"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Testing
+proptest = "1.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+# WASM
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["Window", "Document", "DocumentFragment", "Element", "HtmlElement", "HtmlTemplateElement", "Node", "Text", "console"] }
+bytemuck = { version = "1.14", features = ["derive"] }
+once_cell = "1.19"
+console_error_panic_hook = "0.1"
+
+# OXC Parser
+oxc_allocator = "0.56"
+oxc_parser = "0.56"
+oxc_ast = "0.56"
+oxc_span = "0.56"
+oxc_diagnostics = "0.56"
+
+# Platform-specific I/O
+io-uring = { version = "0.7" }
+windows-sys = { version = "0.59", features = ["Win32_System_IO", "Win32_Foundation", "Win32_Networking_WinSock"] }
+libc = "0.2"
+
+[workspace.lints.rust]
+unsafe_code = "warn"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"
+nursery = "warn"
+unwrap_used = "warn"
+expect_used = "warn"

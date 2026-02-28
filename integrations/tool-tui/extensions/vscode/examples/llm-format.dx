@@ -1,0 +1,16 @@
+// DSR (DX Serializer) Format - Token-efficient LLM format
+// Objects: name[key=value,key2=value2]
+config[name=DX Example,description=Example file demonstrating DSR format,version=1.0,active=true]
+
+// Simple key=value pairs
+tier=Premium
+environment=development
+
+// Arrays: name:count=item1,item2,item3
+brands:3=AcmeCorp,TechInc,GlobalSoft
+
+// Tables: name:count(col1,col2,col3)[row1\nrow2]
+employees:3(id,name,department,salary)[
+1,Alice Smith,Engineering,95000
+2,Bob Johnson,Marketing,75000
+3,Carol Williams,Sales,82000]

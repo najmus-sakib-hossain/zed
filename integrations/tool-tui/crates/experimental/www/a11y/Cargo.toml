@@ -1,0 +1,20 @@
+[package]
+name = "dx-www-a11y"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Compile-time accessibility auditor"
+keywords = ["wasm", "web", "accessibility", "dx", "a11y"]
+categories = ["wasm", "web-programming", "accessibility"]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+oxc_parser = "0.22"
+miette = "7.0"
+
+[dev-dependencies]
+proptest = { workspace = true }

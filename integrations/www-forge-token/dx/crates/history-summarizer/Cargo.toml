@@ -1,0 +1,12 @@
+[package]
+name = "history-summarizer"
+version.workspace = true
+edition.workspace = true
+description = "LLM-powered history summarization — 60-90% savings on old context"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

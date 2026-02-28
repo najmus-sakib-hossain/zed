@@ -1,0 +1,52 @@
+[package]
+name = "dx-www-observability"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+description = "Observability infrastructure for dx-www: tracing, metrics, and structured logging"
+
+[dependencies]
+# OpenTelemetry for distributed tracing
+opentelemetry = { version = "0.21", features = ["trace"] }
+opentelemetry_sdk = { version = "0.21", features = ["trace", "rt-tokio"] }
+opentelemetry-otlp = { version = "0.14", features = ["trace", "tonic"] }
+tracing-opentelemetry = "0.22"
+
+# Tracing infrastructure
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json", "env-filter", "time"] }
+time = "0.3"
+
+# Prometheus metrics
+prometheus = "0.13"
+
+# Tower middleware for request tracing
+tower = "0.4"
+tower-http = { version = "0.5", features = ["trace", "request-id", "propagate-header"] }
+http = "1.0"
+
+# Async runtime
+tokio.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Error handling
+thiserror.workspace = true
+
+# Time handling for log timestamps
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+proptest.workspace = true
+axum = "0.7"
+hyper = "1.0"
+tokio = { version = "1.35", features = ["rt-multi-thread", "macros"] }
+regex = "1.10"
+
+[lints]
+workspace = true

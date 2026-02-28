@@ -1,0 +1,18 @@
+[package]
+name = "dx-py-collections"
+description = "SIMD-Accelerated Collections for DX-Py-Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+
+[[bench]]
+name = "collections_benchmarks"
+harness = false

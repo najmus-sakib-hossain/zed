@@ -1,0 +1,13 @@
+[package]
+name = "dx-test-executor"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+dx-test-core = { path = "../dx-test-core" }
+dx-test-cache = { path = "../dx-test-cache" }
+dx-test-vm = { path = "../dx-test-vm" }
+rayon = { workspace = true }
+num_cpus = { workspace = true }

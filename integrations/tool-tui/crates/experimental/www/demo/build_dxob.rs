@@ -1,0 +1,441 @@
+use std::fs;
+use std::collections::HashMap;
+
+/// DX Optimal Binary CSS (DXOB) - Semantic CSS Encoding
+/// 
+/// Key insight: Encode CSS semantics, not text
+/// - Colors as RGB bytes (not strings)
+/// - Lengths as unit+value (not text)
+/// - Keywords as enums (not strings)
+/// - Properties as IDs (not names)
+
+// Property IDs (1 byte = 256 properties)
+fn get_prop_id(prop: &str) -> Option<u8> {
+    match prop {
+        "display" => Some(0x00),
+        "position" => Some(0x01),
+        "width" => Some(0x02),
+        "height" => Some(0x03),
+        "min-width" => Some(0x04),
+        "max-width" => Some(0x05),
+        "min-height" => Some(0x06),
+        "max-height" => Some(0x07),
+        "padding" => Some(0x10),
+        "padding-top" => Some(0x11),
+        "padding-bottom" => Some(0x13),
+        "margin" => Some(0x18),
+        "margin-top" => Some(0x19),
+        "margin-bottom" => Some(0x1B),
+        "background" => Some(0x20),
+        "background-color" => Some(0x21),
+        "color" => Some(0x28),
+        "opacity" => Some(0x29),
+        "font-family" => Some(0x30),
+        "font-size" => Some(0x31),
+        "font-weight" => Some(0x32),
+        "line-height" => Some(0x33),
+        "text-align" => Some(0x34),
+        "text-decoration" => Some(0x35),
+        "border" => Some(0x40),
+        "border-radius" => Some(0x41),
+        "box-shadow" => Some(0x44),
+        "flex" => Some(0x50),
+        "justify-content" => Some(0x53),
+        "align-items" => Some(0x54),
+        "gap" => Some(0x55),
+        "cursor" => Some(0x60),
+        "overflow" => Some(0x61),
+        "transform" => Some(0x63),
+        "transition" => Some(0x64),
+        "list-style" => Some(0x65),
+        "outline" => Some(0x66),
+        _ => None,
+    }
+}
+
+// Keyword IDs
+fn get_keyword_id(kw: &str) -> Option<u8> {
+    match kw {
+        "none" => Some(0x00),
+        "auto" => Some(0x01),
+        "flex" => Some(0x10),
+        "block" => Some(0x11),
+        "center" => Some(0x20),
+        "space-between" => Some(0x25),
+        "pointer" => Some(0x40),
+        "bold" => Some(0x50),
+        "normal" => Some(0x51),
+        "hidden" => Some(0x60),
+        "solid" => Some(0x70),
+        "border-box" => Some(0x90),
+        "line-through" => Some(0x92),
+        _ => None,
+    }
+}
+
+// Unit IDs
+fn get_unit_id(unit: &str) -> Option<u8> {
+    match unit {
+        "px" => Some(0),
+        "%" => Some(1),
+        "em" => Some(2),
+        "rem" => Some(3),
+        "vh" => Some(4),
+        "vw" => Some(5),
+        "s" => Some(8),
+        _ => None,
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Color { r: u8, g: u8, b: u8, a: Option<u8> }
+
+#[derive(Debug, Clone)]
+struct Length { value: u16, unit: u8 }
+
+#[derive(Debug)]
+enum ValueType {
+    Color(usize),      // Index in colors table
+    Length(usize),     // Index in lengths table
+    Keyword(usize),    // Index in keywords table
+    String(usize),     // Index in strings table
+}
+
+fn main() {
+    let styles = vec![
+        (1, "margin:0;padding:0;box-sizing:border-box"),
+        (2, "font-family:system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px"),
+        (3, "background:white;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3);padding:40px;max-width:600px;width:100%"),
+        (4, "color:#667eea;font-size:2rem;margin-bottom:10px"),
+        (5, "color:#666;margin-bottom:30px;font-size:0.9rem"),
+        (6, "display:flex;gap:10px;margin-bottom:20px"),
+        (7, "flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:8px;font-size:1rem;transition:border-color 0.2s"),
+        (8, "outline:none;border-color:#667eea"),
+        (9, "background:#667eea;color:white;border:none;padding:12px 24px;font-size:1rem;border-radius:8px;cursor:pointer;transition:all 0.2s;min-width:44px;min-height:44px"),
+        (10, "background:#5568d3;transform:translateY(-2px);box-shadow:0 4px 12px rgba(102,126,234,0.4)"),
+        (11, "transform:translateY(0)"),
+        (12, "margin-bottom:20px"),
+        (13, "display:flex;align-items:center;gap:12px;padding:12px;background:#f8f9fa;border-radius:8px;margin-bottom:8px;transition:all 0.2s"),
+        (14, "background:#e9ecef"),
+        (15, "opacity:0.6"),
+        (16, "text-decoration:line-through;color:#999"),
+        (17, "width:20px;height:20px;cursor:pointer"),
+        (18, "flex:1;font-size:1rem;color:#333"),
+        (19, "background:#f44336;padding:8px 16px;font-size:0.9rem;min-width:auto;min-height:auto"),
+        (20, "background:#d32f2f"),
+        (21, "display:flex;justify-content:space-between;padding:15px;background:#f8f9fa;border-radius:8px;margin-bottom:20px"),
+        (22, "text-align:center"),
+        (23, "font-size:1.5rem;font-weight:bold;color:#667eea"),
+        (24, "font-size:0.8rem;color:#666;margin-top:4px"),
+        (25, "background:#e8f5e9;padding:15px;border-radius:8px;border-left:4px solid #4caf50"),
+        (26, "font-weight:600;color:#2e7d32;margin-bottom:10px"),
+        (27, "list-style:none;padding:0"),
+        (28, "padding:4px 0;color:#2e7d32;font-size:0.9rem"),
+        (29, "text-align:center;padding:40px;color:#999"),
+        (30, "font-size:3rem;margin-bottom:10px"),
+    ];
+    
+    let mut encoder = DXOBEncoder::new();
+    
+    for (id, css) in &styles {
+        encoder.add_style(*id, css);
+    }
+    
+    let binary = encoder.encode();
+    fs::write("styles.dxob", &binary).unwrap();
+    
+    println!("Generated DXOB: {} bytes", binary.len());
+    println!("  Header: 4 bytes");
+    println!("  Colors: {} entries ({} bytes)", encoder.colors.len(), 1 + encoder.colors.len() * 3);
+    println!("  Lengths: {} entries ({} bytes)", encoder.lengths.len(), 1 + encoder.lengths.len() * 2);
+    println!("  Keywords: {} entries ({} bytes)", encoder.keywords.len(), 1 + encoder.keywords.len());
+    println!("  Strings: {} entries (~{} bytes)", encoder.strings.len(), encoder.strings.len() * 10);
+    println!("  Styles: {} entries", encoder.styles.len());
+    
+    // Compare with other formats
+    let css_size = fs::metadata("crates/www/demo/styles.css").map(|m| m.len() as usize).unwrap_or(0);
+    let sr_size = fs::metadata("crates/www/demo/styles.sr").map(|m| m.len() as usize).unwrap_or(0);
+    
+    println!("\n=== SIZE COMPARISON ===");
+    println!("CSS: {} bytes", css_size);
+    if css_size > 0 && dxs_size > 0 {
+        println!("DX Serializer: {} bytes ({}% smaller)", dxs_size, 100 - (dxs_size * 100 / css_size));
+    }
+    if css_size > 0 {
+        println!("DXOB: {} bytes ({}% smaller)", binary.len(), 100 - (binary.len() * 100 / css_size));
+    }
+    
+    // Compress with Brotli
+    use std::process::Command;
+    let _ = Command::new("brotli").args(&["-9", "-k", "-f", "styles.dxob"]).output();
+    
+    if let Ok(meta) = fs::metadata("styles.dxob.br") {
+        let compressed = meta.len() as usize;
+        let css_br = fs::metadata("crates/www/demo/styles.css.br").map(|m| m.len() as usize).unwrap_or(845);
+        
+        println!("\n=== COMPRESSED (Brotli) ===");
+        println!("CSS: {} bytes", css_br);
+        println!("DXOB: {} bytes", compressed);
+        
+        if compressed < css_br {
+            let advantage = 100 - (compressed * 100 / css_br);
+            println!("\n🎉 DXOB vs CSS (Brotli): {}% smaller", advantage);
+            
+            if advantage >= 40 {
+                println!("✅ SUCCESS: Achieved 40%+ target!");
+            } else {
+                println!("⚠️  Target not reached. Need {}% more reduction.", 40 - advantage);
+            }
+        } else {
+            println!("❌ DXOB is larger than CSS when compressed");
+        }
+    }
+}
+
+struct DXOBEncoder {
+    colors: Vec<Color>,
+    color_map: HashMap<String, usize>,
+    lengths: Vec<Length>,
+    length_map: HashMap<String, usize>,
+    keywords: Vec<u8>,
+    keyword_map: HashMap<String, usize>,
+    strings: Vec<String>,
+    string_map: HashMap<String, usize>,
+    styles: Vec<(u16, Vec<(u8, ValueType)>)>,
+}
+
+impl DXOBEncoder {
+    fn new() -> Self {
+        Self {
+            colors: Vec::new(),
+            color_map: HashMap::new(),
+            lengths: Vec::new(),
+            length_map: HashMap::new(),
+            keywords: Vec::new(),
+            keyword_map: HashMap::new(),
+            strings: Vec::new(),
+            string_map: HashMap::new(),
+            styles: Vec::new(),
+        }
+    }
+    
+    fn parse_color(&mut self, value: &str) -> Option<ValueType> {
+        // Hex color
+        if value.starts_with('#') {
+            let hex = &value[1..];
+            if hex.len() == 6 {
+                let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
+                let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
+                let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
+                
+                let key = format!("{},{},{}", r, g, b);
+                if let Some(&idx) = self.color_map.get(&key) {
+                    return Some(ValueType::Color(idx));
+                }
+                
+                let idx = self.colors.len();
+                self.colors.push(Color { r, g, b, a: None });
+                self.color_map.insert(key, idx);
+                return Some(ValueType::Color(idx));
+            }
+        }
+        
+        // rgba
+        if value.starts_with("rgba(") {
+            let inner = &value[5..value.len()-1];
+            let parts: Vec<&str> = inner.split(',').collect();
+            if parts.len() == 4 {
+                let r = parts[0].trim().parse().ok()?;
+                let g = parts[1].trim().parse().ok()?;
+                let b = parts[2].trim().parse().ok()?;
+                let a = (parts[3].trim().parse::<f32>().ok()? * 255.0) as u8;
+                
+                let key = format!("{},{},{},{}", r, g, b, a);
+                if let Some(&idx) = self.color_map.get(&key) {
+                    return Some(ValueType::Color(idx));
+                }
+                
+                let idx = self.colors.len();
+                self.colors.push(Color { r, g, b, a: Some(a) });
+                self.color_map.insert(key, idx);
+                return Some(ValueType::Color(idx));
+            }
+        }
+        
+        // Named colors
+        if value == "white" {
+            return self.parse_color("#ffffff");
+        }
+        
+        None
+    }
+    
+    fn parse_length(&mut self, value: &str) -> Option<ValueType> {
+        if value == "0" {
+            let key = "0:0".to_string();
+            if let Some(&idx) = self.length_map.get(&key) {
+                return Some(ValueType::Length(idx));
+            }
+            let idx = self.lengths.len();
+            self.lengths.push(Length { value: 0, unit: 0 });
+            self.length_map.insert(key, idx);
+            return Some(ValueType::Length(idx));
+        }
+        
+        for (unit_str, unit_id) in &[("px", 0), ("%", 1), ("rem", 3), ("vh", 4), ("s", 8)] {
+            if value.ends_with(unit_str) {
+                let num_str = &value[..value.len() - unit_str.len()];
+                if let Ok(num) = num_str.parse::<f32>() {
+                    let encoded = (num * 4.0) as u16;
+                    if encoded < 4096 {
+                        let key = format!("{}:{}", unit_id, encoded);
+                        if let Some(&idx) = self.length_map.get(&key) {
+                            return Some(ValueType::Length(idx));
+                        }
+                        let idx = self.lengths.len();
+                        self.lengths.push(Length { value: encoded, unit: *unit_id });
+                        self.length_map.insert(key, idx);
+                        return Some(ValueType::Length(idx));
+                    }
+                }
+            }
+        }
+        
+        None
+    }
+    
+    fn add_value(&mut self, value: &str) -> ValueType {
+        let value = value.trim();
+        
+        // Try keyword
+        if let Some(kw_id) = get_keyword_id(value) {
+            if let Some(&idx) = self.keyword_map.get(value) {
+                return ValueType::Keyword(idx);
+            }
+            let idx = self.keywords.len();
+            self.keywords.push(kw_id);
+            self.keyword_map.insert(value.to_string(), idx);
+            return ValueType::Keyword(idx);
+        }
+        
+        // Try length
+        if let Some(vt) = self.parse_length(value) {
+            return vt;
+        }
+        
+        // Try color
+        if let Some(vt) = self.parse_color(value) {
+            return vt;
+        }
+        
+        // Fallback: string
+        if let Some(&idx) = self.string_map.get(value) {
+            return ValueType::String(idx);
+        }
+        let idx = self.strings.len();
+        self.strings.push(value.to_string());
+        self.string_map.insert(value.to_string(), idx);
+        ValueType::String(idx)
+    }
+    
+    fn add_style(&mut self, id: u16, css: &str) {
+        let mut properties = Vec::new();
+        
+        for pair in css.split(';') {
+            if let Some(colon_idx) = pair.find(':') {
+                let prop = pair[..colon_idx].trim();
+                let value = pair[colon_idx + 1..].trim();
+                
+                if let Some(prop_id) = get_prop_id(prop) {
+                    let value_ref = self.add_value(value);
+                    properties.push((prop_id, value_ref));
+                }
+            }
+        }
+        
+        self.styles.push((id, properties));
+    }
+    
+    fn encode(&self) -> Vec<u8> {
+        let mut output = Vec::new();
+        
+        // Header: "DXOB" magic
+        output.extend_from_slice(b"DXOB");
+        
+        // Colors table
+        self.write_varint(&mut output, self.colors.len() as u64);
+        for color in &self.colors {
+            output.push(color.r);
+            output.push(color.g);
+            output.push(color.b);
+            if let Some(a) = color.a {
+                output.push(0x80 | a); // High bit = has alpha
+            }
+        }
+        
+        // Lengths table
+        self.write_varint(&mut output, self.lengths.len() as u64);
+        for length in &self.lengths {
+            let packed = (length.unit as u16) << 12 | length.value;
+            output.push((packed & 0xFF) as u8);
+            output.push((packed >> 8) as u8);
+        }
+        
+        // Keywords table
+        self.write_varint(&mut output, self.keywords.len() as u64);
+        for &kw in &self.keywords {
+            output.push(kw);
+        }
+        
+        // Strings table
+        self.write_varint(&mut output, self.strings.len() as u64);
+        for s in &self.strings {
+            let bytes = s.as_bytes();
+            self.write_varint(&mut output, bytes.len() as u64);
+            output.extend_from_slice(bytes);
+        }
+        
+        // Styles
+        self.write_varint(&mut output, self.styles.len() as u64);
+        for (id, props) in &self.styles {
+            self.write_varint(&mut output, *id as u64);
+            self.write_varint(&mut output, props.len() as u64);
+            
+            for (prop_id, value_type) in props {
+                output.push(*prop_id);
+                
+                match value_type {
+                    ValueType::Color(idx) => {
+                        output.push(0x00 | ((*idx as u8) & 0x3F));
+                    }
+                    ValueType::Length(idx) => {
+                        output.push(0x40 | ((*idx as u8) & 0x3F));
+                    }
+                    ValueType::Keyword(idx) => {
+                        output.push(0x80 | ((*idx as u8) & 0x3F));
+                    }
+                    ValueType::String(idx) => {
+                        output.push(0xC0);
+                        self.write_varint(&mut output, *idx as u64);
+                    }
+                }
+            }
+        }
+        
+        output
+    }
+    
+    fn write_varint(&self, buf: &mut Vec<u8>, mut value: u64) {
+        loop {
+            let mut byte = (value & 0x7F) as u8;
+            value >>= 7;
+            if value != 0 {
+                byte |= 0x80;
+            }
+            buf.push(byte);
+            if value == 0 {
+                break;
+            }
+        }
+    }
+}

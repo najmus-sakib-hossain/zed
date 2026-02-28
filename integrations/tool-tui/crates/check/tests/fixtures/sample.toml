@@ -1,0 +1,8 @@
+[package]
+name = "sample"
+version = "1.0.0"
+edition = "2024"
+
+[dependencies]
+serde = "1.0"
+tokio = { version = "1.0", features = ["full"] }

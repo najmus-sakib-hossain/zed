@@ -1,0 +1,19 @@
+[package]
+name = "dx-pkg-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+bytemuck = { workspace = true }
+xxhash-rust = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+junction = "1.0"
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = "3.10"

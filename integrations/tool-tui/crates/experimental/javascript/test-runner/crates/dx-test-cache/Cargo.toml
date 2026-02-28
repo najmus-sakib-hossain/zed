@@ -1,0 +1,15 @@
+[package]
+name = "dx-test-cache"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+dx-test-core = { path = "../dx-test-core" }
+blake3 = { workspace = true }
+memmap2 = { workspace = true }
+bytemuck = { workspace = true }
+walkdir = { workspace = true }
+parking_lot = { workspace = true }
+once_cell = { workspace = true }

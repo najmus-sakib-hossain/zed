@@ -1,0 +1,36 @@
+[package]
+name = "dx-wasm"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "WASM compilation and runtime for DX - compile Python, JS, Go to WASM"
+
+[dependencies]
+# Workspace dependencies
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+# Internal crates
+dx-core = { path = "../core" }
+dx-serializer = { path = "../serializer" }
+
+# WASM runtime
+wasmtime = "40.0"
+wasmtime-wasi = "40.0"
+
+# For compiling to WASM
+# wasm-bindgen = "0.2"
+
+# Temp files for compilation
+tempfile = "3"
+
+# Process execution
+which = "7"
+
+[dev-dependencies]
+mockall.workspace = true

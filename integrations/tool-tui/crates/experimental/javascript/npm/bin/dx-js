@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+/**
+ * DX JavaScript Runtime - Binary Wrapper
+ * 
+ * This script wraps the native binary and passes through all arguments.
+ */
+
+const { spawn } = require('child_process');
+const path = require('path');
+
+const BINARY_NAME = process.platform === 'win32' ? 'dx-js.exe' : 'dx-js';
+const binaryPath = path.join(__dirname, BINARY_NAME);
+
+const child = spawn(binaryPath, process.argv.slice(2), {
+  stdio: 'inherit',
+  windowsHide: true
+});
+
+child.on('error', (err) => {
+  if (err.code === 'ENOENT') {
+    console.error('Error: DX JavaScript Runtime binary not found.');
+    console.error('Please try reinstalling: npm install -g dx-js');
+    process.exit(1);
+  }
+  throw err;
+});
+
+child.on('exit', (code, signal) => {
+  if (signal) {
+    process.kill(process.pid, signal);
+  } else {
+    process.exit(code || 0);
+  }
+});

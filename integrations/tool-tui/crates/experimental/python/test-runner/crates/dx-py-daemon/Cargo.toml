@@ -1,0 +1,17 @@
+[package]
+name = "dx-py-daemon"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+dx-py-core = { path = "../dx-py-core" }
+dx-py-protocol = { path = "../dx-py-protocol" }
+tokio = { workspace = true }
+crossbeam = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+num_cpus = "1.16"
+
+[dev-dependencies]
+proptest = { workspace = true }

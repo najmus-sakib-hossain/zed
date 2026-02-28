@@ -1,0 +1,73 @@
+[package]
+name = "dx-serializer-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.serializer]
+package = "dx-serializer"
+path = ".."
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+# =============================================================================
+# FUZZ TARGETS
+# =============================================================================
+# Run with: cargo +nightly fuzz run <target>
+# List all: cargo +nightly fuzz list
+
+[[bin]]
+name = "parse"
+path = "fuzz_targets/parse.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "llm_to_doc"
+path = "fuzz_targets/llm_to_doc.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "machine_to_doc"
+path = "fuzz_targets/machine_to_doc.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "base62"
+path = "fuzz_targets/base62.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "tokenizer"
+path = "fuzz_targets/tokenizer.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "human_format"
+path = "fuzz_targets/human_format.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "converters"
+path = "fuzz_targets/converters.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "roundtrip"
+path = "fuzz_targets/roundtrip.rs"
+test = false
+doc = false

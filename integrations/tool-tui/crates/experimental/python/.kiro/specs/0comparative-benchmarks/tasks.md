@@ -1,0 +1,242 @@
+
+# Implementation Plan: Comparative Benchmarks
+
+## Overview
+
+This implementation plan creates a comprehensive benchmarking framework in Rust for comparing DX-Py components against CPython, UV, and pytest/unittest. The implementation follows a bottom-up approach, starting with core statistical analysis, then building up to benchmark execution, and finally report generation.
+
+## Tasks
+
+- Set up project structure and dependencies
+- Create `crates/benchmarks` directory with Cargo.toml
+- Add dependencies: proptest, serde, serde_json, chrono, clap, sysinfo
+- Define module structure: core, suites, analysis, report, data
+- Requirements: 1.1
+- -Implement StatisticalAnalyzer
+- 2.1 Implement basic statistics computation
+- Create `Statistics` struct with mean, median, std_dev, min, max, percentiles
+- Implement `compute_statistics` function for timing arrays
+- Handle edge cases: empty array, single value, all same values
+- Requirements: 5.1
+- 2.2 Write property test for statistics computation
+- Property 6: Statistics Computation Correctness
+- Validates: Requirements 5.1
+- 2.3 Implement confidence interval computation
+- Implement 95% confidence interval using t-distribution
+- Handle sample sizes >= 30 for normal approximation
+- Requirements: 5.2
+- 2.4 Write property test for confidence intervals
+- Property 7: Confidence Interval Validity
+- Validates: Requirements 5.2
+- 2.5 Implement outlier detection
+- Implement IQR-based outlier detection
+- Return indices of outlier values
+- Requirements: 5.4
+- 2.6 Write property test for outlier detection
+- Property 9: Outlier Detection Correctness
+- Validates: Requirements 5.4
+- 2.7 Implement Welch's t-test for significance testing
+- Implement two-sample t-test with unequal variances
+- Return t-statistic and p-value
+- Requirements: 5.3
+- 2.8 Write property test for significance testing
+- Property 8: Significance Testing Consistency
+- Validates: Requirements 5.3
+- 2.9 Implement variance warning detection
+- Calculate coefficient of variation
+- Flag results with CV > 10%
+- Requirements: 5.5
+- 2.10 Write property test for variance warning
+- Property 10: Variance Warning Threshold
+- Validates: Requirements 5.5
+- -Checkpoint
+- Ensure all StatisticalAnalyzer tests pass
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement TestDataGenerator
+- 4.1 Create TestDataGenerator with seeded RNG
+- Implement `new(seed: u64)` constructor
+- Use deterministic PRNG (e.g., ChaCha8Rng)
+- Requirements: 7.2, 8.3
+- 4.2 Write property test for deterministic generation
+- Property 16: Deterministic Generation Round-Trip
+- Validates: Requirements 7.2, 8.3
+- 4.3 Implement test file generation
+- Generate Python test files with configurable patterns
+- Support: SimpleFunctions, Classes, Fixtures, Async, Parametrized, Mixed
+- Requirements: 8.4
+- 4.4 Implement data size generation
+- Generate JSON and string data of configurable sizes
+- Small (~1KB), Medium (~100KB), Large (~10MB)
+- Requirements: 8.1
+- 4.5 Write property test for data size bounds
+- Property 17: Data Size Configurability
+- Validates: Requirements 8.1
+- 4.6 Implement test project generation
+- Generate pyproject.toml with configurable dependency counts
+- Include real-world dependency patterns
+- Requirements: 8.2, 8.5
+- -Checkpoint
+- Ensure all TestDataGenerator tests pass
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement BenchmarkRunner
+- 6.1 Create BenchmarkRunner with configuration
+- Implement warmup_iterations, measurement_iterations, timeout
+- Validate minimum 30 measurement iterations
+- Requirements: 1.3, 5.6
+- 6.2 Write property test for iteration count enforcement
+- Property 2: Iteration Count Respected
+- Property 11: Minimum Iterations Enforcement
+- Validates: Requirements 1.3, 5.6
+- 6.3 Implement benchmark execution with warmup
+- Execute warmup iterations first, discard timings
+- Execute measurement iterations, collect timings
+- Requirements: 1.2
+- 6.4 Write property test for warmup ordering
+- Property 1: Warmup Precedes Measurement
+- Validates: Requirements 1.2
+- 6.5 Implement external command execution
+- Run external commands (CPython, UV, pytest) with timing
+- Capture stdout/stderr for debugging
+- Requirements: 2.3, 3.4, 4.3
+- 6.6 Implement Python benchmark execution
+- Execute Python code on CPython and DX-Py
+- Use same benchmark spec for both runtimes
+- Requirements: 2.3
+- 6.7 Write property test for benchmark equivalence
+- Property 5: Benchmark Equivalence Across Tools
+- Validates: Requirements 2.3, 3.4, 4.3
+- -Checkpoint
+- Ensure all BenchmarkRunner tests pass
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement SystemInfo collection
+- 8.1 Create SystemInfo struct and collection
+- Collect OS, CPU, memory info using sysinfo crate
+- Detect Python, DX-Py, UV, pytest versions
+- Requirements: 1.5
+- 8.2 Write property test for system info completeness
+- Property 4: System Info Completeness
+- Validates: Requirements 1.5
+- -Implement ResultStore
+- 9.1 Create ResultStore with file-based storage
+- Store results as JSON files with timestamps
+- Implement save, load, list_recent, get_historical
+- Requirements: 7.5
+- 9.2 Write property test for metadata recording
+- Property 15: Metadata Recording Completeness
+- Validates: Requirements 7.1, 7.3, 7.5
+- -Implement ReportGenerator
+- 10.1 Implement Markdown report generation
+- Generate comparison tables with benchmark names and timings
+- Include speedup factors and confidence intervals
+- Add methodology section
+- Requirements: 6.1, 6.2, 6.5
+- 10.2 Implement slowdown indication
+- mark benchmarks where speedup < 1.0
+- Use visual indicators (e.g., ⚠️ or red text)
+- Requirements: 6.3
+- 10.3 Write property test for report content completeness
+- Property 12: Report Content Completeness
+- Validates: Requirements 6.1, 6.2, 6.3, 6.5
+- 10.4 Implement JSON report generation
+- Generate valid JSON with all benchmark data
+- Include statistical metrics and system info
+- Requirements: 6.4
+- 10.5 Write property test for JSON validity
+- Property 13: JSON Output Validity
+- Validates: Requirements 6.4
+- 10.6 Implement historical comparison
+- Compare current results with previous runs
+- Show performance trends over time
+- Requirements: 6.6
+- 10.7 Write property test for historical comparison
+- Property 14: Historical Comparison Generation
+- Validates: Requirements 6.6
+- -Checkpoint
+- Ensure all ReportGenerator tests pass
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement Benchmark Suites
+- 12.1 Implement RuntimeSuite micro-benchmarks
+- Integer arithmetic, string operations, list operations, dict operations
+- Create equivalent Python code for CPython and DX-Py
+- Requirements: 2.1
+- 12.2 Implement RuntimeSuite macro-benchmarks
+- JSON parsing, file I/O, HTTP handling
+- Use realistic data sizes
+- Requirements: 2.2
+- 12.3 Implement RuntimeSuite startup and memory benchmarks
+- Cold startup time measurement
+- Memory usage tracking
+- Requirements: 2.4, 2.5
+- 12.4 Implement PackageSuite benchmarks
+- Dependency resolution (small, medium, large)
+- Installation (cold/warm cache)
+- Lock file generation, venv creation
+- Requirements: 3.1, 3.2, 3.3, 3.5
+- 12.5 Implement PackageSuite real-world benchmarks
+- Flask, Django, requests, numpy projects
+- Requirements: 3.6
+- 12.6 Implement TestRunnerSuite discovery benchmarks
+- Discovery for 10, 100, 1000 tests
+- Requirements: 4.1
+- 12.7 Implement TestRunnerSuite execution benchmarks
+- Simple, fixtures, parametrized, async tests
+- Parallel execution where supported
+- Requirements: 4.2, 4.4, 4.5, 4.6, 4.7
+- -Implement BenchmarkFramework orchestration
+- 13.1 Create BenchmarkFramework coordinator
+- Wire together runner, analyzer, reporter, store
+- Implement run_suite and run_all methods
+- Requirements: 1.1
+- 13.2 Implement dual output format
+- Generate both Markdown and JSON for each run
+- Requirements: 1.4
+- 13.3 Write property test for dual output validity
+- Property 3: Dual Output Format Validity
+- Validates: Requirements 1.4
+- 13.4 Implement reproduce command
+- Load previous config and re-run benchmarks
+- Requirements: 7.4
+- -Implement CLI
+- 14.1 Create CLI with clap
+- Commands: run, list, reproduce, compare
+- Options:
+- -suite,
+- -iterations,
+- -output,
+- -seed
+- Requirements: 1.1
+- 14.2 Implement run command
+- Execute specified benchmark suites
+- Output results to console and files
+- Requirements: 1.1
+- 14.3 Implement list command
+- List available benchmark suites and benchmarks
+- Requirements: 1.1
+- 14.4 Implement reproduce command
+- Re-run benchmarks from stored configuration
+- Requirements: 7.4
+- 14.5 Implement compare command
+- Compare two benchmark runs
+- Show performance differences
+- Requirements: 6.6
+- -Final checkpoint
+- Ensure all tests pass
+- Ensure all tests pass, ask the user if questions arise.
+- -Integration testing
+- 16.1 Write end-to-end integration tests
+- Run small benchmark suite through complete flow
+- Verify results are stored and reports generated
+- Requirements: 1.1, 1.4, 7.5
+- 16.2 Write external tool integration tests
+- Verify CPython, UV, pytest invocation works
+- Handle missing tools gracefully
+- Requirements: 2.3, 3.4, 4.3
+
+## Notes
+
+- All tasks are required for comprehensive correctness guarantees
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
+- The implementation uses Rust with proptest for property-based testing

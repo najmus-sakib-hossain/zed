@@ -1,0 +1,30 @@
+[
+  {
+    "id": "msg_1",
+    "original_text": "Hello, world!",
+    "translated_text": "¡Hola Mundo!",
+    "source_language": "en",
+    "target_language": "es"
+  },
+  {
+    "id": "msg_2",
+    "original_text": "Good morning, how are you?",
+    "translated_text": "Buenos días, ¿cómo estás?",
+    "source_language": "en",
+    "target_language": "es"
+  },
+  {
+    "id": "msg_3",
+    "original_text": "Thank you for using our service.",
+    "translated_text": "Gracias por utilizar nuestro servicio.",
+    "source_language": "en",
+    "target_language": "es"
+  },
+  {
+    "id": "msg_4",
+    "original_text": "Welcome to the internationalization library.",
+    "translated_text": "Bienvenido a la biblioteca de internacionalización.",
+    "source_language": "en",
+    "target_language": "es"
+  }
+]

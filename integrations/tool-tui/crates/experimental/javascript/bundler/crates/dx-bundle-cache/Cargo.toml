@@ -1,0 +1,20 @@
+[package]
+name = "dx-bundle-cache"
+description = "Persistent warm cache with memory-mapping for DX Bundler v2"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+dx-bundle-core = { path = "../dx-bundle-core" }
+memmap2.workspace = true
+blake3.workspace = true
+parking_lot.workspace = true
+dashmap.workspace = true
+thiserror.workspace = true
+bincode.workspace = true
+serde.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile = "3.14"

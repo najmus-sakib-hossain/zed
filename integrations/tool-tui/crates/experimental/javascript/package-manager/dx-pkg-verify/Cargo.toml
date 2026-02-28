@@ -1,0 +1,11 @@
+[package]
+name = "dx-pkg-verify"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+sha2 = "0.10"
+ed25519-dalek = "2.1"

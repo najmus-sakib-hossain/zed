@@ -1,0 +1,20 @@
+[package]
+name = "dx-compat-compile"
+version = "0.0.1"
+edition = "2021"
+description = "Single executable compilation for DX"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+zstd = "0.13"
+thiserror = "2.0"
+bytes = "1.9"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sha2 = "0.10"
+walkdir = "2.5"
+base64 = "0.22"
+
+[dev-dependencies]
+tempfile = "3.14"
+proptest = "1.4"

@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc a2461ae025dd8366b38a143639c8855adeaf7863c254ae6f7090b01d7d2fb5fa # shrinks to file_stem = "test", content = "# Title\n\n## Section 1\n\nThis is a paragraph with **bold** and *italic* text.\n\n- Bullet 1\n- Bullet 2\n- Bullet 3\n\n## Section 2\n\n```rust\nfn test() {\n    assert_eq!(1, 1);\n}\n```\n\n| Header 1 | Header 2 |\n|----------|----------|\n| Cell 1   | Cell 2   |\n"

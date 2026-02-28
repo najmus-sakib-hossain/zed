@@ -1,0 +1,67 @@
+[package]
+name = "dx-www-query"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Binary RPC data fetching - zero-parse request/response with cache"
+keywords = ["wasm", "web", "rpc", "dx", "query"]
+categories = ["wasm", "web-programming"]
+
+[lib]
+name = "dx_www_query"
+path = "src/lib.rs"
+
+[dependencies]
+# Binary serialization
+serde = { version = "1.0", features = ["derive"] }
+
+# Fast hashing for cache keys
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+# Concurrent cache storage
+dashmap = "6.0"
+
+# async runtime
+tokio = { version = "1.35", features = ["sync", "time"], optional = true }
+
+# HTTP client (server)
+reqwest = { version = "0.12", features = ["json"], optional = true }
+
+# Database integration
+sqlx = { version = "0.8", default-features = false, features = [
+    "postgres",
+    "runtime-tokio-rustls",
+], optional = true }
+
+# Error handling
+thiserror = "1.0"
+
+# WASM (client)
+gloo-net = { version = "0.6", optional = true }
+wasm-bindgen = { version = "0.2", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+js-sys = { version = "0.3", optional = true }
+web-sys = { version = "0.3", features = [
+    "Headers",
+    "Request",
+    "RequestInit",
+    "RequestMode",
+    "Response",
+    "Window",
+], optional = true }
+
+# Internal dependencies
+dx-www-packet = { workspace = true, features = ["std"], optional = true }
+
+[features]
+default = ["std", "tokio"]
+std = ["dx-www-packet"]
+server = ["tokio", "reqwest"]
+postgres = ["sqlx", "tokio"]
+wasm = ["gloo-net", "wasm-bindgen", "wasm-bindgen-futures", "js-sys", "web-sys"]
+
+[dev-dependencies]
+tokio = { version = "1.35", features = ["full", "test-util"] }
+proptest = "1.4"

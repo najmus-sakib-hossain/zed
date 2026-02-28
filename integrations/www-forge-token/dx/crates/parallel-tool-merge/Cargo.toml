@@ -1,0 +1,12 @@
+[package]
+name = "parallel-tool-merge"
+version.workspace = true
+edition.workspace = true
+description = "Merge parallel tool results — 10-30% savings on tool message overhead"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

@@ -1,0 +1,2157 @@
+{
+  "suite": "package",
+  "benchmarks": [
+    {
+      "name": "install_cold_cache_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 69211300
+        },
+        {
+          "secs": 0,
+          "nanos": 67971300
+        },
+        {
+          "secs": 0,
+          "nanos": 60267900
+        },
+        {
+          "secs": 0,
+          "nanos": 76733900
+        },
+        {
+          "secs": 0,
+          "nanos": 62907800
+        },
+        {
+          "secs": 0,
+          "nanos": 82422400
+        },
+        {
+          "secs": 0,
+          "nanos": 59671700
+        },
+        {
+          "secs": 0,
+          "nanos": 53609700
+        },
+        {
+          "secs": 0,
+          "nanos": 53623800
+        },
+        {
+          "secs": 0,
+          "nanos": 53389600
+        },
+        {
+          "secs": 0,
+          "nanos": 53592000
+        },
+        {
+          "secs": 0,
+          "nanos": 53177300
+        },
+        {
+          "secs": 0,
+          "nanos": 53307900
+        },
+        {
+          "secs": 0,
+          "nanos": 54362200
+        },
+        {
+          "secs": 0,
+          "nanos": 54181400
+        },
+        {
+          "secs": 0,
+          "nanos": 53140000
+        },
+        {
+          "secs": 0,
+          "nanos": 53874200
+        },
+        {
+          "secs": 0,
+          "nanos": 53890900
+        },
+        {
+          "secs": 0,
+          "nanos": 55178000
+        },
+        {
+          "secs": 0,
+          "nanos": 53254500
+        },
+        {
+          "secs": 0,
+          "nanos": 53509900
+        },
+        {
+          "secs": 0,
+          "nanos": 53709800
+        },
+        {
+          "secs": 0,
+          "nanos": 54354300
+        },
+        {
+          "secs": 0,
+          "nanos": 57794300
+        },
+        {
+          "secs": 0,
+          "nanos": 53364800
+        },
+        {
+          "secs": 0,
+          "nanos": 53674200
+        },
+        {
+          "secs": 0,
+          "nanos": 53374500
+        },
+        {
+          "secs": 0,
+          "nanos": 53808400
+        },
+        {
+          "secs": 0,
+          "nanos": 53582100
+        },
+        {
+          "secs": 0,
+          "nanos": 52784700
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "install_cold_cache_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 52935800
+        },
+        {
+          "secs": 0,
+          "nanos": 52376100
+        },
+        {
+          "secs": 0,
+          "nanos": 53464100
+        },
+        {
+          "secs": 0,
+          "nanos": 53423000
+        },
+        {
+          "secs": 0,
+          "nanos": 53602100
+        },
+        {
+          "secs": 0,
+          "nanos": 52963300
+        },
+        {
+          "secs": 0,
+          "nanos": 53502800
+        },
+        {
+          "secs": 0,
+          "nanos": 53165900
+        },
+        {
+          "secs": 0,
+          "nanos": 54003300
+        },
+        {
+          "secs": 0,
+          "nanos": 53647100
+        },
+        {
+          "secs": 0,
+          "nanos": 56737500
+        },
+        {
+          "secs": 0,
+          "nanos": 53305900
+        },
+        {
+          "secs": 0,
+          "nanos": 54149800
+        },
+        {
+          "secs": 0,
+          "nanos": 54136800
+        },
+        {
+          "secs": 0,
+          "nanos": 53795600
+        },
+        {
+          "secs": 0,
+          "nanos": 53232400
+        },
+        {
+          "secs": 0,
+          "nanos": 53900900
+        },
+        {
+          "secs": 0,
+          "nanos": 52886900
+        },
+        {
+          "secs": 0,
+          "nanos": 55114300
+        },
+        {
+          "secs": 0,
+          "nanos": 52654300
+        },
+        {
+          "secs": 0,
+          "nanos": 53452900
+        },
+        {
+          "secs": 0,
+          "nanos": 54575800
+        },
+        {
+          "secs": 0,
+          "nanos": 53885700
+        },
+        {
+          "secs": 0,
+          "nanos": 53293000
+        },
+        {
+          "secs": 0,
+          "nanos": 53128600
+        },
+        {
+          "secs": 0,
+          "nanos": 53879800
+        },
+        {
+          "secs": 0,
+          "nanos": 58788900
+        },
+        {
+          "secs": 0,
+          "nanos": 53472700
+        },
+        {
+          "secs": 0,
+          "nanos": 56711600
+        },
+        {
+          "secs": 0,
+          "nanos": 54362000
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "install_warm_cache_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 53513800
+        },
+        {
+          "secs": 0,
+          "nanos": 53956500
+        },
+        {
+          "secs": 0,
+          "nanos": 54202200
+        },
+        {
+          "secs": 0,
+          "nanos": 52673700
+        },
+        {
+          "secs": 0,
+          "nanos": 52709700
+        },
+        {
+          "secs": 0,
+          "nanos": 53291300
+        },
+        {
+          "secs": 0,
+          "nanos": 53036100
+        },
+        {
+          "secs": 0,
+          "nanos": 54045100
+        },
+        {
+          "secs": 0,
+          "nanos": 52801300
+        },
+        {
+          "secs": 0,
+          "nanos": 52637600
+        },
+        {
+          "secs": 0,
+          "nanos": 52535100
+        },
+        {
+          "secs": 0,
+          "nanos": 53858900
+        },
+        {
+          "secs": 0,
+          "nanos": 54072600
+        },
+        {
+          "secs": 0,
+          "nanos": 53432200
+        },
+        {
+          "secs": 0,
+          "nanos": 53793000
+        },
+        {
+          "secs": 0,
+          "nanos": 58993500
+        },
+        {
+          "secs": 0,
+          "nanos": 53331900
+        },
+        {
+          "secs": 0,
+          "nanos": 53141800
+        },
+        {
+          "secs": 0,
+          "nanos": 53880000
+        },
+        {
+          "secs": 0,
+          "nanos": 53827200
+        },
+        {
+          "secs": 0,
+          "nanos": 54921500
+        },
+        {
+          "secs": 0,
+          "nanos": 53636900
+        },
+        {
+          "secs": 0,
+          "nanos": 53189300
+        },
+        {
+          "secs": 0,
+          "nanos": 55296600
+        },
+        {
+          "secs": 0,
+          "nanos": 53905600
+        },
+        {
+          "secs": 0,
+          "nanos": 53824200
+        },
+        {
+          "secs": 0,
+          "nanos": 53691000
+        },
+        {
+          "secs": 0,
+          "nanos": 53756300
+        },
+        {
+          "secs": 0,
+          "nanos": 53104000
+        },
+        {
+          "secs": 0,
+          "nanos": 53759800
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "install_warm_cache_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 53638100
+        },
+        {
+          "secs": 0,
+          "nanos": 58919400
+        },
+        {
+          "secs": 0,
+          "nanos": 54396000
+        },
+        {
+          "secs": 0,
+          "nanos": 53964200
+        },
+        {
+          "secs": 0,
+          "nanos": 54500100
+        },
+        {
+          "secs": 0,
+          "nanos": 53716500
+        },
+        {
+          "secs": 0,
+          "nanos": 54169200
+        },
+        {
+          "secs": 0,
+          "nanos": 53747300
+        },
+        {
+          "secs": 0,
+          "nanos": 53966800
+        },
+        {
+          "secs": 0,
+          "nanos": 54567700
+        },
+        {
+          "secs": 0,
+          "nanos": 54852700
+        },
+        {
+          "secs": 0,
+          "nanos": 54184500
+        },
+        {
+          "secs": 0,
+          "nanos": 54042900
+        },
+        {
+          "secs": 0,
+          "nanos": 54331700
+        },
+        {
+          "secs": 0,
+          "nanos": 54354200
+        },
+        {
+          "secs": 0,
+          "nanos": 55124200
+        },
+        {
+          "secs": 0,
+          "nanos": 55232300
+        },
+        {
+          "secs": 0,
+          "nanos": 52165200
+        },
+        {
+          "secs": 0,
+          "nanos": 60004200
+        },
+        {
+          "secs": 0,
+          "nanos": 54475200
+        },
+        {
+          "secs": 0,
+          "nanos": 58113000
+        },
+        {
+          "secs": 0,
+          "nanos": 54036600
+        },
+        {
+          "secs": 0,
+          "nanos": 54396400
+        },
+        {
+          "secs": 0,
+          "nanos": 52838900
+        },
+        {
+          "secs": 0,
+          "nanos": 53569600
+        },
+        {
+          "secs": 0,
+          "nanos": 53286200
+        },
+        {
+          "secs": 0,
+          "nanos": 54742500
+        },
+        {
+          "secs": 0,
+          "nanos": 53611700
+        },
+        {
+          "secs": 0,
+          "nanos": 54235500
+        },
+        {
+          "secs": 0,
+          "nanos": 62507900
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "lock_generation_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 65954000
+        },
+        {
+          "secs": 0,
+          "nanos": 66199900
+        },
+        {
+          "secs": 0,
+          "nanos": 65980300
+        },
+        {
+          "secs": 0,
+          "nanos": 69097100
+        },
+        {
+          "secs": 0,
+          "nanos": 67675300
+        },
+        {
+          "secs": 0,
+          "nanos": 76334500
+        },
+        {
+          "secs": 0,
+          "nanos": 64545900
+        },
+        {
+          "secs": 0,
+          "nanos": 79559400
+        },
+        {
+          "secs": 0,
+          "nanos": 65404100
+        },
+        {
+          "secs": 0,
+          "nanos": 65308700
+        },
+        {
+          "secs": 0,
+          "nanos": 66630900
+        },
+        {
+          "secs": 0,
+          "nanos": 65024600
+        },
+        {
+          "secs": 0,
+          "nanos": 65973100
+        },
+        {
+          "secs": 0,
+          "nanos": 66320200
+        },
+        {
+          "secs": 0,
+          "nanos": 67333200
+        },
+        {
+          "secs": 0,
+          "nanos": 65460300
+        },
+        {
+          "secs": 0,
+          "nanos": 65819200
+        },
+        {
+          "secs": 0,
+          "nanos": 65407900
+        },
+        {
+          "secs": 0,
+          "nanos": 66382600
+        },
+        {
+          "secs": 0,
+          "nanos": 68665500
+        },
+        {
+          "secs": 0,
+          "nanos": 64916000
+        },
+        {
+          "secs": 0,
+          "nanos": 65556800
+        },
+        {
+          "secs": 0,
+          "nanos": 64600900
+        },
+        {
+          "secs": 0,
+          "nanos": 65195800
+        },
+        {
+          "secs": 0,
+          "nanos": 65663600
+        },
+        {
+          "secs": 0,
+          "nanos": 66932000
+        },
+        {
+          "secs": 0,
+          "nanos": 66074400
+        },
+        {
+          "secs": 0,
+          "nanos": 66400900
+        },
+        {
+          "secs": 0,
+          "nanos": 66148200
+        },
+        {
+          "secs": 0,
+          "nanos": 64831000
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "lock_generation_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 65262900
+        },
+        {
+          "secs": 0,
+          "nanos": 65835600
+        },
+        {
+          "secs": 0,
+          "nanos": 65831200
+        },
+        {
+          "secs": 0,
+          "nanos": 66576400
+        },
+        {
+          "secs": 0,
+          "nanos": 64955000
+        },
+        {
+          "secs": 0,
+          "nanos": 64468200
+        },
+        {
+          "secs": 0,
+          "nanos": 65002200
+        },
+        {
+          "secs": 0,
+          "nanos": 65819800
+        },
+        {
+          "secs": 0,
+          "nanos": 69064000
+        },
+        {
+          "secs": 0,
+          "nanos": 68813800
+        },
+        {
+          "secs": 0,
+          "nanos": 65268300
+        },
+        {
+          "secs": 0,
+          "nanos": 65713900
+        },
+        {
+          "secs": 0,
+          "nanos": 65341700
+        },
+        {
+          "secs": 0,
+          "nanos": 65195900
+        },
+        {
+          "secs": 0,
+          "nanos": 64486400
+        },
+        {
+          "secs": 0,
+          "nanos": 66348800
+        },
+        {
+          "secs": 0,
+          "nanos": 66398600
+        },
+        {
+          "secs": 0,
+          "nanos": 66025100
+        },
+        {
+          "secs": 0,
+          "nanos": 69687400
+        },
+        {
+          "secs": 0,
+          "nanos": 64916800
+        },
+        {
+          "secs": 0,
+          "nanos": 65694700
+        },
+        {
+          "secs": 0,
+          "nanos": 65697200
+        },
+        {
+          "secs": 0,
+          "nanos": 66432800
+        },
+        {
+          "secs": 0,
+          "nanos": 67185300
+        },
+        {
+          "secs": 0,
+          "nanos": 68288900
+        },
+        {
+          "secs": 0,
+          "nanos": 66474500
+        },
+        {
+          "secs": 0,
+          "nanos": 67002200
+        },
+        {
+          "secs": 0,
+          "nanos": 64967000
+        },
+        {
+          "secs": 0,
+          "nanos": 66990800
+        },
+        {
+          "secs": 0,
+          "nanos": 65757900
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "venv_creation_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 83806700
+        },
+        {
+          "secs": 0,
+          "nanos": 79063400
+        },
+        {
+          "secs": 0,
+          "nanos": 78290600
+        },
+        {
+          "secs": 0,
+          "nanos": 78696900
+        },
+        {
+          "secs": 0,
+          "nanos": 79358200
+        },
+        {
+          "secs": 0,
+          "nanos": 80143300
+        },
+        {
+          "secs": 0,
+          "nanos": 80544300
+        },
+        {
+          "secs": 0,
+          "nanos": 80659300
+        },
+        {
+          "secs": 0,
+          "nanos": 79356100
+        },
+        {
+          "secs": 0,
+          "nanos": 79982100
+        },
+        {
+          "secs": 0,
+          "nanos": 79335300
+        },
+        {
+          "secs": 0,
+          "nanos": 79033300
+        },
+        {
+          "secs": 0,
+          "nanos": 78431200
+        },
+        {
+          "secs": 0,
+          "nanos": 83746700
+        },
+        {
+          "secs": 0,
+          "nanos": 82352700
+        },
+        {
+          "secs": 0,
+          "nanos": 79596600
+        },
+        {
+          "secs": 0,
+          "nanos": 77755900
+        },
+        {
+          "secs": 0,
+          "nanos": 78582400
+        },
+        {
+          "secs": 0,
+          "nanos": 81762000
+        },
+        {
+          "secs": 0,
+          "nanos": 81258000
+        },
+        {
+          "secs": 0,
+          "nanos": 79430800
+        },
+        {
+          "secs": 0,
+          "nanos": 79441000
+        },
+        {
+          "secs": 0,
+          "nanos": 80584100
+        },
+        {
+          "secs": 0,
+          "nanos": 79961900
+        },
+        {
+          "secs": 0,
+          "nanos": 80268100
+        },
+        {
+          "secs": 0,
+          "nanos": 82322400
+        },
+        {
+          "secs": 0,
+          "nanos": 85346400
+        },
+        {
+          "secs": 0,
+          "nanos": 80372000
+        },
+        {
+          "secs": 0,
+          "nanos": 79489800
+        },
+        {
+          "secs": 0,
+          "nanos": 79492600
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "venv_creation_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 80867100
+        },
+        {
+          "secs": 0,
+          "nanos": 80360600
+        },
+        {
+          "secs": 0,
+          "nanos": 79797300
+        },
+        {
+          "secs": 0,
+          "nanos": 79773400
+        },
+        {
+          "secs": 0,
+          "nanos": 80491400
+        },
+        {
+          "secs": 0,
+          "nanos": 79863900
+        },
+        {
+          "secs": 0,
+          "nanos": 84104100
+        },
+        {
+          "secs": 0,
+          "nanos": 80446500
+        },
+        {
+          "secs": 0,
+          "nanos": 79789500
+        },
+        {
+          "secs": 0,
+          "nanos": 79666800
+        },
+        {
+          "secs": 0,
+          "nanos": 80549500
+        },
+        {
+          "secs": 0,
+          "nanos": 83965900
+        },
+        {
+          "secs": 0,
+          "nanos": 81499500
+        },
+        {
+          "secs": 0,
+          "nanos": 81161500
+        },
+        {
+          "secs": 0,
+          "nanos": 80432000
+        },
+        {
+          "secs": 0,
+          "nanos": 79268200
+        },
+        {
+          "secs": 0,
+          "nanos": 78915400
+        },
+        {
+          "secs": 0,
+          "nanos": 80474700
+        },
+        {
+          "secs": 0,
+          "nanos": 81607600
+        },
+        {
+          "secs": 0,
+          "nanos": 83285400
+        },
+        {
+          "secs": 0,
+          "nanos": 79991200
+        },
+        {
+          "secs": 0,
+          "nanos": 79378900
+        },
+        {
+          "secs": 0,
+          "nanos": 79382800
+        },
+        {
+          "secs": 0,
+          "nanos": 81228100
+        },
+        {
+          "secs": 0,
+          "nanos": 81868100
+        },
+        {
+          "secs": 0,
+          "nanos": 82089600
+        },
+        {
+          "secs": 0,
+          "nanos": 81296600
+        },
+        {
+          "secs": 0,
+          "nanos": 80289600
+        },
+        {
+          "secs": 0,
+          "nanos": 80186400
+        },
+        {
+          "secs": 0,
+          "nanos": 78997100
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_flask_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 59053800
+        },
+        {
+          "secs": 0,
+          "nanos": 54252400
+        },
+        {
+          "secs": 0,
+          "nanos": 53271400
+        },
+        {
+          "secs": 0,
+          "nanos": 53328000
+        },
+        {
+          "secs": 0,
+          "nanos": 54431900
+        },
+        {
+          "secs": 0,
+          "nanos": 55764300
+        },
+        {
+          "secs": 0,
+          "nanos": 56281800
+        },
+        {
+          "secs": 0,
+          "nanos": 53893600
+        },
+        {
+          "secs": 0,
+          "nanos": 54101500
+        },
+        {
+          "secs": 0,
+          "nanos": 56171100
+        },
+        {
+          "secs": 0,
+          "nanos": 53618400
+        },
+        {
+          "secs": 0,
+          "nanos": 53946600
+        },
+        {
+          "secs": 0,
+          "nanos": 54701700
+        },
+        {
+          "secs": 0,
+          "nanos": 53467300
+        },
+        {
+          "secs": 0,
+          "nanos": 53778700
+        },
+        {
+          "secs": 0,
+          "nanos": 53849600
+        },
+        {
+          "secs": 0,
+          "nanos": 55278200
+        },
+        {
+          "secs": 0,
+          "nanos": 54223400
+        },
+        {
+          "secs": 0,
+          "nanos": 58544100
+        },
+        {
+          "secs": 0,
+          "nanos": 55420300
+        },
+        {
+          "secs": 0,
+          "nanos": 53661100
+        },
+        {
+          "secs": 0,
+          "nanos": 54299200
+        },
+        {
+          "secs": 0,
+          "nanos": 56296100
+        },
+        {
+          "secs": 0,
+          "nanos": 58505500
+        },
+        {
+          "secs": 0,
+          "nanos": 55156100
+        },
+        {
+          "secs": 0,
+          "nanos": 55203300
+        },
+        {
+          "secs": 0,
+          "nanos": 53436200
+        },
+        {
+          "secs": 0,
+          "nanos": 53721400
+        },
+        {
+          "secs": 0,
+          "nanos": 54016700
+        },
+        {
+          "secs": 0,
+          "nanos": 55517400
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_flask_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 54077300
+        },
+        {
+          "secs": 0,
+          "nanos": 53213100
+        },
+        {
+          "secs": 0,
+          "nanos": 54467700
+        },
+        {
+          "secs": 0,
+          "nanos": 53548000
+        },
+        {
+          "secs": 0,
+          "nanos": 53495800
+        },
+        {
+          "secs": 0,
+          "nanos": 59308800
+        },
+        {
+          "secs": 0,
+          "nanos": 53017900
+        },
+        {
+          "secs": 0,
+          "nanos": 54125400
+        },
+        {
+          "secs": 0,
+          "nanos": 54611300
+        },
+        {
+          "secs": 0,
+          "nanos": 54235900
+        },
+        {
+          "secs": 0,
+          "nanos": 53290900
+        },
+        {
+          "secs": 0,
+          "nanos": 55042700
+        },
+        {
+          "secs": 0,
+          "nanos": 53903400
+        },
+        {
+          "secs": 0,
+          "nanos": 54378100
+        },
+        {
+          "secs": 0,
+          "nanos": 54756900
+        },
+        {
+          "secs": 0,
+          "nanos": 54645600
+        },
+        {
+          "secs": 0,
+          "nanos": 55435800
+        },
+        {
+          "secs": 0,
+          "nanos": 54163600
+        },
+        {
+          "secs": 0,
+          "nanos": 53683600
+        },
+        {
+          "secs": 0,
+          "nanos": 53558100
+        },
+        {
+          "secs": 0,
+          "nanos": 54340700
+        },
+        {
+          "secs": 0,
+          "nanos": 53943700
+        },
+        {
+          "secs": 0,
+          "nanos": 53138800
+        },
+        {
+          "secs": 0,
+          "nanos": 55636100
+        },
+        {
+          "secs": 0,
+          "nanos": 58596300
+        },
+        {
+          "secs": 0,
+          "nanos": 53922700
+        },
+        {
+          "secs": 0,
+          "nanos": 54345400
+        },
+        {
+          "secs": 0,
+          "nanos": 54753700
+        },
+        {
+          "secs": 0,
+          "nanos": 55715500
+        },
+        {
+          "secs": 0,
+          "nanos": 56500900
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_django_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 53880800
+        },
+        {
+          "secs": 0,
+          "nanos": 54789800
+        },
+        {
+          "secs": 0,
+          "nanos": 54833000
+        },
+        {
+          "secs": 0,
+          "nanos": 55369400
+        },
+        {
+          "secs": 0,
+          "nanos": 53134800
+        },
+        {
+          "secs": 0,
+          "nanos": 54400300
+        },
+        {
+          "secs": 0,
+          "nanos": 54353300
+        },
+        {
+          "secs": 0,
+          "nanos": 54022100
+        },
+        {
+          "secs": 0,
+          "nanos": 54253900
+        },
+        {
+          "secs": 0,
+          "nanos": 53809700
+        },
+        {
+          "secs": 0,
+          "nanos": 59562700
+        },
+        {
+          "secs": 0,
+          "nanos": 54522800
+        },
+        {
+          "secs": 0,
+          "nanos": 54446000
+        },
+        {
+          "secs": 0,
+          "nanos": 54067900
+        },
+        {
+          "secs": 0,
+          "nanos": 54151000
+        },
+        {
+          "secs": 0,
+          "nanos": 55379600
+        },
+        {
+          "secs": 0,
+          "nanos": 55066700
+        },
+        {
+          "secs": 0,
+          "nanos": 54991700
+        },
+        {
+          "secs": 0,
+          "nanos": 53614700
+        },
+        {
+          "secs": 0,
+          "nanos": 53808500
+        },
+        {
+          "secs": 0,
+          "nanos": 54955400
+        },
+        {
+          "secs": 0,
+          "nanos": 55176100
+        },
+        {
+          "secs": 0,
+          "nanos": 54379700
+        },
+        {
+          "secs": 0,
+          "nanos": 54060100
+        },
+        {
+          "secs": 0,
+          "nanos": 54073000
+        },
+        {
+          "secs": 0,
+          "nanos": 54115500
+        },
+        {
+          "secs": 0,
+          "nanos": 54311400
+        },
+        {
+          "secs": 0,
+          "nanos": 54183200
+        },
+        {
+          "secs": 0,
+          "nanos": 60208800
+        },
+        {
+          "secs": 0,
+          "nanos": 54528100
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_django_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 53782900
+        },
+        {
+          "secs": 0,
+          "nanos": 54904200
+        },
+        {
+          "secs": 0,
+          "nanos": 55372300
+        },
+        {
+          "secs": 0,
+          "nanos": 53768000
+        },
+        {
+          "secs": 0,
+          "nanos": 53433600
+        },
+        {
+          "secs": 0,
+          "nanos": 54507300
+        },
+        {
+          "secs": 0,
+          "nanos": 55037000
+        },
+        {
+          "secs": 0,
+          "nanos": 53810200
+        },
+        {
+          "secs": 0,
+          "nanos": 54909300
+        },
+        {
+          "secs": 0,
+          "nanos": 54180100
+        },
+        {
+          "secs": 0,
+          "nanos": 54808900
+        },
+        {
+          "secs": 0,
+          "nanos": 53766000
+        },
+        {
+          "secs": 0,
+          "nanos": 54720500
+        },
+        {
+          "secs": 0,
+          "nanos": 54316700
+        },
+        {
+          "secs": 0,
+          "nanos": 55278000
+        },
+        {
+          "secs": 0,
+          "nanos": 59731700
+        },
+        {
+          "secs": 0,
+          "nanos": 55075300
+        },
+        {
+          "secs": 0,
+          "nanos": 53815000
+        },
+        {
+          "secs": 0,
+          "nanos": 54343500
+        },
+        {
+          "secs": 0,
+          "nanos": 55296500
+        },
+        {
+          "secs": 0,
+          "nanos": 55593700
+        },
+        {
+          "secs": 0,
+          "nanos": 53746400
+        },
+        {
+          "secs": 0,
+          "nanos": 54458400
+        },
+        {
+          "secs": 0,
+          "nanos": 57367500
+        },
+        {
+          "secs": 0,
+          "nanos": 53345800
+        },
+        {
+          "secs": 0,
+          "nanos": 53387900
+        },
+        {
+          "secs": 0,
+          "nanos": 54771000
+        },
+        {
+          "secs": 0,
+          "nanos": 53919700
+        },
+        {
+          "secs": 0,
+          "nanos": 53848800
+        },
+        {
+          "secs": 0,
+          "nanos": 54481200
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_requests_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 53899200
+        },
+        {
+          "secs": 0,
+          "nanos": 63529000
+        },
+        {
+          "secs": 0,
+          "nanos": 53854000
+        },
+        {
+          "secs": 0,
+          "nanos": 55182500
+        },
+        {
+          "secs": 0,
+          "nanos": 54193800
+        },
+        {
+          "secs": 0,
+          "nanos": 54685100
+        },
+        {
+          "secs": 0,
+          "nanos": 55367700
+        },
+        {
+          "secs": 0,
+          "nanos": 55046800
+        },
+        {
+          "secs": 0,
+          "nanos": 53699700
+        },
+        {
+          "secs": 0,
+          "nanos": 56538800
+        },
+        {
+          "secs": 0,
+          "nanos": 56473100
+        },
+        {
+          "secs": 0,
+          "nanos": 57693400
+        },
+        {
+          "secs": 0,
+          "nanos": 55707700
+        },
+        {
+          "secs": 0,
+          "nanos": 59026900
+        },
+        {
+          "secs": 0,
+          "nanos": 53729600
+        },
+        {
+          "secs": 0,
+          "nanos": 54817600
+        },
+        {
+          "secs": 0,
+          "nanos": 55028700
+        },
+        {
+          "secs": 0,
+          "nanos": 54767500
+        },
+        {
+          "secs": 0,
+          "nanos": 53462200
+        },
+        {
+          "secs": 0,
+          "nanos": 61214900
+        },
+        {
+          "secs": 0,
+          "nanos": 54597700
+        },
+        {
+          "secs": 0,
+          "nanos": 54781600
+        },
+        {
+          "secs": 0,
+          "nanos": 54261300
+        },
+        {
+          "secs": 0,
+          "nanos": 54173500
+        },
+        {
+          "secs": 0,
+          "nanos": 56167300
+        },
+        {
+          "secs": 0,
+          "nanos": 55196700
+        },
+        {
+          "secs": 0,
+          "nanos": 53757200
+        },
+        {
+          "secs": 0,
+          "nanos": 54220100
+        },
+        {
+          "secs": 0,
+          "nanos": 55585700
+        },
+        {
+          "secs": 0,
+          "nanos": 56139200
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_requests_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 55121500
+        },
+        {
+          "secs": 0,
+          "nanos": 53783100
+        },
+        {
+          "secs": 0,
+          "nanos": 53980200
+        },
+        {
+          "secs": 0,
+          "nanos": 59212900
+        },
+        {
+          "secs": 0,
+          "nanos": 54008100
+        },
+        {
+          "secs": 0,
+          "nanos": 55816100
+        },
+        {
+          "secs": 0,
+          "nanos": 58852000
+        },
+        {
+          "secs": 0,
+          "nanos": 54155500
+        },
+        {
+          "secs": 0,
+          "nanos": 54788600
+        },
+        {
+          "secs": 0,
+          "nanos": 56315600
+        },
+        {
+          "secs": 0,
+          "nanos": 56958000
+        },
+        {
+          "secs": 0,
+          "nanos": 56750500
+        },
+        {
+          "secs": 0,
+          "nanos": 57434500
+        },
+        {
+          "secs": 0,
+          "nanos": 55375900
+        },
+        {
+          "secs": 0,
+          "nanos": 54871700
+        },
+        {
+          "secs": 0,
+          "nanos": 55436100
+        },
+        {
+          "secs": 0,
+          "nanos": 54987200
+        },
+        {
+          "secs": 0,
+          "nanos": 53818900
+        },
+        {
+          "secs": 0,
+          "nanos": 54318700
+        },
+        {
+          "secs": 0,
+          "nanos": 55144400
+        },
+        {
+          "secs": 0,
+          "nanos": 53878500
+        },
+        {
+          "secs": 0,
+          "nanos": 54474300
+        },
+        {
+          "secs": 0,
+          "nanos": 114833000
+        },
+        {
+          "secs": 0,
+          "nanos": 57517600
+        },
+        {
+          "secs": 0,
+          "nanos": 52717900
+        },
+        {
+          "secs": 0,
+          "nanos": 54260400
+        },
+        {
+          "secs": 0,
+          "nanos": 54158900
+        },
+        {
+          "secs": 0,
+          "nanos": 55348000
+        },
+        {
+          "secs": 0,
+          "nanos": 53652000
+        },
+        {
+          "secs": 0,
+          "nanos": 53452000
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_numpy_uv",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 54544200
+        },
+        {
+          "secs": 0,
+          "nanos": 54316600
+        },
+        {
+          "secs": 0,
+          "nanos": 53435400
+        },
+        {
+          "secs": 0,
+          "nanos": 54111400
+        },
+        {
+          "secs": 0,
+          "nanos": 52769900
+        },
+        {
+          "secs": 0,
+          "nanos": 53558200
+        },
+        {
+          "secs": 0,
+          "nanos": 54433600
+        },
+        {
+          "secs": 0,
+          "nanos": 53520800
+        },
+        {
+          "secs": 0,
+          "nanos": 55703200
+        },
+        {
+          "secs": 0,
+          "nanos": 60717000
+        },
+        {
+          "secs": 0,
+          "nanos": 53557800
+        },
+        {
+          "secs": 0,
+          "nanos": 54680400
+        },
+        {
+          "secs": 0,
+          "nanos": 53619500
+        },
+        {
+          "secs": 0,
+          "nanos": 55413200
+        },
+        {
+          "secs": 0,
+          "nanos": 53523900
+        },
+        {
+          "secs": 0,
+          "nanos": 53596600
+        },
+        {
+          "secs": 0,
+          "nanos": 54294500
+        },
+        {
+          "secs": 0,
+          "nanos": 54088500
+        },
+        {
+          "secs": 0,
+          "nanos": 54867100
+        },
+        {
+          "secs": 0,
+          "nanos": 53140700
+        },
+        {
+          "secs": 0,
+          "nanos": 54416300
+        },
+        {
+          "secs": 0,
+          "nanos": 58477800
+        },
+        {
+          "secs": 0,
+          "nanos": 53299600
+        },
+        {
+          "secs": 0,
+          "nanos": 53687600
+        },
+        {
+          "secs": 0,
+          "nanos": 53314000
+        },
+        {
+          "secs": 0,
+          "nanos": 54566900
+        },
+        {
+          "secs": 0,
+          "nanos": 53681600
+        },
+        {
+          "secs": 0,
+          "nanos": 61237100
+        },
+        {
+          "secs": 0,
+          "nanos": 54928900
+        },
+        {
+          "secs": 0,
+          "nanos": 53785500
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "CPython",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    },
+    {
+      "name": "real_world_numpy_dxpy",
+      "timings": [
+        {
+          "secs": 0,
+          "nanos": 54264000
+        },
+        {
+          "secs": 0,
+          "nanos": 53406300
+        },
+        {
+          "secs": 0,
+          "nanos": 54321400
+        },
+        {
+          "secs": 0,
+          "nanos": 54901100
+        },
+        {
+          "secs": 0,
+          "nanos": 53491000
+        },
+        {
+          "secs": 0,
+          "nanos": 53719100
+        },
+        {
+          "secs": 0,
+          "nanos": 55641200
+        },
+        {
+          "secs": 0,
+          "nanos": 53972400
+        },
+        {
+          "secs": 0,
+          "nanos": 54096700
+        },
+        {
+          "secs": 0,
+          "nanos": 54085600
+        },
+        {
+          "secs": 0,
+          "nanos": 54485500
+        },
+        {
+          "secs": 0,
+          "nanos": 53913300
+        },
+        {
+          "secs": 0,
+          "nanos": 53603600
+        },
+        {
+          "secs": 0,
+          "nanos": 55306800
+        },
+        {
+          "secs": 0,
+          "nanos": 59284400
+        },
+        {
+          "secs": 0,
+          "nanos": 53390300
+        },
+        {
+          "secs": 0,
+          "nanos": 54517500
+        },
+        {
+          "secs": 0,
+          "nanos": 54321700
+        },
+        {
+          "secs": 0,
+          "nanos": 55821900
+        },
+        {
+          "secs": 0,
+          "nanos": 53719300
+        },
+        {
+          "secs": 0,
+          "nanos": 53888800
+        },
+        {
+          "secs": 0,
+          "nanos": 54312700
+        },
+        {
+          "secs": 0,
+          "nanos": 55213700
+        },
+        {
+          "secs": 0,
+          "nanos": 54047800
+        },
+        {
+          "secs": 0,
+          "nanos": 55316500
+        },
+        {
+          "secs": 0,
+          "nanos": 53213700
+        },
+        {
+          "secs": 0,
+          "nanos": 54114300
+        },
+        {
+          "secs": 0,
+          "nanos": 53150900
+        },
+        {
+          "secs": 0,
+          "nanos": 53797800
+        },
+        {
+          "secs": 0,
+          "nanos": 53410600
+        }
+      ],
+      "memory_samples": [],
+      "metadata": {
+        "runtime": "DxPy",
+        "description": "",
+        "tags": []
+      },
+      "warmup_completed": true,
+      "timed_out": false
+    }
+  ],
+  "system_info": {
+    "os": "Windows",
+    "os_version": "11 (26200)",
+    "cpu_model": "AMD Ryzen 5 5600G with Radeon Graphics         ",
+    "cpu_cores": 12,
+    "memory_gb": 7.296237945556641,
+    "python_version": "Unknown",
+    "dxpy_version": "Unknown",
+    "uv_version": "0.9.7",
+    "pytest_version": null
+  },
+  "config": {
+    "warmup_iterations": 2,
+    "measurement_iterations": 30,
+    "timeout_seconds": 300,
+    "output_format": "Both",
+    "output_dir": "benchmark_results",
+    "seed": null,
+    "suites": [
+      "package"
+    ],
+    "filter": null
+  },
+  "timestamp": "2025-12-29T07:17:41.224255900Z"
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vitest Testing Demo — almostnode</title>
+    <link rel="stylesheet" href="./shared-styles.css" />
+    <style>
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        background: var(--border);
+        height: calc(100vh - 44px);
+      }
+      @media (max-width: 768px) {
+        .layout {
+          grid-template-columns: 1fr;
+          grid-template-rows: 300px 1fr;
+        }
+      }
+      .file-tabs {
+        display: flex;
+        gap: 0;
+        border-bottom: 1px solid var(--border);
+        background: #111;
+      }
+      .file-tab {
+        padding: 6px 14px;
+        font-size: 0.78rem;
+        font-family: var(--mono, monospace);
+        color: #666;
+        cursor: pointer;
+        border-right: 1px solid var(--border);
+        user-select: none;
+        transition: color 0.15s, background 0.15s;
+      }
+      .file-tab:hover { color: #aaa; background: #1a1a1a; }
+      .file-tab.active { color: #f0f0f0; background: var(--bg); border-bottom: 2px solid var(--accent); }
+      #terminal { background: #0c0c0c; }
+      .save-btn {
+        padding: 3px 10px;
+        font-size: 0.72rem;
+        font-family: var(--mono, monospace);
+        background: transparent;
+        border: 1px solid var(--border);
+        color: #888;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .save-btn:hover { color: var(--accent); border-color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <div class="demo-topbar">
+      <a href="../index.html" class="back">&larr; demos</a>
+      <span class="sep">/</span>
+      <a href="../index.html" class="logo">almostnode</a>
+      <span class="sep">/</span>
+      <span class="title">Vitest Testing</span>
+      <span class="tag">vitest &middot; npm run test</span>
+    </div>
+
+    <div class="layout">
+      <div class="panel" style="display:flex;flex-direction:column;">
+        <div class="panel-header">
+          <span class="panel-label">Editor</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="save-btn" id="saveBtn" title="Save (Cmd+S)">Save</button>
+            <div class="status-dot" id="statusDot"></div>
+            <span class="panel-label" id="status">Initializing...</span>
+          </div>
+        </div>
+        <div class="file-tabs" id="fileTabs">
+          <div class="file-tab active" data-file="utils.js">utils.js</div>
+          <div class="file-tab" data-file="utils.test.js">utils.test.js</div>
+          <div class="file-tab" data-file="package.json">package.json</div>
+        </div>
+        <textarea id="editor"></textarea>
+      </div>
+
+      <div class="panel" style="display:flex;flex-direction:column;">
+        <div class="panel-header">
+          <span class="panel-label">Terminal</span>
+          <label class="toggle-row">
+            <input type="checkbox" id="watchMode" />
+            <span>Watch mode</span>
+          </label>
+        </div>
+        <div id="terminal" style="flex:1;min-height:0;"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/vitest-demo-entry.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Getting Started — almostnode docs</title>
+  <meta name="description" content="Get started with almostnode — install, set up, and run your first Node.js server in the browser.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://almostnode.dev/docs/">
+  <meta property="og:title" content="Getting Started — almostnode docs">
+  <meta property="og:description" content="Get started with almostnode — install, set up, and run your first Node.js server in the browser.">
+  <meta property="og:image" content="https://almostnode.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Getting Started — almostnode docs">
+  <meta name="twitter:description" content="Get started with almostnode — install, set up, and run your first Node.js server in the browser.">
+  <meta name="twitter:image" content="https://almostnode.dev/og-image.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <label class="menu-toggle" for="sidebar-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </label>
+  <a href="../" class="topbar-logo"><span>almostnode</span></a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-section">Docs</span>
+  <ul class="topbar-links">
+    <li><a href="https://github.com/macaly/almostnode">GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/almostnode">npm</a></li>
+  </ul>
+</div>
+
+<input type="checkbox" id="sidebar-check">
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-label">Guide</div>
+      <a href="./" class="active">Getting Started</a>
+      <a href="./core-concepts.html">Core Concepts</a>
+      <a href="./security.html">Security</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Frameworks</div>
+      <a href="./nextjs-guide.html">Next.js</a>
+      <a href="./vite-guide.html">Vite</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Tutorials</div>
+      <a href="./tutorial-editor.html">Editor + Preview</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Reference</div>
+      <a href="./api-reference.html">API Reference</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Getting Started</h1>
+    <p class="lead">almostnode lets you run Node.js, install npm packages, and start framework dev servers — entirely in the browser.</p>
+
+    <h2>What is almostnode?</h2>
+    <p>almostnode is a JavaScript library that provides a complete Node.js-like environment inside the browser. It includes:</p>
+    <ul>
+      <li>A <strong>virtual filesystem</strong> (VirtualFS) with POSIX-compatible operations</li>
+      <li>A <strong>runtime</strong> that executes JavaScript/TypeScript with 40+ shimmed Node.js modules</li>
+      <li>A <strong>package manager</strong> that installs real npm packages client-side</li>
+      <li>Built-in <strong>Next.js and Vite dev servers</strong> with HMR and file-based routing</li>
+      <li>A <strong>service worker bridge</strong> that makes virtual servers accessible via real URLs</li>
+    </ul>
+
+    <h2>Installation</h2>
+    <pre><code>npm install almostnode</code></pre>
+
+    <h2>Quick Start</h2>
+    <p>The fastest way to get started is with <code>createContainer()</code>. It sets up a virtual filesystem, runtime, and package manager in one call:</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createContainer</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> <span class="op">{</span> vfs<span class="op">,</span> runtime<span class="op">,</span> npm <span class="op">}</span> <span class="op">=</span> <span class="fn">createContainer</span><span class="op">();</span>
+
+<span class="cm">// Write a file to the virtual filesystem</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/hello.js'</span><span class="op">,</span> <span class="str">`
+  console.log('Hello from almostnode!');
+`</span><span class="op">);</span>
+
+<span class="cm">// Execute it</span>
+runtime<span class="op">.</span><span class="fn">runFile</span><span class="op">(</span><span class="str">'/hello.js'</span><span class="op">);</span></code></pre>
+
+    <h2>Your First Server</h2>
+    <p>Let's create an HTTP server that runs entirely in the browser:</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createContainer</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> <span class="op">{</span> vfs<span class="op">,</span> runtime <span class="op">}</span> <span class="op">=</span> <span class="fn">createContainer</span><span class="op">();</span>
+
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/server.js'</span><span class="op">,</span> <span class="str">`
+  const http = require('http');
+
+  const server = http.createServer((req, res) =&gt; {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end('&lt;h1&gt;Hello from the browser!&lt;/h1&gt;');
+  });
+
+  server.listen(3000, () =&gt; {
+    console.log('Server running on port 3000');
+  });
+`</span><span class="op">);</span>
+
+runtime<span class="op">.</span><span class="fn">runFile</span><span class="op">(</span><span class="str">'/server.js'</span><span class="op">);</span></code></pre>
+    <p>The <code>http</code> module is one of 40+ shimmed Node.js modules available out of the box. The server runs in-memory and can be accessed through the service worker bridge.</p>
+
+    <h2>Installing npm Packages</h2>
+    <p>You can install real npm packages at runtime. The package manager fetches packages from the npm registry, resolves dependencies, and extracts tarballs — all in the browser:</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createContainer</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> <span class="op">{</span> vfs<span class="op">,</span> npm<span class="op">,</span> runtime <span class="op">}</span> <span class="op">=</span> <span class="fn">createContainer</span><span class="op">();</span>
+
+<span class="cm">// Install Express from npm</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'express'</span><span class="op">);</span>
+
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app.js'</span><span class="op">,</span> <span class="str">`
+  const express = require('express');
+  const app = express();
+
+  app.get('/', (req, res) =&gt; {
+    res.json({ message: 'Express in the browser!' });
+  });
+
+  app.listen(3000);
+`</span><span class="op">);</span>
+
+runtime<span class="op">.</span><span class="fn">runFile</span><span class="op">(</span><span class="str">'/app.js'</span><span class="op">);</span></code></pre>
+
+    <h2>Comparison with WebContainers</h2>
+    <table>
+      <tr>
+        <th>Feature</th>
+        <th>almostnode</th>
+        <th>WebContainers</th>
+      </tr>
+      <tr><td>Bundle Size</td><td>~250KB gzipped</td><td>~2MB</td></tr>
+      <tr><td>Startup Time</td><td>Instant</td><td>2-5 seconds</td></tr>
+      <tr><td>Execution Model</td><td>Main thread or Web Worker</td><td>Web Worker isolates</td></tr>
+      <tr><td>Shell</td><td><code>just-bash</code> (POSIX subset)</td><td>Full Linux kernel</td></tr>
+      <tr><td>Native Modules</td><td>Stubs only</td><td>Full support</td></tr>
+      <tr><td>Networking</td><td>Virtual ports</td><td>Real TCP/IP</td></tr>
+      <tr><td>Use Case</td><td>Lightweight playgrounds, demos</td><td>Full dev environments</td></tr>
+    </table>
+
+    <h2 id="use-cases">Use Cases</h2>
+
+    <h3>Interactive Documentation &amp; Tutorials</h3>
+    <p>Embed live, editable code examples directly in your docs. Users can modify code and see results instantly — no backend, no setup, no "open in CodeSandbox" redirect.</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createContainer</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> <span class="op">{</span> vfs<span class="op">,</span> runtime <span class="op">}</span> <span class="op">=</span> <span class="fn">createContainer</span><span class="op">();</span>
+<span class="kw">const</span> repl <span class="op">=</span> runtime<span class="op">.</span><span class="fn">createREPL</span><span class="op">();</span>
+
+<span class="cm">// Wire up to a text editor in your docs page</span>
+runButton<span class="op">.</span><span class="fn">addEventListener</span><span class="op">(</span><span class="str">'click'</span><span class="op">,</span> <span class="op">()</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">const</span> result <span class="op">=</span> repl<span class="op">.</span><span class="fn">eval</span><span class="op">(</span>editor<span class="op">.</span>value<span class="op">);</span>
+  output<span class="op">.</span>textContent <span class="op">=</span> <span class="fn">String</span><span class="op">(</span>result<span class="op">);</span>
+<span class="op">});</span></code></pre>
+    <p>This is how the REPL on the <a href="../">almostnode homepage</a> works. Users type Node.js code, hit Enter, and see results — state persists across evaluations, just like a real Node.js REPL.</p>
+
+    <h3>AI Coding Agents in the Browser</h3>
+    <p>Build AI-powered coding assistants that write, execute, and iterate on code — all client-side. The LLM generates code, almostnode runs it, and the agent can inspect output and fix errors in a loop.</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createContainer</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> <span class="op">{</span> vfs<span class="op">,</span> runtime<span class="op">,</span> npm <span class="op">}</span> <span class="op">=</span> <span class="fn">createContainer</span><span class="op">({</span>
+  onConsole<span class="op">:</span> <span class="op">(</span>level<span class="op">,</span> <span class="op">...</span>args<span class="op">)</span> <span class="op">=&gt;</span> logs<span class="op">.</span><span class="fn">push</span><span class="op">({</span> level<span class="op">,</span> args <span class="op">})</span>
+<span class="op">});</span>
+
+<span class="kw">async function</span> <span class="fn">agentLoop</span><span class="op">(</span>task<span class="op">)</span> <span class="op">{</span>
+  <span class="kw">let</span> code <span class="op">=</span> <span class="kw">await</span> <span class="fn">askLLM</span><span class="op">(</span>task<span class="op">);</span>
+
+  <span class="kw">for</span> <span class="op">(</span><span class="kw">let</span> i <span class="op">=</span> <span class="num">0</span><span class="op">;</span> i <span class="op">&lt;</span> <span class="num">5</span><span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span>
+    vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/agent/index.js'</span><span class="op">,</span> code<span class="op">);</span>
+    logs <span class="op">=</span> <span class="op">[];</span>
+    <span class="kw">try</span> <span class="op">{</span>
+      runtime<span class="op">.</span><span class="fn">runFile</span><span class="op">(</span><span class="str">'/agent/index.js'</span><span class="op">);</span>
+      <span class="kw">return</span> <span class="op">{</span> success<span class="op">:</span> <span class="kw">true</span><span class="op">,</span> logs <span class="op">};</span>
+    <span class="op">}</span> <span class="kw">catch</span> <span class="op">(</span>err<span class="op">)</span> <span class="op">{</span>
+      <span class="cm">// Send error back to LLM for a fix</span>
+      code <span class="op">=</span> <span class="kw">await</span> <span class="fn">askLLM</span><span class="op">(</span>
+        <span class="str">`Fix this error: ${err.message}\nCode:\n${code}`</span>
+      <span class="op">);</span>
+    <span class="op">}</span>
+  <span class="op">}</span>
+<span class="op">}</span></code></pre>
+    <p>Because everything runs in the browser, there's no backend to provision. The agent can install npm packages, read/write files, run servers, and inspect output — all within the user's browser tab. For untrusted AI-generated code, use a <a href="./security.html">cross-origin sandboxed iframe</a> to isolate execution.</p>
+
+    <h3>Code Playgrounds &amp; Sandboxes</h3>
+    <p>Build standalone coding environments where users can experiment with Node.js, Express, or full framework setups. Unlike hosted solutions, everything runs client-side — no server costs, no cold starts, no rate limits.</p>
+
+    <h3>Educational Tools</h3>
+    <p>Teach Node.js, npm, or web frameworks with live exercises. Students write code and see it execute in real time. The virtual filesystem lets you pre-populate project structures, and the REPL lets students explore APIs interactively.</p>
+
+    <h3>Prototyping &amp; Demos</h3>
+    <p>Spin up a working Next.js or Express app in seconds to demonstrate ideas, test API designs, or prototype UI components — all from a single HTML page with no build step.</p>
+
+    <h2>Next Steps</h2>
+    <ul>
+      <li><a href="./core-concepts.html">Core Concepts</a> — understand the architecture: VirtualFS, Runtime, PackageManager, and ServerBridge</li>
+      <li><a href="./security.html">Security &amp; Sandbox</a> — cross-origin isolation, security modes, and service worker setup</li>
+      <li><a href="./nextjs-guide.html">Next.js Guide</a> — run a full Next.js dev server with App Router, HMR, and CSS Modules</li>
+      <li><a href="./vite-guide.html">Vite Guide</a> — set up Vite with React and hot module replacement</li>
+      <li><a href="./tutorial-editor.html">Tutorial: Editor + Preview</a> — build a file editor with live Next.js preview and cross-origin sandbox</li>
+      <li><a href="./api-reference.html">API Reference</a> — full method signatures for every class and function</li>
+    </ul>
+
+    <div class="page-nav">
+      <div></div>
+      <a href="./core-concepts.html" class="next">
+        <div class="label">Next</div>
+        <div class="title">Core Concepts</div>
+      </a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

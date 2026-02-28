@@ -1,0 +1,32 @@
+[package]
+name = "markdown-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.markdown]
+path = ".."
+
+[[bin]]
+name = "compiler"
+path = "fuzz_targets/compiler.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "parser"
+path = "fuzz_targets/parser.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "table_conversion"
+path = "fuzz_targets/table_conversion.rs"
+test = false
+doc = false

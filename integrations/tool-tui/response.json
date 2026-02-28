@@ -1,0 +1,76 @@
+{
+  "suite": "dx-onboard-prompts",
+  "total": 1,
+  "completed_at": "2026-02-20T03:35:37.410780200+06:00",
+  "results": [
+    {
+      "test": "dx_onboarding",
+      "results": {
+        "runtime_environment": "real_os",
+        "runtime_label": "Real OS workstation",
+        "install_mode": "full_local",
+        "components_to_download": [
+          "desktop_app",
+          "tui",
+          "ide_extension",
+          "browser_extension",
+          "local_website"
+        ],
+        "account": {
+          "method": "skipped",
+          "email": "dev@localhost",
+          "name": "DX Developer",
+          "oauth_subject": null
+        },
+        "avatar_source": null,
+        "avatar_ascii_preview_generated": false,
+        "avatar_pixel_preview_generated": false,
+        "llm_providers": [
+          "opencode"
+        ],
+        "available_provider_count": 227,
+        "provider_100_plus_ready": true,
+        "provider_connection_status": [
+          {
+            "provider_id": "opencode",
+            "status": "unverified",
+            "detail": "no built-in probe for this provider yet"
+          }
+        ],
+        "provider_models": [
+          {
+            "provider_id": "opencode",
+            "models": [
+              "big-pickle",
+              "glm-5-free",
+              "minimax-m2.5-free",
+              "trinity-large-preview-free"
+            ],
+            "modules": [],
+            "status": "ok",
+            "detail": "fetched model list"
+          }
+        ],
+        "provider_model_probes": [
+          {
+            "provider_id": "opencode",
+            "api_key_env": "OPENCODE_API_KEY",
+            "selected_model": "glm-5-free",
+            "status": "ok",
+            "detail": "long-form probe succeeded",
+            "response_preview": "Hello! I'm GLM, trained by Z.ai. How can I assist you today? Whether you have questions, need information, or just want to chat, I'm here to help. What would you like to discuss?"
+          }
+        ],
+        "provider_pricing_hints": [
+          "opencode => $1.4657/1M in | $8.1027/1M out"
+        ],
+        "provider_config_path": "C:\\Users\\Computer\\.dx\\config\\providers.toml",
+        "provider_config_status": "saved",
+        "smart_default_model": "opencode:glm-5-free",
+        "small_subagent_model": "opencode:glm-5-free",
+        "multi_agent_model": "opencode:minimax-m2.5-free",
+        "messaging_channels": []
+      }
+    }
+  ]
+}

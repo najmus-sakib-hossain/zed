@@ -1,0 +1,108 @@
+[package]
+name = "dx-i18n"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "Multi-provider translation engine with support for Google, DeepL, and other translation APIs"
+license.workspace = true
+repository.workspace = true
+build = "build.rs"
+keywords = [
+    "i18n",
+    "translation",
+    "localization",
+    "internationalization",
+    "api",
+]
+categories = ["internationalization", "localization", "web-programming"]
+include = [
+    "src/**/*",
+    "models/ggml-tiny.en.bin",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE*",
+]
+
+[dependencies]
+reqwest = { version = "0.11", default-features = false, features = [
+    "json",
+    "blocking",
+    "rustls-tls",
+] }
+tokio = { version = "1.0", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+async-trait = "0.1"
+thiserror = "1.0"
+scraper = "0.18"
+base64 = "0.21"
+url = "2.5"
+futures = "0.3"
+lazy_static = "1.4"
+regex = "1.10"
+urlencoding = "2.1"
+tokio-tungstenite = { version = "0.21", features = ["rustls-tls-native-roots"] }
+futures-util = "0.3"
+uuid = { version = "1.6", features = ["v4"] }
+chrono = "0.4"
+html-escape = "0.2"
+sha2 = "0.10"
+whisper-rs = { version = "0.12", optional = true, default-features = false }
+hound = "3.5"
+cpal = "0.15"
+num_cpus = "1.16"
+libc = "0.2"
+Rust_Grammar = { version = "2.2", optional = true }
+
+[features]
+default = ["whisper"]
+whisper = ["dep:whisper-rs"]
+wisprflow = ["dep:Rust_Grammar"]
+
+[lib]
+name = "dx_i18n"
+path = "src/lib.rs"
+
+[[bin]]
+name = "i18n-demo"
+path = "src/bin/demo.rs"
+
+[[bin]]
+name = "test-features"
+path = "playgrounds/test_features.rs"
+
+[[bin]]
+name = "sts-demo"
+path = "playgrounds/sts_demo.rs"
+
+[[bin]]
+name = "sts-test"
+path = "playgrounds/sts_test.rs"
+
+[[bin]]
+name = "auto-sts-demo"
+path = "playgrounds/auto_sts_demo.rs"
+
+[[bin]]
+name = "test-audio"
+path = "playgrounds/test_audio.rs"
+
+[[example]]
+name = "wisprflow_mic"
+path = "examples/wisprflow_mic.rs"
+required-features = ["whisper", "wisprflow"]
+
+[[example]]
+name = "wisprflow_file_test"
+path = "examples/wisprflow_file_test.rs"
+required-features = ["whisper", "wisprflow"]
+
+[[example]]
+name = "wisprflow_cached"
+path = "examples/wisprflow_cached.rs"
+required-features = ["whisper", "wisprflow"]
+
+[[example]]
+name = "wisprflow_silent"
+path = "examples/wisprflow_silent.rs"
+required-features = ["whisper", "wisprflow"]

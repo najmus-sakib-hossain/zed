@@ -1,0 +1,17 @@
+[package]
+name = "semantic-cache"
+version.workspace = true
+edition.workspace = true
+description = "In-memory semantic cache — 100% savings per cache hit"
+
+[dependencies]
+dx-core = { workspace = true }
+blake3 = { workspace = true }
+moka = { workspace = true }
+regex-lite = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

@@ -1,0 +1,311 @@
+- # Implementation Plan: DX-JS Production Readiness
+
+## Overview
+
+This implementation plan breaks down the production readiness work into discrete, incremental tasks. Each task builds on previous work and includes property-based tests to validate correctness. The plan prioritizes core language features (BigInt, dynamic import) before API completions.
+
+## Tasks
+
+- [-] 1. Implement BigInt Support
+- 1.1 Add BigInt storage to RuntimeHeap
+- Add `num-bigint` dependency to `runtime/Cargo.toml`
+- Add `bigints: HashMap<u64, num_bigint::BigInt>` to RuntimeHeap struct
+- Implement `allocate_bigint()` and `get_bigint()` methods
+- Add BigInt tagging constants (BIGINT_TAG_OFFSET)
+- Implement `is_bigint_id()`, `encode_bigint_id()`, `decode_bigint_id()` functions
+- Requirements: 1.1, 1.8
+- 1.2 Implement BigInt parsing in OXC integration
+- Update parser module to recognize BigInt literals (e.g., `123n`)
+- Add BigInt literal handling in AST lowering
+- Generate code to allocate BigInt values in heap
+- Requirements: 1.1
+- 1.3 Implement BigInt arithmetic built-ins
+- Implement `builtin_bigint_add`, `builtin_bigint_sub`, `builtin_bigint_mul`
+- Implement `builtin_bigint_div` with RangeError for non-integer results
+- Implement `builtin_bigint_mod`, `builtin_bigint_pow`
+- Register built-ins in CodeGenerator
+- Requirements: 1.2, 1.6
+- 1.4 Write property tests for BigInt arithmetic
+- Property 2: BigInt arithmetic correctness
+- Validates: Requirements 1.2
+- 1.5 Implement BigInt comparison built-ins
+- Implement `builtin_bigint_lt`, `builtin_bigint_gt`, `builtin_bigint_le`, `builtin_bigint_ge`
+- Implement `builtin_bigint_eq`, `builtin_bigint_strict_eq`
+- Requirements: 1.3
+- 1.6 Write property tests for BigInt comparison
+- Property 3: BigInt comparison correctness
+- Validates: Requirements 1.3
+- 1.7 Implement BigInt bitwise built-ins
+- Implement `builtin_bigint_and`, `builtin_bigint_or`, `builtin_bigint_xor`
+- Implement `builtin_bigint_not`, `builtin_bigint_shl`, `builtin_bigint_shr`
+- Requirements: 1.5
+- 1.8 Write property tests for BigInt bitwise operations
+- Property 4: BigInt bitwise correctness
+- Validates: Requirements 1.5
+- 1.9 Implement BigInt conversion and error handling
+- Implement `builtin_bigint_to_string`, `builtin_bigint_from_string`
+- Implement `builtin_bigint_from_number` with validation
+- Add TypeError for BigInt/Number mixing in arithmetic codegen
+- Requirements: 1.4, 1.7, 1.8
+- 1.10 Write property tests for BigInt round-trip and errors
+- Property 1: BigInt literal round-trip
+- Property 5: BigInt division error handling
+- Property 6: BigInt/Number mixing error
+- Property 7: BigInt constructor correctness
+- Validates: Requirements 1.1, 1.4, 1.6, 1.7, 1.8
+- Checkpoint
+- BigInt Complete
+- Ensure all BigInt tests pass, ask the user if questions arise.
+- [-] 3. Implement Dynamic Import Support
+- 3.1 Create DynamicImportLoader module
+- Create `runtime/src/compiler/dynamic_import.rs`
+- Implement ModuleResolver for specifier resolution
+- Implement module cache with HashMap<String, ModuleNamespace>
+- Add async `import()` method returning Promise
+- Requirements: 2.1, 2.2, 2.3
+- 3.2 Integrate dynamic import with JIT codegen
+- Add `import()` expression handling in expressions.rs
+- Generate code to call DynamicImportLoader
+- Handle Promise creation and resolution
+- Requirements: 2.1
+- 3.3 Implement ESM/CJS interop for dynamic import
+- Handle importing CJS modules from ESM
+- Handle importing ESM modules from CJS
+- Implement default export handling for CJS
+- Requirements: 2.7
+- 3.4 Implement error handling for dynamic import
+- Return rejected Promise for non-existent modules
+- Return rejected Promise with SyntaxError for invalid modules
+- Requirements: 2.4, 2.5
+- 3.5 Write property tests for dynamic import
+- Property 8: Dynamic import resolution
+- Property 9: Dynamic import error handling
+- Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5
+- 3.6 Implement bundler code splitting for dynamic imports ✓
+- Update dx-bundle to detect dynamic import boundaries
+- Implement chunk generation for dynamic imports
+- Handle shared dependencies between chunks
+- Requirements: 2.6
+- Checkpoint
+- Dynamic Import Complete ✓
+- All dynamic import tests pass (18 tests in runtime, 4 tests in bundler)
+- Implement File System Watching
+- 5.1 Add notify dependency and create watch module
+- Add `notify = "6.0"` to `compatibility/Cargo.toml`
+- Create `compatibility/crates/dx-compat-node/src/fs/watch.rs`
+- Define FSWatcher struct with notify::RecommendedWatcher
+- Define WatchEvent enum (Change, Rename, Error)
+- Requirements: 3.1
+- 5.2 Implement fs.watch() functionality
+- Implement FSWatcher::new() with callback
+- Implement FSWatcher::watch() to add paths
+- Implement FSWatcher::unwatch() to remove paths
+- Implement FSWatcher::close() for cleanup
+- Map notify events to Node.js event types
+- Requirements: 3.1, 3.2, 3.3, 3.6
+- 5.3 Implement fs.watchFile() polling functionality
+- Create FSWatchFile struct with polling interval
+- Implement stat-based change detection
+- Implement callback invocation with prev/curr stats
+- Implement fs.unwatchFile()
+- Requirements: 3.4, 3.5
+- 5.4 Implement watch error handling
+- Emit error event for non-existent paths
+- Handle permission errors
+- Handle watcher resource limits
+- Requirements: 3.7, 3.8
+- 5.5 Write property tests for file watching
+- Property 10: Watch event correctness
+- Property 11: Watch resource cleanup
+- Property 12: Watch error handling
+- Validates: Requirements 3.1, 3.2, 3.3, 3.5, 3.6, 3.7, 3.8
+- Checkpoint
+- File Watching Complete
+- Ensure all file watching tests pass, ask the user if questions arise.
+- Implement Complete HTTP Server
+- 7.1 Add hyper dependency and create HTTP module
+- Add `hyper = { version = "1.0", features = ["server", "http1", "http2"] }` to Cargo.toml
+- Create `compatibility/crates/dx-compat-node/src/http/server.rs`
+- Define HttpServer struct with TcpListener
+- Define Request and Response structs
+- Requirements: 4.1
+- 7.2 Implement HTTP request parsing
+- Parse all HTTP methods (GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS)
+- Parse headers into HeaderMap
+- Make request body available as AsyncRead stream
+- Requirements: 4.2, 4.3
+- 7.3 Implement HTTP response handling
+- Implement Response::write_head() for status and headers
+- Implement Response::write() with chunked encoding support
+- Implement Response::end() for response completion
+- Requirements: 4.4, 4.5, 4.6
+- 7.4 Implement Keep-Alive connection handling
+- Parse Connection header
+- Implement connection reuse for Keep-Alive
+- Implement connection timeout handling
+- Requirements: 4.7
+- 7.5 Implement HTTPS server with TLS
+- Add `rustls` and `tokio-rustls` dependencies
+- Implement TLS configuration loading
+- Create https.createServer() with TLS options
+- Requirements: 4.8
+- 7.6 Write property tests for HTTP server
+- Property 13: HTTP method parsing
+- Property 14: HTTP response lifecycle
+- Property 15: HTTP request body streaming
+- Validates: Requirements 4.2, 4.3, 4.4, 4.5, 4.6
+- Checkpoint
+- HTTP Server Complete
+- Ensure all HTTP server tests pass, ask the user if questions arise.
+- Implement Stream API Completion
+- 9.1 Implement Duplex stream
+- Create `compatibility/crates/dx-compat-node/src/stream/duplex.rs`
+- Implement DuplexStream with readable and writable halves
+- Implement AsyncRead and AsyncWrite traits
+- Requirements: 5.1
+- 9.2 Implement Transform stream
+- Create `compatibility/crates/dx-compat-node/src/stream/transform.rs`
+- Implement TransformStream with transformation function
+- Connect readable output to writable input through transform
+- Requirements: 5.2
+- 9.3 Implement stream.pipeline()
+- Create pipeline function connecting multiple streams
+- Implement error propagation through pipeline
+- Implement cleanup on completion or error
+- Requirements: 5.3, 5.6, 5.7
+- 9.4 Implement stream.finished() and backpressure
+- Implement finished() callback for stream completion
+- Implement backpressure handling in pipeline
+- Pause source when destination is not ready
+- Requirements: 5.4, 5.5
+- 9.5 Write property tests for streams
+- Property 16: Duplex stream bidirectionality
+- Property 17: Transform stream transformation
+- Property 18: Pipeline correctness
+- Property 19: Backpressure handling
+- Validates: Requirements 5.1, 5.2, 5.3, 5.5, 5.6, 5.7
+- Checkpoint
+- Streams Complete
+- Ensure all stream tests pass, ask the user if questions arise.
+- Implement Crypto API Completion ✓
+- 11.1 Add crypto dependencies
+- Add `ring = "0.17"` for key derivation and hashing
+- Add `rsa = "0.9"` for RSA key generation
+- Add `p256 = "0.13"` and `p384 = "0.13"` for EC keys
+- Requirements: 6.1, 6.2, 6.3
+- 11.2 Implement key derivation functions
+- Implement crypto.pbkdf2() using ring
+- Implement crypto.scrypt() using ring or scrypt crate
+- Support async and sync variants
+- Requirements: 6.1, 6.2
+- 11.3 Implement key generation
+- Implement crypto.generateKeyPair() for RSA
+- Implement crypto.generateKeyPair() for EC (P-256, P-384)
+- Return KeyPair with public and private keys
+- Requirements: 6.3
+- 11.4 Implement signing and verification
+- Implement crypto.sign() for RSA and EC
+- Implement crypto.verify() for RSA and EC
+- Support multiple digest algorithms
+- Requirements: 6.4, 6.5
+- 11.5 Complete cipher support
+- Extend createCipheriv() beyond AES
+- Add support for ChaCha20-Poly1305
+- Ensure createDecipheriv() matches
+- Requirements: 6.6, 6.7
+- 11.6 Write property tests for crypto ✓
+- Property 20: Key derivation correctness
+- Property 21: Sign/verify round-trip
+- Property 22: Encrypt/decrypt round-trip
+- Property 23: Key pair validity
+- Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7
+- Checkpoint
+- Crypto Complete ✓
+- All 16 crypto tests pass (PBKDF2, scrypt, EC P-256/P-384, RSA, AES-CBC, AES-CTR, ChaCha20-Poly1305)
+- Implement Error Handling Improvements
+- 13.1 Improve source location accuracy
+- Enhance ModuleSourceMap with finer granularity
+- Map JIT addresses to source positions accurately
+- Include column information in error locations
+- Requirements: 10.1, 10.2
+- 13.2 Implement source map support
+- Parse source maps from.map files
+- Apply source map transformations to error locations
+- Support inline source maps
+- Requirements: 10.3
+- 13.3 Implement unhandled rejection tracking
+- Track pending Promise rejections
+- Report unhandled rejections with full context
+- Include rejection reason and stack trace
+- Requirements: 10.6
+- 13.4 Write property tests for error handling
+- Property 24: Error source location accuracy
+- Property 25: Unhandled rejection reporting
+- Validates: Requirements 10.1, 10.2, 10.3, 10.6
+- Checkpoint
+- Error Handling Complete ✓
+- All 17 error handling tests pass (11 property tests + 6 unit tests)
+- Property 24: Error source location accuracy (6 tests)
+- Property 25: Unhandled rejection reporting (5 tests)
+- Implement Ecosystem Compatibility Testing ✓
+- 15.1 Set up Test262 integration
+- Created Test262Harness with metadata parsing
+- Implemented test runner framework with skip/pass/fail tracking
+- Target 95%+ pass rate on applicable tests
+- Requirements: 7.1
+- 15.2 Create popular package test suite
+- Created LodashTestSuite with 40+ function tests across 6 categories
+- Created ExpressTestSuite with 20+ HTTP/middleware tests
+- Created TypeScriptTestSuite with 25+ compilation tests
+- Requirements: 7.2, 7.3, 7.4
+- 15.3 Write integration tests for ecosystem compatibility
+- 40 integration tests validating test suite structure
+- Tests for lodash function execution patterns
+- Tests for express HTTP serving patterns
+- Tests for typescript compilation patterns
+- Validates: Requirements 7.2, 7.3, 7.4
+- Implement Pre-built Binary Distribution
+- 16.1 Set up cross-compilation
+- Configure GitHub Actions for multi-platform builds
+- Set up Linux x86_64 and ARM64 builds
+- Set up macOS x86_64 and ARM64 builds
+- Set up Windows x86_64 builds
+- Requirements: 8.3, 8.4, 8.5, 8.6, 8.7
+- 16.2 Implement binary packaging
+- Create release archives with binaries
+- Generate checksums for integrity verification
+- Create npm package with binary download script
+- Requirements: 8.1, 8.2
+- 16.3 Automate release process
+- Configure GitHub Actions to build on tag push
+- Automatically attach binaries to GitHub releases
+- Publish npm package on release
+- Requirements: 8.8
+- Implement Performance Benchmarking
+- 17.1 Create benchmark suite
+- Create standardized benchmark workloads
+- Implement cold start time measurement
+- Implement memory usage measurement
+- Implement throughput measurement
+- Requirements: 9.1, 9.3, 9.4, 9.5
+- 17.2 Set up CI benchmark integration
+- Run benchmarks in CI on each PR
+- Compare against baseline
+- Detect performance regressions automatically
+- Report results with confidence intervals
+- Requirements: 9.2, 9.6
+- Final Checkpoint
+- Production Ready
+- Ensure all tests pass
+- Verify Test262 pass rate >= 95%
+- Verify all popular package tests pass
+- Verify binaries build for all platforms
+- Production readiness verification script created
+
+## Notes
+
+- All tasks are required for comprehensive production readiness
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases

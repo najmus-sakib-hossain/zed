@@ -1,0 +1,26 @@
+author=essensefromexistence
+version=0.0.2
+name=dx
+description="Orchestrate don't just own your code - UPDATED TEST"
+title="Enhanced Developing Experience"
+serializer(default=human path=@/serializer ignore=[trash crates essence])
+markdown(default=human path=@/markdown)
+driven(path=@/driven)
+editors(default=neovim items=[neovim zed vscode cursor antigravity replit firebase-studio])
+font(path=@/fonts default=[Inter "Jetbrain Mono" all])
+forge(container=none pipeline=none repository=https://dx.vercel.app/essensefromexistence/dx tasks=none tools=[cli docs examples packages scripts style tests])
+generator(path=@/generator)
+i18n.locales(default=en-US dev=en-US path=@/locales prod=all)
+i18n.ttses(default=en-US path=@/media/sounds prod=all dev=[en-US bn-BD])
+icon(path=@/icon variant=default pack=[Lucide Solar Svgl])
+js.dependencies(next=16.0.1 react=19.0.1)
+media(assets=@/media/assets images=@/media/images sounds=@/media/sounds videos=@/media/videos)
+python.dependencies(django=latest numpy=latest)
+scripts(build="dx workspace build" dev="www dev" status="dx forge status")
+style(path=@/style themes=dx)
+ui(default=button path=@/components/ui components=[button card modal navbar footer all])
+workspace(paths=[@/www @/backend])
+dependencies[name version](
+dx-package-1 0.0.1
+dx-package-2 0.0.1
+)

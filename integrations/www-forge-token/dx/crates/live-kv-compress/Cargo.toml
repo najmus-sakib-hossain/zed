@@ -1,0 +1,12 @@
+[package]
+name = "live-kv-compress"
+version.workspace = true
+edition.workspace = true
+description = "Live stream KV cache compression — 15.7x compression ratio"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

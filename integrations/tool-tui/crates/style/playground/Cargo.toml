@@ -1,0 +1,12 @@
+[package]
+name = "dx-style-playground"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[[bin]]
+name = "style-playground"
+path = "main.rs"
+
+[dependencies]
+dx-style = { path = ".." }

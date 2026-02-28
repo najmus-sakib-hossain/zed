@@ -1,0 +1,156 @@
+# Cross-Platform CI Configuration for DX Forge
+# Tests platform-native I/O backends on Linux, macOS, and Windows
+# Requirements: 4.1, 4.2, 4.3, 4.4
+
+name: Cross-Platform CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  # Linux tests with io_uring backend
+  test-linux:
+    name: Linux (io_uring)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, beta]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: ${{ matrix.rust }}
+          components: clippy, rustfmt
+      
+      - name: Check kernel version
+        run: uname -r
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Build
+        run: cargo build --verbose
+      
+      - name: Run unit tests
+        run: cargo test --lib --verbose
+      
+      - name: Run integration tests
+        run: cargo test --test integration_test --verbose
+      
+      - name: Run platform I/O tests
+        run: cargo test platform_io --lib --verbose
+      
+      - name: Run property tests
+        run: cargo test prop_ --lib --verbose -- --test-threads=1
+
+  # macOS tests with kqueue backend
+  test-macos:
+    name: macOS (kqueue)
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        rust: [stable]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: ${{ matrix.rust }}
+      
+      - name: Check macOS version
+        run: sw_vers
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Build
+        run: cargo build --verbose
+      
+      - name: Run unit tests
+        run: cargo test --lib --verbose
+      
+      - name: Run integration tests
+        run: cargo test --test integration_test --verbose
+      
+      - name: Run platform I/O tests
+        run: cargo test platform_io --lib --verbose
+
+  # Windows tests with IOCP backend
+  test-windows:
+    name: Windows (IOCP)
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        rust: [stable]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: ${{ matrix.rust }}
+      
+      - name: Check Windows version
+        run: systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      
+      - name: Build
+        run: cargo build --verbose
+      
+      - name: Run unit tests
+        run: cargo test --lib --verbose
+      
+      - name: Run integration tests
+        run: cargo test --test integration_test --verbose
+      
+      - name: Run platform I/O tests
+        run: cargo test platform_io --lib --verbose
+
+  # Clippy and format checks
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+      
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings

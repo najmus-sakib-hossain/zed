@@ -1,0 +1,18 @@
+reTypewriter Snapshots v1
+
+--01----------
+
+
+--02----------
+
+export function activatePowerMode() {
+
+}
+
+--03----------
+
+export function activatePowerMode() {
+  console.warn('Make power mode great again!!!')
+}
+
+--------------

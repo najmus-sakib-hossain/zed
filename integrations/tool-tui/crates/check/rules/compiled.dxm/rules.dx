@@ -1,0 +1,2972 @@
+# DX Check Rules Database
+# Auto-generated - DO NOT EDIT MANUALLY
+# To modify rules, edit the extractors and run: dx-check rules compile
+# Version: 1
+# Total Rules: 231
+# Compiled: 2025-12-27T14:39:12.650904300+00:00
+
+## JS Rules (64)
+
+### js/no-console
+
+- **ID**: 0
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/no-console
+
+Disallow the use of console
+
+---
+
+### js/no-debugger
+
+- **ID**: 1
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Error
+- **Fixable**: true
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/no-debugger
+
+Disallow the use of debugger
+
+---
+
+### js/no-unused-vars
+
+- **ID**: 2
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/no-unused-vars
+
+Disallow unused variables
+
+---
+
+### js/eqeqeq
+
+- **ID**: 3
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/eqeqeq
+
+Require the use of = == and !==
+
+---
+
+### js/prefer-const
+
+- **ID**: 4
+- **Category**: style
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/prefer-const
+
+Require const declarations for variables that are never reassigned
+
+---
+
+### js/no-var
+
+- **ID**: 5
+- **Category**: style
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/no-var
+
+Require let or const instead of var
+
+---
+
+### js/no-eval
+
+- **ID**: 6
+- **Category**: security
+- **Source**: dx-check
+- **Severity**: Error
+- **Fixable**: false
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/no-eval
+
+Disallow the use of eval()
+
+---
+
+### js/no-with
+
+- **ID**: 7
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Error
+- **Fixable**: false
+- **Recommended**: true
+- **Docs**: https://dx.dev/rules/no-with
+
+Disallow with statements
+
+---
+
+### js/noAccumulatingSpread
+
+- **ID**: 8
+- **Category**: performance
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow spreading objects that may have large number of properties
+
+---
+
+### js/noAssignInExpressions
+
+- **ID**: 9
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow assignments in expressions
+
+---
+
+### js/noAsyncPromiseExecutor
+
+- **ID**: 10
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow async Promise executors
+
+---
+
+### js/noCatchAssign
+
+- **ID**: 11
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow reassigning exceptions in catch clauses
+
+---
+
+### js/noClassAssign
+
+- **ID**: 12
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow reassigning class members
+
+---
+
+### js/noCommentText
+
+- **ID**: 13
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Prevent comments from being inserted as text nodes
+
+---
+
+### js/noCompareNegZero
+
+- **ID**: 14
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow comparing against -0
+
+---
+
+### js/noConstAssign
+
+- **ID**: 15
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow reassigning const variables
+
+---
+
+### js/noConstantCondition
+
+- **ID**: 16
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow constant conditions
+
+---
+
+### js/noControlCharactersInRegex
+
+- **ID**: 17
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow control characters in regex
+
+---
+
+### js/noDebugger
+
+- **ID**: 18
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow debugger statements
+
+---
+
+### js/noDoubleEquals
+
+- **ID**: 19
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Require = == and !==
+
+---
+
+### js/noDuplicateCase
+
+- **ID**: 20
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate case labels
+
+---
+
+### js/noDuplicateClassMembers
+
+- **ID**: 21
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate class members
+
+---
+
+### js/noDuplicateObjectKeys
+
+- **ID**: 22
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate keys in object literals
+
+---
+
+### js/noDuplicateParameters
+
+- **ID**: 23
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate parameters
+
+---
+
+### js/noEmptyCharacterClassInRegex
+
+- **ID**: 24
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow empty character classes in regex
+
+---
+
+### js/noEmptyPattern
+
+- **ID**: 25
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow empty destructuring patterns
+
+---
+
+### js/noExtraNonNullAssertion
+
+- **ID**: 26
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow extra non-null assertions
+
+---
+
+### js/noFallthroughSwitchClause
+
+- **ID**: 27
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow fallthrough switch cases
+
+---
+
+### js/noGlobalObjectCalls
+
+- **ID**: 28
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow calling global objects as functions
+
+---
+
+### js/noInnerDeclarations
+
+- **ID**: 29
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow variable or function declarations in nested blocks
+
+---
+
+### js/noInvalidConstructorSuper
+
+- **ID**: 30
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow invalid super() calls
+
+---
+
+### js/noNonoctalDecimalEscape
+
+- **ID**: 31
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow \\8 and \\9 escape sequences
+
+---
+
+### js/noPrecisionLoss
+
+- **ID**: 32
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow number literals that lose precision
+
+---
+
+### js/noPrototypeBuiltins
+
+- **ID**: 33
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow direct use of Object.prototype builtins
+
+---
+
+### js/noRedeclare
+
+- **ID**: 34
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow variable redeclaration
+
+---
+
+### js/noSelfAssign
+
+- **ID**: 35
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow assignments where both sides are exactly the same
+
+---
+
+### js/noShadowRestrictedNames
+
+- **ID**: 36
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow shadowing of restricted names
+
+---
+
+### js/noSparseArray
+
+- **ID**: 37
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow sparse arrays
+
+---
+
+### js/noUnsafeFinally
+
+- **ID**: 38
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow control flow statements in finally blocks
+
+---
+
+### js/noUnsafeOptionalChaining
+
+- **ID**: 39
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unsafe optional chaining
+
+---
+
+### js/noUnusedLabels
+
+- **ID**: 40
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unused labels
+
+---
+
+### js/noUnusedVariables
+
+- **ID**: 41
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unused variables
+
+---
+
+### js/useValidForDirection
+
+- **ID**: 42
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Enforce for loop update clause moving the counter in the right direction
+
+---
+
+### js/useYield
+
+- **ID**: 43
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Require generator functions to contain yield
+
+---
+
+### js/for-direction
+
+- **ID**: 44
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Enforce for loop update clause moving the counter in the right direction
+
+---
+
+### js/getter-return
+
+- **ID**: 45
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Enforce return statements in getters
+
+---
+
+### js/no-async-promise-executor
+
+- **ID**: 46
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow async Promise executors
+
+---
+
+### js/no-compare-neg-zero
+
+- **ID**: 47
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow comparing against -0
+
+---
+
+### js/no-cond-assign
+
+- **ID**: 48
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow assignment operators in conditional expressions
+
+---
+
+### js/no-const-assign
+
+- **ID**: 49
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow reassigning const variables
+
+---
+
+### js/no-constant-binary-expression
+
+- **ID**: 50
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow expressions where the operation doesn't affect the value
+
+---
+
+### js/no-dupe-else-if
+
+- **ID**: 51
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate conditions in if-else-if chains
+
+---
+
+### js/no-duplicate-case
+
+- **ID**: 52
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate case labels
+
+---
+
+### js/no-empty-character-class
+
+- **ID**: 53
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow empty character classes in regex
+
+---
+
+### js/no-ex-assign
+
+- **ID**: 54
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow reassigning exceptions in catch clauses
+
+---
+
+### js/no-fallthrough
+
+- **ID**: 55
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow fallthrough of case statements
+
+---
+
+### js/no-func-assign
+
+- **ID**: 56
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow reassigning function declarations
+
+---
+
+### js/no-import-assign
+
+- **ID**: 57
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow assigning to imported bindings
+
+---
+
+### js/no-inner-declarations
+
+- **ID**: 58
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow variable or function declarations in nested blocks
+
+---
+
+### js/no-irregular-whitespace
+
+- **ID**: 59
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow irregular whitespace
+
+---
+
+### js/no-self-assign
+
+- **ID**: 60
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow assignments where both sides are exactly the same
+
+---
+
+### js/no-sparse-arrays
+
+- **ID**: 61
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow sparse arrays
+
+---
+
+### js/no-unreachable
+
+- **ID**: 62
+- **Category**: correctness
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unreachable code after return, throw, continue, and break
+
+---
+
+### js/no-unsafe-negation
+
+- **ID**: 63
+- **Category**: suspicious
+- **Source**: dx-check
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow negating the left operand of relational operators
+
+---
+
+## TS Rules (5)
+
+### ts/noExplicitAny
+
+- **ID**: 4096
+- **Category**: types
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow explicit any
+
+---
+
+### ts/noExtraNonNullAssertion
+
+- **ID**: 4097
+- **Category**: types
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow extra non-null assertions
+
+---
+
+### ts/useEnumInitializers
+
+- **ID**: 4098
+- **Category**: style
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Require enum initializers
+
+---
+
+### ts/useExportType
+
+- **ID**: 4099
+- **Category**: style
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Prefer type-only exports when possible
+
+---
+
+### ts/useImportType
+
+- **ID**: 4100
+- **Category**: style
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Prefer type-only imports when possible
+
+---
+
+## PY Rules (42)
+
+### py/F401
+
+- **ID**: 8192
+- **Category**: imports
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Unused import
+
+---
+
+### py/F402
+
+- **ID**: 8193
+- **Category**: imports
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Import shadowed by loop variable
+
+---
+
+### py/F403
+
+- **ID**: 8194
+- **Category**: imports
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Star imports used; unable to detect undefined names
+
+---
+
+### py/F404
+
+- **ID**: 8195
+- **Category**: imports
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Late future import
+
+---
+
+### py/F405
+
+- **ID**: 8196
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Name may be undefined, or defined from star imports
+
+---
+
+### py/F406
+
+- **ID**: 8197
+- **Category**: imports
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+from __future__ imports must occur at the beginning of the file
+
+---
+
+### py/F407
+
+- **ID**: 8198
+- **Category**: imports
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Future feature not defined
+
+---
+
+### py/F501
+
+- **ID**: 8199
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Invalid % format string
+
+---
+
+### py/F502
+
+- **ID**: 8200
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format expected mapping but got sequence
+
+---
+
+### py/F503
+
+- **ID**: 8201
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format expected sequence but got mapping
+
+---
+
+### py/F504
+
+- **ID**: 8202
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format unused named arguments
+
+---
+
+### py/F505
+
+- **ID**: 8203
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format missing named arguments
+
+---
+
+### py/F506
+
+- **ID**: 8204
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format mixed positional and named arguments
+
+---
+
+### py/F507
+
+- **ID**: 8205
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format mismatch of placeholder and argument count
+
+---
+
+### py/F508
+
+- **ID**: 8206
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format with * specifier requires a sequence
+
+---
+
+### py/F509
+
+- **ID**: 8207
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+% format with unsupported format character
+
+---
+
+### py/F521
+
+- **ID**: 8208
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+.format(...) invalid format string
+
+---
+
+### py/F522
+
+- **ID**: 8209
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+.format(...) unused named arguments
+
+---
+
+### py/F523
+
+- **ID**: 8210
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+.format(...) unused positional arguments
+
+---
+
+### py/F524
+
+- **ID**: 8211
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+.format(...) missing argument
+
+---
+
+### py/F525
+
+- **ID**: 8212
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+.format(...) mixing automatic and manual numbering
+
+---
+
+### py/F541
+
+- **ID**: 8213
+- **Category**: style
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+f-string without any placeholders
+
+---
+
+### py/F601
+
+- **ID**: 8214
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Multi-value repeated key in dictionary
+
+---
+
+### py/F602
+
+- **ID**: 8215
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Multi-value repeated key in dictionary
+
+---
+
+### py/F621
+
+- **ID**: 8216
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Too many expressions in star-unpacking assignment
+
+---
+
+### py/F622
+
+- **ID**: 8217
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Two starred expressions in assignment
+
+---
+
+### py/F631
+
+- **ID**: 8218
+- **Category**: suspicious
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Assert test is a tuple
+
+---
+
+### py/F632
+
+- **ID**: 8219
+- **Category**: suspicious
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Use = = to compare constant literals
+
+---
+
+### py/F633
+
+- **ID**: 8220
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Use of >> is invalid with print function
+
+---
+
+### py/F634
+
+- **ID**: 8221
+- **Category**: suspicious
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+If test is a tuple
+
+---
+
+### py/F701
+
+- **ID**: 8222
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Break outside loop
+
+---
+
+### py/F702
+
+- **ID**: 8223
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Continue outside loop
+
+---
+
+### py/F704
+
+- **ID**: 8224
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Yield outside function
+
+---
+
+### py/F706
+
+- **ID**: 8225
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Return outside function
+
+---
+
+### py/F707
+
+- **ID**: 8226
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Except block not the last exception handler
+
+---
+
+### py/F811
+
+- **ID**: 8227
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Redefinition of unused name
+
+---
+
+### py/F821
+
+- **ID**: 8228
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Undefined name
+
+---
+
+### py/F822
+
+- **ID**: 8229
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Undefined name in __all__
+
+---
+
+### py/F823
+
+- **ID**: 8230
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Local variable referenced before assignment
+
+---
+
+### py/F841
+
+- **ID**: 8231
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Local variable is assigned to but never used
+
+---
+
+### py/F842
+
+- **ID**: 8232
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Local variable is annotated but never used
+
+---
+
+### py/F901
+
+- **ID**: 8233
+- **Category**: correctness
+- **Source**: ruff
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Raise with no exception
+
+---
+
+## GO Rules (7)
+
+### go/fmt
+
+- **ID**: 12288
+- **Category**: format
+- **Source**: gofmt.rs
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Type**: Formatter
+
+Format Go code using gofmt
+
+---
+
+### go/simplify
+
+- **ID**: 12289
+- **Category**: format
+- **Source**: gofmt.rs
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Type**: Formatter
+
+Simplify code using gofmt -s
+
+---
+
+### go/errcheck
+
+- **ID**: 12290
+- **Category**: correctness
+- **Source**: gofmt.rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Check for unchecked errors
+
+---
+
+### go/ineffassign
+
+- **ID**: 12291
+- **Category**: correctness
+- **Source**: gofmt.rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Detect ineffectual assignments
+
+---
+
+### go/unused
+
+- **ID**: 12292
+- **Category**: correctness
+- **Source**: gofmt.rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Check for unused code
+
+---
+
+### go/deadcode
+
+- **ID**: 12293
+- **Category**: correctness
+- **Source**: gofmt.rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Find unused code
+
+---
+
+### go/varcheck
+
+- **ID**: 12294
+- **Category**: correctness
+- **Source**: gofmt.rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Find unused global variables and constants
+
+---
+
+## RS Rules (16)
+
+### rs/fmt
+
+- **ID**: 16384
+- **Category**: format
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Type**: Formatter
+
+Format Rust code using rustfmt
+
+---
+
+### rs/clippy::unwrap_used
+
+- **ID**: 16385
+- **Category**: correctness
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unwrap()
+
+---
+
+### rs/clippy::expect_used
+
+- **ID**: 16386
+- **Category**: correctness
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow expect()
+
+---
+
+### rs/clippy::panic
+
+- **ID**: 16387
+- **Category**: correctness
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow panic!()
+
+---
+
+### rs/clippy::todo
+
+- **ID**: 16388
+- **Category**: correctness
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow todo!()
+
+---
+
+### rs/clippy::unimplemented
+
+- **ID**: 16389
+- **Category**: correctness
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unimplemented!()
+
+---
+
+### rs/clippy::missing_errors_doc
+
+- **ID**: 16390
+- **Category**: docs
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Missing errors documentation
+
+---
+
+### rs/clippy::missing_panics_doc
+
+- **ID**: 16391
+- **Category**: docs
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Missing panics documentation
+
+---
+
+### rs/clippy::cognitive_complexity
+
+- **ID**: 16392
+- **Category**: complexity
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Function is too complex
+
+---
+
+### rs/clippy::too_many_arguments
+
+- **ID**: 16393
+- **Category**: complexity
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Too many arguments
+
+---
+
+### rs/clippy::type_complexity
+
+- **ID**: 16394
+- **Category**: complexity
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Type is too complex
+
+---
+
+### rs/clippy::needless_return
+
+- **ID**: 16395
+- **Category**: style
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Needless return statement
+
+---
+
+### rs/clippy::redundant_closure
+
+- **ID**: 16396
+- **Category**: style
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Redundant closure
+
+---
+
+### rs/clippy::clone_on_copy
+
+- **ID**: 16397
+- **Category**: performance
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Cloning a copy type
+
+---
+
+### rs/clippy::unnecessary_unwrap
+
+- **ID**: 16398
+- **Category**: correctness
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Unnecessary unwrap
+
+---
+
+### rs/clippy::match_wildcard_for_single_variants
+
+- **ID**: 16399
+- **Category**: style
+- **Source**: rustfmt
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Match wildcard for single variants
+
+---
+
+## PHP Rules (7)
+
+### php/no-unused-variable
+
+- **ID**: 20480
+- **Category**: correctness
+- **Source**: mago
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unused variables
+
+---
+
+### php/no-undefined-variable
+
+- **ID**: 20481
+- **Category**: correctness
+- **Source**: mago
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow undefined variables
+
+---
+
+### php/no-unused-import
+
+- **ID**: 20482
+- **Category**: imports
+- **Source**: mago
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unused imports
+
+---
+
+### php/no-duplicate-property
+
+- **ID**: 20483
+- **Category**: correctness
+- **Source**: mago
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate class properties
+
+---
+
+### php/no-empty-block
+
+- **ID**: 20484
+- **Category**: style
+- **Source**: mago
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow empty blocks
+
+---
+
+### php/prefer-null-coalesce
+
+- **ID**: 20485
+- **Category**: style
+- **Source**: mago
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Prefer null coalesce operator
+
+---
+
+### php/no-deprecated-function
+
+- **ID**: 20486
+- **Category**: deprecated
+- **Source**: mago
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow deprecated functions
+
+---
+
+## MD Rules (38)
+
+### md/MD001
+
+- **ID**: 24576
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Header levels should only increment by one level at a time
+
+---
+
+### md/MD003
+
+- **ID**: 24577
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Header style
+
+---
+
+### md/MD004
+
+- **ID**: 24578
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Unordered list style
+
+---
+
+### md/MD005
+
+- **ID**: 24579
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Inconsistent indentation for list items
+
+---
+
+### md/MD007
+
+- **ID**: 24580
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Unordered list indentation
+
+---
+
+### md/MD009
+
+- **ID**: 24581
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Trailing spaces
+
+---
+
+### md/MD010
+
+- **ID**: 24582
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Hard tabs
+
+---
+
+### md/MD011
+
+- **ID**: 24583
+- **Category**: correctness
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Reversed link syntax
+
+---
+
+### md/MD012
+
+- **ID**: 24584
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Multiple consecutive blank lines
+
+---
+
+### md/MD013
+
+- **ID**: 24585
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Line length
+
+---
+
+### md/MD014
+
+- **ID**: 24586
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Dollar signs used before commands
+
+---
+
+### md/MD018
+
+- **ID**: 24587
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+No space after hash on atx style header
+
+---
+
+### md/MD019
+
+- **ID**: 24588
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Multiple spaces after hash on atx style header
+
+---
+
+### md/MD022
+
+- **ID**: 24589
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Headers should be surrounded by blank lines
+
+---
+
+### md/MD023
+
+- **ID**: 24590
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Headers must start at the beginning of the line
+
+---
+
+### md/MD024
+
+- **ID**: 24591
+- **Category**: suspicious
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Multiple headers with the same content
+
+---
+
+### md/MD025
+
+- **ID**: 24592
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Multiple top level headers in the same document
+
+---
+
+### md/MD026
+
+- **ID**: 24593
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Trailing punctuation in header
+
+---
+
+### md/MD027
+
+- **ID**: 24594
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Multiple spaces after blockquote symbol
+
+---
+
+### md/MD028
+
+- **ID**: 24595
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Blank line inside blockquote
+
+---
+
+### md/MD029
+
+- **ID**: 24596
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Ordered list item prefix
+
+---
+
+### md/MD030
+
+- **ID**: 24597
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Spaces after list markers
+
+---
+
+### md/MD031
+
+- **ID**: 24598
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Fenced code blocks should be surrounded by blank lines
+
+---
+
+### md/MD032
+
+- **ID**: 24599
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Lists should be surrounded by blank lines
+
+---
+
+### md/MD033
+
+- **ID**: 24600
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Inline HTML
+
+---
+
+### md/MD034
+
+- **ID**: 24601
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Bare URL used
+
+---
+
+### md/MD037
+
+- **ID**: 24602
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Spaces inside emphasis markers
+
+---
+
+### md/MD038
+
+- **ID**: 24603
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Spaces inside code span elements
+
+---
+
+### md/MD039
+
+- **ID**: 24604
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Spaces inside link text
+
+---
+
+### md/MD040
+
+- **ID**: 24605
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Fenced code blocks should have a language specified
+
+---
+
+### md/MD041
+
+- **ID**: 24606
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+First line in file should be a top level header
+
+---
+
+### md/MD042
+
+- **ID**: 24607
+- **Category**: correctness
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+No empty links
+
+---
+
+### md/MD043
+
+- **ID**: 24608
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Required header structure
+
+---
+
+### md/MD044
+
+- **ID**: 24609
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Proper names should have the correct capitalization
+
+---
+
+### md/MD045
+
+- **ID**: 24610
+- **Category**: a11y
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Images should have alternate text
+
+---
+
+### md/MD046
+
+- **ID**: 24611
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Code block style
+
+---
+
+### md/MD047
+
+- **ID**: 24612
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Files should end with a single newline character
+
+---
+
+### md/MD048
+
+- **ID**: 24613
+- **Category**: style
+- **Source**: rumdl
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Code fence style
+
+---
+
+## TOML Rules (4)
+
+### toml/fmt
+
+- **ID**: 28672
+- **Category**: format
+- **Source**: taplo
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Type**: Formatter
+
+Format TOML files
+
+---
+
+### toml/no-duplicate-keys
+
+- **ID**: 28673
+- **Category**: correctness
+- **Source**: taplo
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate keys
+
+---
+
+### toml/no-invalid-datetime
+
+- **ID**: 28674
+- **Category**: correctness
+- **Source**: taplo
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow invalid datetime
+
+---
+
+### toml/no-trailing-comma
+
+- **ID**: 28675
+- **Category**: style
+- **Source**: taplo
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow trailing commas
+
+---
+
+## KT Rules (15)
+
+### kt/no-wildcard-imports
+
+- **ID**: 32768
+- **Category**: imports
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Disallow wildcard imports
+
+---
+
+### kt/no-unused-imports
+
+- **ID**: 32769
+- **Category**: imports
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Disallow unused imports
+
+---
+
+### kt/no-consecutive-blank-lines
+
+- **ID**: 32770
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Disallow consecutive blank lines
+
+---
+
+### kt/no-trailing-spaces
+
+- **ID**: 32771
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Disallow trailing spaces
+
+---
+
+### kt/indent
+
+- **ID**: 32772
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Enforce consistent indentation
+
+---
+
+### kt/final-newline
+
+- **ID**: 32773
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Require newline at end of file
+
+---
+
+### kt/no-unit-return
+
+- **ID**: 32774
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Disallow explicit Unit return
+
+---
+
+### kt/chain-wrapping
+
+- **ID**: 32775
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Enforce chain wrapping
+
+---
+
+### kt/comment-spacing
+
+- **ID**: 32776
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Enforce spacing in comments
+
+---
+
+### kt/filename
+
+- **ID**: 32777
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Enforce filename conventions
+
+---
+
+### kt/import-ordering
+
+- **ID**: 32778
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Enforce import ordering
+
+---
+
+### kt/max-line-length
+
+- **ID**: 32779
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Enforce maximum line length
+
+---
+
+### kt/modifier-order
+
+- **ID**: 32780
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Enforce modifier ordering
+
+---
+
+### kt/no-empty-class-body
+
+- **ID**: 32781
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Disallow empty class bodies
+
+---
+
+### kt/no-semicolons
+
+- **ID**: 32782
+- **Category**: style
+- **Source**: ktlint
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+
+Disallow unnecessary semicolons
+
+---
+
+## CPP Rules (14)
+
+### cpp/bugprone-assert-side-effect
+
+- **ID**: 40960
+- **Category**: suspicious
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Assert has side effects
+
+---
+
+### cpp/bugprone-dangling-handle
+
+- **ID**: 40961
+- **Category**: correctness
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Dangling handle detected
+
+---
+
+### cpp/bugprone-infinite-loop
+
+- **ID**: 40962
+- **Category**: correctness
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Infinite loop detected
+
+---
+
+### cpp/bugprone-unused-return-value
+
+- **ID**: 40963
+- **Category**: correctness
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Unused return value
+
+---
+
+### cpp/cert-err58-cpp
+
+- **ID**: 40964
+- **Category**: correctness
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Do not throw in constructor of non-local variable
+
+---
+
+### cpp/cppcoreguidelines-avoid-goto
+
+- **ID**: 40965
+- **Category**: style
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Avoid goto
+
+---
+
+### cpp/cppcoreguidelines-no-malloc
+
+- **ID**: 40966
+- **Category**: style
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Avoid malloc/free
+
+---
+
+### cpp/modernize-use-nullptr
+
+- **ID**: 40967
+- **Category**: style
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Use nullptr
+
+---
+
+### cpp/modernize-use-override
+
+- **ID**: 40968
+- **Category**: style
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: false
+
+Use override keyword
+
+---
+
+### cpp/performance-unnecessary-copy-initialization
+
+- **ID**: 40969
+- **Category**: performance
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Unnecessary copy initialization
+
+---
+
+### cpp/readability-const-return-type
+
+- **ID**: 40970
+- **Category**: style
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Const return type is unnecessary
+
+---
+
+### cpp/readability-identifier-naming
+
+- **ID**: 40971
+- **Category**: style
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Identifier naming convention
+
+---
+
+### cpp/readability-implicit-bool-conversion
+
+- **ID**: 40972
+- **Category**: style
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: false
+
+Implicit bool conversion
+
+---
+
+### cpp/clang-format
+
+- **ID**: 40973
+- **Category**: format
+- **Source**: cpp-linter-rs
+- **Severity**: Warn
+- **Fixable**: true
+- **Recommended**: true
+- **Type**: Formatter
+
+Format C/C++ code using clang-format
+
+---
+
+## JSON Rules (6)
+
+### json/noDuplicateKeys
+
+- **ID**: 45056
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate keys
+
+---
+
+### json/noTrailingCommas
+
+- **ID**: 45057
+- **Category**: style
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow trailing commas
+
+---
+
+### json/noComments
+
+- **ID**: 45058
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow comments in JSON
+
+---
+
+### json/noComments
+
+- **ID**: 45059
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Error
+- **Fixable**: false
+- **Recommended**: true
+- **Docs**: https://biomejs.dev/linter/rules/no-comments
+
+Disallow comments in JSON files
+
+---
+
+### json/noDuplicateKeys
+
+- **ID**: 45060
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Error
+- **Fixable**: false
+- **Recommended**: true
+- **Docs**: https://biomejs.dev/linter/rules/no-duplicate-keys
+
+Disallow duplicate keys in JSON objects
+
+---
+
+### json/noTrailingCommas
+
+- **ID**: 45061
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Error
+- **Fixable**: false
+- **Recommended**: true
+- **Docs**: https://biomejs.dev/linter/rules/no-trailing-commas
+
+Disallow trailing commas in JSON
+
+---
+
+## CSS Rules (7)
+
+### css/noDuplicateSelectors
+
+- **ID**: 49152
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate selectors
+
+---
+
+### css/noEmptyBlock
+
+- **ID**: 49153
+- **Category**: style
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow empty blocks
+
+---
+
+### css/noInvalidPositionAtImportRule
+
+- **ID**: 49154
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow invalid position for @import
+
+---
+
+### css/noDuplicateSelectors
+
+- **ID**: 49155
+- **Category**: suspicious
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow duplicate selectors
+
+---
+
+### css/noInvalidPositionAtImportRule
+
+- **ID**: 49156
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Error
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow invalid position for @import rules
+
+---
+
+### css/noUnknownUnit
+
+- **ID**: 49157
+- **Category**: correctness
+- **Source**: biome
+- **Severity**: Error
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow unknown CSS units
+
+---
+
+### css/noShorthandPropertyOverrides
+
+- **ID**: 49158
+- **Category**: suspicious
+- **Source**: biome
+- **Severity**: Warn
+- **Fixable**: false
+- **Recommended**: true
+
+Disallow shorthand properties that override related longhand properties
+
+---
+

@@ -1,0 +1,9 @@
+{
+    "name": "large-test-suite",
+    "version": "1.0.0",
+    "description": "Large test suite fixture (300 tests) for benchmark comparison",
+    "scripts": {
+        "test": "bun test",
+        "test:dx": "dx-test"
+    }
+}

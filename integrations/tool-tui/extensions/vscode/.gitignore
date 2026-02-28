@@ -1,0 +1,3 @@
+# node_modules/ - included for VSIX packaging
+.vscode-test/
+.DS_Store

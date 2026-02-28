@@ -1,0 +1,45 @@
+[package]
+name = "dx-integrations"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Pre-built integrations for DX Agent - WhatsApp, Telegram, Discord, GitHub, Notion, Spotify, and more"
+
+[dependencies]
+# Workspace dependencies
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+reqwest.workspace = true
+
+# Internal crates
+dx-core = { path = "../core" }
+dx-serializer = { path = "../serializer" }
+
+# Async traits
+async-trait = "0.1"
+
+# URL encoding
+urlencoding = "2"
+
+# UUID for unique identifiers
+uuid = { version = "1", features = ["v4"] }
+
+# Chrono for timestamps
+chrono = "0.4"
+
+# Telegram Bot API
+# teloxide = { version = "0.13", features = ["macros"] }
+
+# Discord API
+# serenity = { version = "0.12", features = ["client", "gateway", "model"] }
+
+# Chrome/Browser automation
+# chromiumoxide = { version = "0.7", features = ["tokio-runtime"] }
+
+[dev-dependencies]
+mockall.workspace = true

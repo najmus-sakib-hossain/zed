@@ -1,0 +1,10 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 69895385a853baa60fd12e84cdb9d4fab99d12a6885c5c3581dbf97ea8399b0a # shrinks to base_id = 5640, count = 2
+cc dfbc180e39588b66cb063d15785359118186dbfa830beba797f57223ad355c87 # shrinks to promise_id = 3486, reason = String("Error: something went wrong")
+cc 55d59ce608a0b2f6848c9ab74fa6454ade3511d4f33c95c342f89dca3756098a # shrinks to promise_id = 2291, reason = Null
+cc b9d0261cfb4a457c5e0f7c4d93dcb352b03406dab493cb1fe9d832e895f1033b # shrinks to promise_id = 1369, reason = String("Network failure")

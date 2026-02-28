@@ -1,0 +1,36 @@
+{
+  "name": "@dx/matrix",
+  "version": "2026.2.4",
+  "description": "Dx Matrix channel plugin",
+  "type": "module",
+  "dependencies": {
+    "@matrix-org/matrix-sdk-crypto-nodejs": "^0.4.0",
+    "@vector-im/matrix-bot-sdk": "0.8.0-element.3",
+    "markdown-it": "14.1.0",
+    "music-metadata": "^11.11.2",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "dx": "workspace:*"
+  },
+  "dx": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "channel": {
+      "id": "matrix",
+      "label": "Matrix",
+      "selectionLabel": "Matrix (plugin)",
+      "docsPath": "/channels/matrix",
+      "docsLabel": "matrix",
+      "blurb": "open protocol; install the plugin to enable.",
+      "order": 70,
+      "quickstartAllowFrom": true
+    },
+    "install": {
+      "npmSpec": "@dx/matrix",
+      "localPath": "extensions/matrix",
+      "defaultChoice": "npm"
+    }
+  }
+}

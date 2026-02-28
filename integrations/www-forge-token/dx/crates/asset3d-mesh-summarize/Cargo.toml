@@ -1,0 +1,12 @@
+[package]
+name = "asset3d-mesh-summarize"
+version.workspace = true
+edition.workspace = true
+description = "Mesh topology summarization for efficient 3D representation"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

@@ -1,0 +1,20 @@
+[package]
+name = "dx-py-ext-loader"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "C extension loader for DX-Py runtime"
+
+[dependencies]
+dx-py-ffi = { path = "../dx-py-ffi" }
+libloading = { workspace = true }
+thiserror = { workspace = true }
+parking_lot = { workspace = true }
+dashmap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }

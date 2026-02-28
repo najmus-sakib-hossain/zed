@@ -1,0 +1,27 @@
+[package]
+name = "dx-www-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Core WASM runtime for dx-www framework"
+keywords = ["wasm", "web", "runtime", "dx", "framework"]
+categories = ["wasm", "web-programming"]
+
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+web-sys.workspace = true
+bytemuck.workspace = true
+once_cell.workspace = true
+regex = "1.10"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook.workspace = true

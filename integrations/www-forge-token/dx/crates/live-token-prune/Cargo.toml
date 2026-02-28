@@ -1,0 +1,13 @@
+[package]
+name = "live-token-prune"
+version.workspace = true
+edition.workspace = true
+description = "Spatial+temporal live token pruning — 45% latency reduction"
+
+[dependencies]
+dx-core = { workspace = true }
+image = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

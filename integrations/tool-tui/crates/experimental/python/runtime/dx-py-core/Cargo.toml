@@ -1,0 +1,29 @@
+[package]
+name = "dx-py-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Core object model for DX-Py runtime"
+
+[dependencies]
+dx-py-gc = { path = "../dx-py-gc" }
+dx-py-bytecode = { path = "../dx-py-bytecode" }
+dx-py-simd = { path = "../dx-py-simd" }
+dx-py-collections = { path = "../dx-py-collections" }
+parking_lot.workspace = true
+dashmap.workspace = true
+thiserror.workspace = true
+regex.workspace = true
+once_cell.workspace = true
+libloading = "0.8"
+hostname = "0.4"
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+tempfile.workspace = true
+
+[[bench]]
+name = "core_benchmarks"
+harness = false

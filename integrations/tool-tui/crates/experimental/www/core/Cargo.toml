@@ -1,0 +1,89 @@
+[package]
+name = "dx-www-compiler"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The Transpiler-to-Binary Pipeline - Converts .tsx to .dxb and .wasm"
+keywords = ["wasm", "web", "compiler", "dx", "transpiler"]
+categories = ["wasm", "compilers", "web-programming"]
+
+[lib]
+name = "dx_compiler"
+path = "src/lib.rs"
+
+[features]
+default = []
+oxc = ["oxc_parser", "oxc_allocator", "oxc_ast", "oxc_span"]
+db-teleport = ["dx-www-db-teleport"]
+
+[dependencies]
+# CLI & Terminal
+clap = { version = "4.5", features = ["derive", "cargo"] }
+console = "0.15"
+indicatif = "0.17"                                         # Loading bars
+
+# Parsing (The Heavy Lifting)
+regex = "1.10"
+once_cell = "1.19"                                         # Lazy static initialization
+
+# OXC Parser (optional - fastest JS/TS parser)
+oxc_parser = { workspace = true, optional = true }
+oxc_allocator = { workspace = true, optional = true }
+oxc_ast = { workspace = true, optional = true }
+oxc_span = { workspace = true, optional = true }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+flate2 = "1.0"                                     # For Gzipping templates
+toml = "0.8"                                       # For TOML config parsing
+
+# Code Generation
+quote = "1.0"
+proc-macro2 = "1.0"
+syn = "2.0"
+
+# Async/System
+tokio = { version = "1.36", features = ["full"] }
+notify = "6.1"                                    # File watching
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Path handling
+pathdiff = "0.2"
+walkdir = "2.4"
+
+# Hashing for cache invalidation
+blake3 = "1.5"
+
+# Datetime for metadata
+chrono = "0.4"
+
+# Internal
+dx-www-packet = { path = "../packet", features = ["std"] }
+
+# Binary Dawn - Cross-platform I/O reactor
+dx-www-reactor = { path = "../reactor" }
+dx-www-db-teleport = { path = "../db-teleport", optional = true }
+
+# Ecosystem crates (compile-time features)
+dx-www-form = { path = "../form" }
+dx-www-query = { path = "../query" }
+dx-www-db = { path = "../db" }
+dx-www-state = { path = "../state" }
+dx-www-a11y = { path = "../a11y" }
+dx-www-print = { path = "../print" }
+dx-www-rtl = { path = "../rtl" }
+
+# DX Tools integration
+dx-icon = { path = "../../icon" }
+
+# Production features (10/10)
+log = "0.4"
+ed25519-dalek = { version = "2.0", features = ["rand_core"] }
+
+[dev-dependencies]
+tempfile = "3.8"
+proptest = "1.4"

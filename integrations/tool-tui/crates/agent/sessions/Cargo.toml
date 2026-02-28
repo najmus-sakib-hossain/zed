@@ -1,0 +1,26 @@
+[package]
+name = "dx-agent-sessions"
+version.workspace = true
+edition.workspace = true
+description = "Session management and persistence for DX Agent"
+license.workspace = true
+
+[dependencies]
+dx-agent-protocol = { path = "../protocol" }
+
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = "0.1"
+chrono = { workspace = true, features = ["serde"] }
+async-trait = "0.1"
+uuid = { version = "1", features = ["v4", "serde"] }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+rusqlite = { version = "0.37", features = ["bundled"] }
+
+[dev-dependencies]
+tokio = { workspace = true }
+tempfile = "3"

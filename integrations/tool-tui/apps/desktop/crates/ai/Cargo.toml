@@ -1,0 +1,47 @@
+[workspace]
+members = [
+    "acp_thread",
+    "acp_tools",
+    "agent",
+    "agent_servers",
+    "agent_settings",
+    "agent_ui",
+    "ai_onboarding",
+    "anthropic",
+    "assistant_slash_command",
+    "assistant_slash_commands",
+    "assistant_text_thread",
+    "bedrock",
+    "cloud_llm_client",
+    "codestral",
+    "context_server",
+    "copilot",
+    "copilot_chat",
+    "copilot_ui",
+    "deepseek",
+    "edit_prediction",
+    "edit_prediction_cli",
+    "edit_prediction_context",
+    "edit_prediction_types",
+    "edit_prediction_ui",
+    "google_ai",
+    "language_model",
+    "language_models",
+    "lmstudio",
+    "mistral",
+    "ollama",
+    "open_ai",
+    "open_router",
+    "prompt_store",
+    "streaming_diff",
+    "supermaven",
+    "supermaven_api",
+    "vercel",
+    "x_ai",
+    "zeta_prompt",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "GPL-3.0-or-later"

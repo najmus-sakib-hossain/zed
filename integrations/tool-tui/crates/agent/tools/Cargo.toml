@@ -1,0 +1,52 @@
+[package]
+name = "dx-agent-tools"
+version.workspace = true
+edition.workspace = true
+description = "Tool system for DX Agent — 50 consolidated tools with 300+ actions"
+license.workspace = true
+
+[dependencies]
+dx-agent-protocol = { path = "../protocol" }
+dx-agent-browser = { path = "../browser" }
+
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = "0.1"
+chrono = { workspace = true }
+uuid = { version = "1", features = ["v4", "serde"] }
+async-trait = "0.1"
+reqwest = { workspace = true, features = ["json", "rustls-tls"] }
+base64 = { workspace = true }
+
+# File operations
+walkdir = "2"
+globset = "0.4"
+similar = "2"
+sha2 = "0.10"
+infer = "0.16"
+tempfile = "3"
+encoding_rs = "0.8"
+
+# Git
+git2 = "0.19"
+
+# System info
+sysinfo = "0.32"
+
+# Config parsing
+toml = "0.8"
+dotenvy = "0.15"
+
+# URL parsing
+url = "2"
+
+# Regex
+regex = "1"
+
+[dev-dependencies]
+tokio = { workspace = true }
+tempfile = "3"
+dotenv = "0.15.0"

@@ -1,0 +1,16 @@
+[package]
+name = "dx-www-fallback"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "HTML fallback mode"
+keywords = ["wasm", "web", "html", "dx", "fallback"]
+categories = ["wasm", "web-programming"]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+maud = "0.26"

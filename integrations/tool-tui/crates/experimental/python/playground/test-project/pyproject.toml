@@ -1,0 +1,13 @@
+[project]
+name = "test-project"
+version = "0.1.0"
+description = "A Python project: test-project"
+requires-python = ">=3.8"
+dependencies = ["requests", "flask"]
+
+[project.optional-dependencies]
+dev = ["numpy",]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

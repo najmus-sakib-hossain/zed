@@ -1,0 +1,16 @@
+[package]
+name = "dx-py-compiler"
+description = "Python Source-to-Bytecode Compiler for DX-Py Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+dx-py-parser = { path = "../dx-py-parser" }
+dx-py-bytecode = { path = "../dx-py-bytecode" }
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile.workspace = true

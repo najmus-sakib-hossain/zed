@@ -1,0 +1,70 @@
+[package]
+name = "dx-generator"
+version.workspace = true
+edition.workspace = true
+rust-version = "1.85"
+authors.workspace = true
+description = "Binary Dawn Code Generator - The world's fastest template engine built on Dx principles"
+repository.workspace = true
+documentation = "https://docs.rs/dx-generator"
+keywords = [
+    "code-generation",
+    "template-engine",
+    "binary",
+    "zero-copy",
+    "performance",
+]
+categories = ["development-tools", "template-engine", "code-generators"]
+readme = "README.md"
+license.workspace = true
+
+[lib]
+name = "dx_generator"
+path = "src/lib.rs"
+
+[dependencies]
+# Zero-Copy Memory
+bytemuck = { version = "1.21", features = ["derive"] }
+bytes = "1.9"
+memmap2 = "0.9"
+
+# Arena Allocation (Stack-Only Pipeline)
+bumpalo = "3.16"
+
+# Hashing (Blake3 for template versioning)
+blake3 = "1.5"
+xxhash-rust = { version = "0.8", features = ["xxh64", "xxh3"] }
+
+# Cryptographic Signing (Ed25519 for template security)
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+
+# Error Handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Parallel Generation
+rayon = "1.10"
+parking_lot = "0.12"
+
+# Optional: Serde for compatibility
+serde = { version = "1.0", optional = true, features = ["derive"] }
+serde_json = { version = "1.0", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tempfile = "3.14"
+rand = "0.8"
+proptest = "1.5"
+
+[features]
+default = ["simd"]
+simd = []                              # AVX2 SIMD placeholder scanning
+serde-compat = ["serde", "serde_json"] # JSON parameter compatibility
+
+[[bench]]
+name = "template_render"
+harness = false
+
+[[bench]]
+name = "simd_scan"
+harness = false

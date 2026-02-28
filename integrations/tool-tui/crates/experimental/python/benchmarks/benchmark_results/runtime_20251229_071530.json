@@ -1,0 +1,28 @@
+{
+  "suite": "runtime",
+  "benchmarks": [],
+  "system_info": {
+    "os": "Windows",
+    "os_version": "11 (26200)",
+    "cpu_model": "AMD Ryzen 5 5600G with Radeon Graphics         ",
+    "cpu_cores": 12,
+    "memory_gb": 7.296237945556641,
+    "python_version": "Unknown",
+    "dxpy_version": "Unknown",
+    "uv_version": "0.9.7",
+    "pytest_version": null
+  },
+  "config": {
+    "warmup_iterations": 5,
+    "measurement_iterations": 30,
+    "timeout_seconds": 300,
+    "output_format": "Both",
+    "output_dir": "benchmark_results",
+    "seed": null,
+    "suites": [
+      "runtime"
+    ],
+    "filter": null
+  },
+  "timestamp": "2025-12-29T07:15:30.181215900Z"
+}

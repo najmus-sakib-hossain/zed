@@ -1,0 +1,13 @@
+[package]
+name = "dedup"
+version.workspace = true
+edition.workspace = true
+description = "Duplicate tool output elimination — 20-50% savings in multi-turn sessions"
+
+[dependencies]
+dx-core = { workspace = true }
+blake3 = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

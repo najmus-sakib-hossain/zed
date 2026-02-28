@@ -1,0 +1,39 @@
+{
+  "name": "@midday/invoice",
+  "private": true,
+  "main": "src/index.tsx",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "bun test --exit src",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.tsx",
+    "./token": "./src/token/index.ts",
+    "./number": "./src/utils/number.ts",
+    "./templates/html": "./src/templates/html/index.tsx",
+    "./templates/pdf": "./src/templates/pdf/index.tsx",
+    "./templates/og": "./src/templates/og/index.tsx",
+    "./editor": "./src/editor/index.tsx",
+    "./calculate": "./src/utils/calculate.ts",
+    "./format-to-html": "./src/templates/html/format.tsx",
+    "./content": "./src/utils/content.ts",
+    "./types": "./src/types.ts",
+    "./utils": "./src/utils/transform.ts",
+    "./currency": "./src/utils/currency.ts",
+    "./recurring": "./src/utils/recurring.ts"
+  },
+  "dependencies": {
+    "@midday/ui": "workspace:*",
+    "@midday/utils": "workspace:*",
+    "@react-pdf/renderer": "catalog:",
+    "date-fns": "catalog:",
+    "jose": "catalog:",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.6"
+  }
+}

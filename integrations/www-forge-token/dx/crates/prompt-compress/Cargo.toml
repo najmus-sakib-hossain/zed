@@ -1,0 +1,10 @@
+[package]
+name = "prompt-compress"
+version.workspace = true
+edition.workspace = true
+description = "Rule-based prompt compression — 15-40% savings on verbose text"
+
+[dependencies]
+dx-core = { workspace = true }
+regex-lite = { workspace = true }
+async-trait = { workspace = true }

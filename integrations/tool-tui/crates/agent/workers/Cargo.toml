@@ -1,0 +1,28 @@
+[package]
+name = "dx-agent-workers"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX Agent worker runtime - IPC transport, process management, and health monitoring"
+
+[dependencies]
+dx-agent-protocol = { path = "../protocol" }
+dx-agent-sandbox = { workspace = true }
+
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+bytes = { workspace = true }
+chrono = { workspace = true }
+tokio = { workspace = true }
+dashmap = { workspace = true }
+tracing = "0.1"
+uuid = { version = "1", features = ["v4", "serde"] }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["full", "test-util"] }
+
+[lints]
+workspace = true

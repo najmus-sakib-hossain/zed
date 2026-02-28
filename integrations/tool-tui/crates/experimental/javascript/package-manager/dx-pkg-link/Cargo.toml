@@ -1,0 +1,23 @@
+[package]
+name = "dx-pkg-link"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+thiserror = "2.0"
+
+# Reflink support (copy-on-write)
+reflink-copy = "0.1"
+
+# Parallel operations
+rayon = "1.8"
+walkdir = "2"
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tempfile = "3"

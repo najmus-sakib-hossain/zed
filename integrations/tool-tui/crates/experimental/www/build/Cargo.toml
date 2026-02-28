@@ -1,0 +1,41 @@
+[package]
+name = "dx-www-build"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "build"
+path = "src/lib.rs"
+
+[dependencies]
+# Error handling
+thiserror.workspace = true
+anyhow.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+
+# Hashing for cache keys
+blake3.workspace = true
+
+# File system operations
+walkdir = "2.4"
+
+# Path manipulation
+pathdiff = "0.2"
+
+# Icon processing
+dx-icon = { path = "../../../icon" }
+
+# Regex for parsing
+regex = "1.10"
+once_cell = "1.19"
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile = "3.8"
+dx-style = { path = "../../../style" }

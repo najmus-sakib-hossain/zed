@@ -1,0 +1,10 @@
+[package]
+name = "dx-pkg-vite-plugin"
+version = "0.0.1"
+edition = "2024"
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+dx-pkg-resolve = { path = "../dx-pkg-resolve" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

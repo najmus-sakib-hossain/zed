@@ -1,0 +1,31 @@
+# Exclude build artifacts
+target/
+Cargo.lock
+
+# Exclude version control
+.git/
+.gitignore
+
+# Exclude logs and temporary files
+logs/
+*.log
+
+# Exclude documentation and examples (not needed for build)
+docs/
+examples/
+tests/
+scripts/
+
+# Exclude VS Code extension
+vscode-forge/
+
+# Exclude environment files
+.env
+.env.example
+
+# Exclude other unnecessary files
+.dx/
+*.md
+LICENSE
+CONTRIBUTING.md
+USAGE.md

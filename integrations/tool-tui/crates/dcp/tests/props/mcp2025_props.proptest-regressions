@@ -1,0 +1,10 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 63c28f89bb471f92b1a133bb462ddf087a3b2b448476733a062dd99fe0780230 # shrinks to annotations = Annotations { audience: None, priority: Some(0.49162344760412924) }
+cc 99a5533d76a8f9fceb52deeb7305bf9375894676d197be72ee1c6ee10b3e8d1e # shrinks to uri = "file:///a", subscribers = ["-", "-"]
+cc 7d9cebee19d0165fa7da9e1a4799b267711d4d5280ca1a8b05cb956bc13854c5 # shrinks to roots = [Root { uri: "file:////", name: None }, Root { uri: "file:////", name: None }]
+cc 1d3624a13744023ab8f48033a5372aebc6b71455875425f800eed551838ff2b1 # shrinks to roots = [Root { uri: "file:///l", name: Some(" ") }, Root { uri: "file:///l", name: None }]

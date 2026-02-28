@@ -1,0 +1,13 @@
+[package]
+name = "video-temporal-merge"
+version.workspace = true
+edition.workspace = true
+description = "ToMe-style temporal token merging for video — reduces per-frame tokens"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+image = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

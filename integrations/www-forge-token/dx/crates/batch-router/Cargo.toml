@@ -1,0 +1,12 @@
+[package]
+name = "batch-router"
+version.workspace = true
+edition.workspace = true
+description = "Batch API routing — 50% cost discount on background tasks"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

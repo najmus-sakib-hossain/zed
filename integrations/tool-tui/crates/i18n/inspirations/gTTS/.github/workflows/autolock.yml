@@ -1,0 +1,16 @@
+name: 'Lock Inactive Issues'
+
+on:
+  schedule:
+    # Every day at 6 AM
+    - cron: '0 6 * * *'
+
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dessant/lock-threads@v5
+        with:
+          github-token: ${{ github.token }}
+          issue-inactive-days: '15'
+          process-only: 'issues'

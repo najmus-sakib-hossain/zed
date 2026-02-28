@@ -1,0 +1,17 @@
+[package]
+name = "dx-py-entangled"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Cross-process shared objects (Entangled Objects) for DX-Py runtime"
+
+[dependencies]
+memmap2.workspace = true
+parking_lot.workspace = true
+uuid.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile.workspace = true

@@ -1,0 +1,29 @@
+[package]
+name = "dx-py-jit"
+description = "Tiered JIT Compiler with Cranelift Backend for DX-Py-Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+cranelift-codegen.workspace = true
+cranelift-frontend.workspace = true
+cranelift-jit.workspace = true
+cranelift-module.workspace = true
+cranelift-native.workspace = true
+dashmap.workspace = true
+parking_lot.workspace = true
+thiserror.workspace = true
+
+dx-py-bytecode = { path = "../dx-py-bytecode" }
+dx-py-core = { path = "../dx-py-core" }
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+tempfile.workspace = true
+
+[[bench]]
+name = "jit_benchmarks"
+harness = false

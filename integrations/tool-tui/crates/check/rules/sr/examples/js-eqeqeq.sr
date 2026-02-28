@@ -1,0 +1,4 @@
+rule:7[language              = js category=suspicious severity=warn fixable=true recommended=true description=Require the use of === and !== instead of == and !=. Strict equality operators prevent type coercion bugs. docs url=https://dx.dev/rules/eqeqeq]
+$left_                       = = $right Use '===' instead of '==' Replace with strict equality $left === $right full both
+$left_!                      = $right Use '!==' instead of '!=' Replace with strict inequality $left !== $right full both
+examples:2[incorrect         = if \(x == null\) {} if \(x != 0\) {} if \(a == b\) {} while \(count != 10\) {} correct=if \(x === null\) {} if \(x !== 0\) {} if \(a === b\) {} while \(count !== 10\) {}]

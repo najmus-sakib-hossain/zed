@@ -1,0 +1,339 @@
+
+# Implementation Plan: DX-JS Runtime Production Ready
+
+## Overview
+
+This implementation plan transforms the DX-JS runtime from a prototype into a production-ready JavaScript execution environment. The tasks are organized to build incrementally, with each phase validating core functionality before moving to the next. Property-based tests are integrated alongside implementation to catch bugs early.
+
+## Tasks
+
+- Memory Safety and Initialization Fixes
+- 1.1 Implement zero-initialization in Arena_Allocator-Modify `runtime/src/runtime/memory.rs` to zero-fill allocated memory
+- Use `alloc_zeroed` or explicit memset after allocation
+- Requirements: 1.1
+- 1.2 Write property test for memory zero-initialization-Property 1: Memory Zero-Initialization
+- Validates: Requirements 1.1
+- 1.3 Add thread-safe synchronization to String_Interner-Wrap string interner in `RwLock` or use `dashmap` for concurrent access
+- Modify `runtime/src/value/string.rs`
+- Requirements: 1.2
+- 1.4 Write property test for thread-safe string interner-Property 2: Thread-Safe String Interner
+- Validates: Requirements 1.2
+- 1.5 Fix unsafe lifetime extension in ZeroCopyReader-Remove `unsafe { std::mem::transmute }` to 'static lifetime
+- Use proper lifetime bounds or owned data
+- Modify `runtime/src/zero_copy/mod.rs`
+- Requirements: 1.3
+- 1.6 Add UTF-8 validation to string allocation-Validate UTF-8 in `RuntimeHeap::allocate_string`
+- Return error for invalid sequences
+- Requirements: 1.5
+- 1.7 Write property test for UTF-8 validation-Property 5: UTF-8 String Validation
+- Validates: Requirements 1.5
+- Checkpoint
+- Memory Safety
+- Ensure all memory safety tests pass
+- Run MIRI on unsafe code blocks
+- Ask the user if questions arise
+- Error Handling and Exception System
+- 3.1 Implement proper exception types-Create `JsErrorType` enum with TypeError, ReferenceError, SyntaxError, RangeError
+- Modify `runtime/src/error.rs`
+- Requirements: 2.1
+- 3.2 Implement stack trace capture-Capture call stack on exception throw
+- Store source locations from SourceSpan
+- Modify exception handling in `runtime/src/compiler/codegen.rs`
+- Requirements: 2.2
+- 3.3 Write property test for stack trace preservation-Property 7: Stack Trace Preservation
+- Validates: Requirements 2.2
+- 3.4 Replace NaN returns with proper exceptions-Audit all `return f64::NAN` in error paths
+- Replace with exception throwing
+- Requirements: 2.3
+- 3.5 Write property test for error propagation-Property 8: Error Propagation (No Silent NaN)
+- Validates: Requirements 2.3
+- 3.6 Implement null/undefined property access TypeError-Add null/undefined check in `builtin_get_property_dynamic`
+- Throw TypeError with descriptive message
+- Requirements: 2.4, 14.1, 14.2
+- 3.7 Write property test for null/undefined property access-Property 9: Null/Undefined Property Access
+- Validates: Requirements 2.4, 14.1, 14.2
+- 3.8 Implement BigInt division by zero RangeError-Check for zero divisor in `builtin_bigint_div` and `builtin_bigint_mod`
+- Throw RangeError instead of returning NaN
+- Requirements: 2.6
+- Checkpoint
+- Error Handling
+- Ensure all error handling tests pass
+- Verify stack traces contain source locations
+- Ask the user if questions arise
+- Loop and Control Flow Completeness
+- 5.1 Verify loop variable updates with Cranelift Variable system-Ensure `def_var`/`use_var` pattern is used consistently
+- Test i++, i--, i+=n patterns
+- Requirements: 3.1, 3.2
+- 5.2 Write property test for loop variable correctness-Property 10: Loop Variable Correctness
+- Validates: Requirements 3.1, 3.2, 3.3
+- 5.3 Implement labeled break/continue-Track label stack during MIR lowering
+- Generate correct jump targets for labeled statements
+- Modify `runtime/src/compiler/statements.rs`
+- Requirements: 3.6
+- 5.4 Write property test for break/continue targeting ✓ PBT PASSED (12 tests)-Property 11: Break/Continue Targeting
+- Validates: Requirements 3.4, 3.5, 3.6
+- 5.5 Verify phi node handling in conditionals-Test variable modification in if/else branches
+- Ensure correct value at join point
+- Requirements: 3.7
+- Verified: Cranelift Variable system with def_var/use_var pattern handles phi nodes automatically
+- 5.6 Write property test for phi node value merging ✓ PBT PASSED (13 tests)-Property 12: Phi Node Value Merging
+- Validates: Requirements 3.7
+- Checkpoint
+- Control Flow
+- Ensure all loop and control flow tests pass
+- Test nested loops with break/continue
+- Ask the user if questions arise
+- Type Coercion Implementation
+- 7.1 Implement loose equality (==) per ECMAScript spec-Handle type coercion rules for all type combinations
+- Modify comparison handling in codegen
+- Requirements: 4.1
+- 7.2 Implement strict equality (===) without coercion-Compare types first, then values
+- Requirements: 4.2
+- 7.3 Write property test for equality semantics-Property 13: Equality Operator Semantics
+- Validates: Requirements 4.1, 4.2
+- 7.4 Implement ToBoolean conversion-Handle falsy values: 0, "", null, undefined, NaN, false
+- Requirements: 4.4
+- 7.5 Implement ToNumber conversion-Handle string to number, boolean to number, null/undefined
+- Requirements: 4.5
+- 7.6 Implement ToString conversion-Handle number to string, boolean to string, null/undefined
+- Requirements: 4.6
+- 7.7 Write property test for type coercion-Property 14: Type Coercion Semantics
+- Validates: Requirements 4.4, 4.5, 4.6
+- 7.8 Implement string concatenation with + operator-Detect string operand and switch to concatenation
+- Requirements: 4.3
+- 7.9 Write property test for string concatenation-Property 15: String Concatenation
+- Validates: Requirements 4.3
+- 7.10 Implement BigInt/Number type checking-Throw TypeError for arithmetic mixing
+- Allow comparison operations
+- Requirements: 4.7
+- 7.11 Write property test for BigInt/Number interaction-Property 16: BigInt/Number Interaction
+- Validates: Requirements 4.7
+- Checkpoint
+- Type Coercion ✓ ALL TESTS PASSED (37 tests)
+- Ensure all type coercion tests pass
+- Test edge cases (NaN, Infinity, empty string)
+- Ask the user if questions arise
+- [-] 9. Async/Await Implementation
+- 9.1 Implement async function wrapper-Create Promise on async function call
+- Set up state machine for suspension
+- Modify `CreateAsyncFunction` instruction handling
+- Requirements: 5.1
+- 9.2 Implement await suspension mechanism-Save execution state on await
+- Register callback for Promise resolution
+- Resume execution when Promise settles
+- Requirements: 5.2
+- 9.3 Implement await rejection handling-Throw rejection reason as exception on rejected Promise
+- Requirements: 5.3
+- 9.4 Write property test for async function Promise return-Property 17: Async Function Promise Return
+- Validates: Requirements 5.1, 5.4, 5.5
+- 9.5 Write property test for await suspension-Property 18: Await Suspension
+- Validates: Requirements 5.2, 5.3
+- 9.6 Implement Promise.all-Wait for all promises, return array of results
+- Reject on first rejection
+- Requirements: 5.6
+- 9.7 Implement Promise.race-Resolve/reject with first settled promise
+- Requirements: 5.7
+- 9.8 Write property test for Promise.all/race-Property 19: Promise.all/race Semantics
+- Validates: Requirements 5.6, 5.7
+- Checkpoint
+- Async/Await
+- Ensure all async tests pass
+- Test error propagation through async boundaries
+- Ask the user if questions arise
+- [-] 11. Class Implementation
+- 11.1 Implement class instantiation with new-Create instance object with prototype
+- Call constructor with correct this binding
+- Modify `CreateClass` instruction handling
+- Requirements: 6.1, 6.2
+- 11.2 Implement prototype chain for inheritance-Set up proto chain for extends
+- Handle instanceof correctly
+- Requirements: 6.3
+- 11.3 Write property test for class instantiation-Property 20: Class Instantiation
+- Validates: Requirements 6.1, 6.2, 6.3
+- PBT PASSED (14 tests)
+- 11.4 Implement super() constructor call-Call parent constructor with correct this
+- Handle TDZ for this before super()
+- Requirements: 6.4
+- 11.5 Implement super.method() calls-Look up method on parent prototype
+- Call with current this binding
+- Requirements: 6.5
+- 11.6 Write property test for super calls-Property 21: Super Call Semantics
+- Validates: Requirements 6.4, 6.5
+- 11.7 Implement static methods-Attach methods to class constructor
+- Requirements: 6.6
+- 11.8 Write property test for static methods-Property 22: Static Method Attachment
+- Validates: Requirements 6.6
+- 11.9 Implement getters and setters-Define accessor properties on prototype
+- Invoke on property access/assignment
+- Requirements: 6.7
+- 11.10 Write property test for getters/setters-Property 23: Getter/Setter Invocation
+- Validates: Requirements 6.7
+- 11.11 Implement private fields (#field)-Store private fields separately from public properties
+- Throw TypeError on external access
+- Requirements: 6.8
+- 11.12 Write property test for private fields-Property 24: Private Field Encapsulation
+- Validates: Requirements 6.8
+- Checkpoint
+- Classes
+- Ensure all class tests pass
+- Test inheritance chains
+- Ask the user if questions arise
+- Destructuring Implementation
+- 13.1 Implement array destructuring-Extract elements by index
+- Handle default values for undefined
+- Requirements: 7.1, 7.3
+- 13.2 Implement object destructuring-Extract properties by name
+- Handle default values for undefined
+- Requirements: 7.2, 7.3
+- 13.3 Write property test for destructuring extraction-Property 25: Destructuring Extraction
+- Validates: Requirements 7.1, 7.2, 7.3
+- 13.4 Implement rest elements in array destructuring-Collect remaining elements into array
+- Requirements: 7.4
+- 13.5 Implement rest properties in object destructuring-Collect remaining properties into object
+- Requirements: 7.5
+- 13.6 Implement nested destructuring-Recursively extract from nested structures
+- Requirements: 7.6
+- 13.7 Write property test for rest patterns-Property 26: Rest Pattern Collection
+- Validates: Requirements 7.4, 7.5, 7.6
+- 13.8 Implement destructuring null/undefined error-Throw TypeError when destructuring null/undefined
+- Requirements: 7.7
+- 13.9 Write property test for destructuring errors-Property 27: Destructuring Null/Undefined Error
+- Validates: Requirements 7.7
+- Checkpoint
+- Destructuring
+- Ensure all destructuring tests pass
+- Test deeply nested patterns
+- Ask the user if questions arise
+- Template Literal Implementation
+- 15.1 Implement template literal interpolation-Evaluate expressions in ${...}
+- Concatenate with string parts
+- Requirements: 8.1
+- 15.2 Preserve multiline template literals-Keep line breaks in template strings
+- Requirements: 8.2
+- 15.3 Write property test for template interpolation-Property 28: Template Literal Interpolation
+- Validates: Requirements 8.1, 8.2
+- 15.4 Implement tagged templates-Call tag function with strings array and values
+- Requirements: 8.3
+- 15.5 Write property test for tagged templates-Property 29: Tagged Template Invocation
+- Validates: Requirements 8.3
+- Generator Implementation
+- 16.1 Implement generator function creation-Return generator object without executing body
+- Set up state machine
+- Requirements: 9.1
+- 16.2 Implement next() method-Execute until yield, return {value, done}
+- Requirements: 9.2, 9.3
+- 16.3 Implement generator completion-Return {value: undefined, done: true} when finished
+- Requirements: 9.4
+- 16.4 Write property test for generator state machine ✓ PBT PASSED (12 tests)-Property 30: Generator State Machine
+- Validates: Requirements 9.1, 9.2, 9.3, 9.4
+- 16.5 Implement next(value) send-Pass value as yield expression result
+- Requirements: 9.5
+- 16.6 Implement throw() method-Throw error inside generator
+- Requirements: 9.6
+- 16.7 Implement return() method-Complete generator with given value
+- Requirements: 9.7
+- 16.8 Write property test for generator send/throw/return ✓ PBT PASSED (14 tests)-Property 31: Generator Send/Throw/Return
+- Validates: Requirements 9.5, 9.6, 9.7
+- Checkpoint
+- Generators
+- Ensure all generator tests pass
+- Test generator with try/finally
+- Ask the user if questions arise
+- Spread Operator Implementation
+- 18.1 Implement array spread [...arr]-Expand iterable elements into array
+- Requirements: 10.1
+- 18.2 Implement function call spread f(...args)-Expand arguments array
+- Requirements: 10.2
+- 18.3 Implement object spread {...obj}-Copy enumerable properties
+- Requirements: 10.3
+- 18.4 Write property test for spread expansion-Property 32: Spread Operator Expansion
+- Validates: Requirements 10.1, 10.2, 10.3
+- 18.5 Implement spread error handling-TypeError for non-iterable in array context
+- Skip null/undefined in object context
+- Requirements: 10.4, 10.5
+- 18.6 Write property test for spread errors-Property 33: Spread Error Handling
+- Validates: Requirements 10.4, 10.5
+- Module System Completeness
+- 19.1 Implement module caching-Cache loaded modules by specifier
+- Return cached instance on re-import
+- Requirements: 11.5
+- 19.2 Implement circular dependency handling-Handle partial exports during circular import
+- Requirements: 11.3
+- 19.3 Write property test for module loading-Property 34: Module Loading and Caching
+- Validates: Requirements 11.1, 11.2, 11.5
+- 19.4 Write property test for circular dependencies-Property 35: Circular Dependency Handling
+- Validates: Requirements 11.3
+- 19.5 Complete dynamic import() implementation-Return Promise resolving to module namespace
+- Requirements: 11.4
+- 19.6 Write property test for dynamic import-Property 36: Dynamic Import Promise
+- Validates: Requirements 11.4
+- 19.7 Implement import.meta-Provide url and other metadata
+- Requirements: 11.6
+- Checkpoint
+- Modules
+- Ensure all module tests pass
+- Test complex dependency graphs
+- Ask the user if questions arise
+- Optimization Passes
+- 21.1 Implement constant folding-Evaluate constant expressions at compile time
+- Requirements: 12.1
+- 21.2 Write property test for constant folding-Property 37: Constant Folding
+- Validates: Requirements 12.1
+- 21.3 Implement dead code elimination-Remove unreachable code after return
+- Remove false branches of constant conditions
+- Requirements: 12.2
+- 21.4 Write property test for dead code elimination-Property 38: Dead Code Elimination
+- Validates: Requirements 12.2
+- 21.5 Implement code caching-Cache compiled code by source hash
+- Reuse cached code on subsequent runs
+- Requirements: 12.5
+- Built-in Object Completeness
+- 22.1 Complete Array methods-Implement map, filter, reduce, forEach, find, findIndex, some, every, includes
+- Requirements: 13.1
+- 22.2 Write property test for Array methods-Property 40: Array Method Correctness
+- Validates: Requirements 13.1
+- 22.3 Complete String methods-Implement split, slice, substring, substr, indexOf, lastIndexOf, includes, startsWith, endsWith
+- Requirements: 13.2
+- 22.4 Write property test for String methods-Property 41: String Method Correctness
+- Validates: Requirements 13.2
+- 22.5 Complete Object methods-Implement keys, values, entries, assign, freeze, seal
+- Requirements: 13.3
+- 22.6 Complete Math methods-Implement pow, min, max, round, trunc, sign, log, exp
+- Requirements: 13.4
+- 22.7 Complete JSON methods-Verify JSON.parse and JSON.stringify work correctly
+- Requirements: 13.5, 13.6
+- 22.8 Write property test for JSON round-trip-Property 39: JSON Round-Trip
+- Validates: Requirements 13.5, 13.6
+- 22.9 Implement Date object-Basic Date constructor and methods
+- Requirements: 13.7
+- 22.10 Implement RegExp-Basic regex matching with test, exec, match
+- Requirements: 13.8
+- Null Safety and Defensive Programming
+- 23.1 Implement non-callable TypeError-Check callee is function before call
+- Requirements: 14.3
+- 23.2 Write property test for non-callable error-Property 42: Non-Callable Error
+- Validates: Requirements 14.3
+- 23.3 Implement non-constructor TypeError-Check constructor before new
+- Requirements: 14.4
+- 23.4 Write property test for non-constructor error-Property 43: Non-Constructor Error
+- Validates: Requirements 14.4
+- 23.5 Verify IEEE 754 special value handling-Test NaN and Infinity propagation
+- Requirements: 14.5, 14.6
+- 23.6 Write property test for IEEE 754 handling-Property 44: IEEE 754 Special Values
+- Validates: Requirements 14.5, 14.6
+- Final Checkpoint
+- Production Ready
+- Ensure all tests pass
+- Run full test suite including property tests
+- Run MIRI on all unsafe code
+- Document any remaining limitations
+- Ask the user if questions arise
+
+## Notes
+
+- All tasks including property-based tests are required for comprehensive coverage
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
+- The Cranelift Variable system fix (Task 5.1) is already partially implemented from previous work

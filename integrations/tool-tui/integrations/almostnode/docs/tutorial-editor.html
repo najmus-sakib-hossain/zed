@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial: Editor + Preview — almostnode docs</title>
+  <meta name="description" content="Build a file editor with live Next.js preview in a cross-origin sandboxed iframe using almostnode.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://almostnode.dev/docs/tutorial-editor.html">
+  <meta property="og:title" content="Tutorial: Editor + Preview — almostnode docs">
+  <meta property="og:description" content="Build a file editor with live Next.js preview in a cross-origin sandboxed iframe using almostnode.">
+  <meta property="og:image" content="https://almostnode.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tutorial: Editor + Preview — almostnode docs">
+  <meta name="twitter:description" content="Build a file editor with live Next.js preview in a cross-origin sandboxed iframe using almostnode.">
+  <meta name="twitter:image" content="https://almostnode.dev/og-image.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <label class="menu-toggle" for="sidebar-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </label>
+  <a href="../" class="topbar-logo"><span>almostnode</span></a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-section">Docs</span>
+  <ul class="topbar-links">
+    <li><a href="https://github.com/macaly/almostnode">GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/almostnode">npm</a></li>
+  </ul>
+</div>
+
+<input type="checkbox" id="sidebar-check">
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-label">Guide</div>
+      <a href="./">Getting Started</a>
+      <a href="./core-concepts.html">Core Concepts</a>
+      <a href="./security.html">Security</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Frameworks</div>
+      <a href="./nextjs-guide.html">Next.js</a>
+      <a href="./vite-guide.html">Vite</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Tutorials</div>
+      <a href="./tutorial-editor.html" class="active">Editor + Preview</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Reference</div>
+      <a href="./api-reference.html">API Reference</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Tutorial: Editor + Next.js Preview</h1>
+    <p class="lead">Build a file editor with tabs, a live Next.js preview in an iframe, and HMR — step by step. Then lock it down with a cross-origin sandbox for production.</p>
+
+    <h2>What We're Building</h2>
+    <p>A two-panel layout: a code editor on the left (textarea with file tabs) and a live Next.js preview on the right (iframe). When you edit a file and save, the preview updates instantly via Hot Module Replacement — no full page reload.</p>
+
+    <p>The architecture looks like this:</p>
+    <pre class="arch"><code>
+  ┌─────────────────────┐     ┌──────────────────────────┐
+  │   Your App (Editor) │     │   Preview (iframe)       │
+  │                     │     │                          │
+  │  textarea ──write──►│VFS  │  /__virtual__/3000/      │
+  │                     │  │  │                          │
+  │                     │  │  │  Next.js HTML + React    │
+  │                     │  ▼  │                          │
+  │  NextDevServer ─────┼──┼──│  HMR via postMessage     │
+  │                     │  │  │                          │
+  └─────────────────────┘  │  └──────────────────────────┘
+                           │
+                    Service Worker
+                  (intercepts fetch)
+    </code></pre>
+
+    <p>The <strong>VirtualFS</strong> stores your files in memory. The <strong>NextDevServer</strong> transforms JSX/TSX and serves HTML. The <strong>Service Worker</strong> intercepts <code>fetch</code> requests to <code>/__virtual__/3000/</code> and routes them to the dev server. The <strong>iframe</strong> loads the dev server URL and receives HMR updates via <code>postMessage</code>.</p>
+
+    <div class="callout">
+      <div class="callout-title">Live example</div>
+      <p>See the finished result at <a href="../examples/editor-tutorial.html"><code>/examples/editor-tutorial.html</code></a>. Run <code>npm run dev</code> and open it in your browser.</p>
+    </div>
+
+    <h2>Step 1: HTML Scaffolding</h2>
+    <p>Start with a two-column layout — an editor panel on the left and a preview panel on the right:</p>
+
+    <pre><code><span class="op">&lt;</span><span class="kw">div</span> class<span class="op">=</span><span class="str">"container"</span><span class="op">&gt;</span>
+  <span class="cm">&lt;!-- Left: Editor --&gt;</span>
+  <span class="op">&lt;</span><span class="kw">div</span> class<span class="op">=</span><span class="str">"editor-panel"</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="kw">div</span> id<span class="op">=</span><span class="str">"file-tabs"</span><span class="op">&gt;&lt;/</span><span class="kw">div</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="kw">textarea</span> id<span class="op">=</span><span class="str">"editor"</span><span class="op">&gt;&lt;/</span><span class="kw">textarea</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="kw">button</span> id<span class="op">=</span><span class="str">"start-btn"</span><span class="op">&gt;</span>Start Preview<span class="op">&lt;/</span><span class="kw">button</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="kw">button</span> id<span class="op">=</span><span class="str">"save-btn"</span><span class="op">&gt;</span>Save<span class="op">&lt;/</span><span class="kw">button</span><span class="op">&gt;</span>
+  <span class="op">&lt;/</span><span class="kw">div</span><span class="op">&gt;</span>
+
+  <span class="cm">&lt;!-- Right: Preview --&gt;</span>
+  <span class="op">&lt;</span><span class="kw">div</span> class<span class="op">=</span><span class="str">"preview-panel"</span><span class="op">&gt;</span>
+    <span class="op">&lt;</span><span class="kw">iframe</span> id<span class="op">=</span><span class="str">"preview-frame"</span><span class="op">&gt;&lt;/</span><span class="kw">iframe</span><span class="op">&gt;</span>
+  <span class="op">&lt;/</span><span class="kw">div</span><span class="op">&gt;</span>
+<span class="op">&lt;/</span><span class="kw">div</span><span class="op">&gt;</span></code></pre>
+
+    <p>The file tabs will be generated dynamically based on your project's files. The textarea is our simple editor — you can swap it for CodeMirror or Monaco later.</p>
+
+    <h2>Step 2: Set Up the Virtual Filesystem</h2>
+    <p>Create a <code>VirtualFS</code> and populate it with a Next.js App Router project:</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+
+<span class="cm">// Create directories</span>
+vfs<span class="op">.</span><span class="fn">mkdirSync</span><span class="op">(</span><span class="str">'/app'</span><span class="op">,</span> <span class="op">{</span> recursive<span class="op">:</span> <span class="kw">true</span> <span class="op">});</span>
+vfs<span class="op">.</span><span class="fn">mkdirSync</span><span class="op">(</span><span class="str">'/app/about'</span><span class="op">,</span> <span class="op">{</span> recursive<span class="op">:</span> <span class="kw">true</span> <span class="op">});</span>
+
+<span class="cm">// Root layout</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/layout.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function RootLayout({ children }) {
+    return (
+      &lt;html&gt;
+        &lt;body&gt;
+          &lt;nav&gt;
+            &lt;a href="/"&gt;Home&lt;/a&gt;
+            &lt;a href="/about"&gt;About&lt;/a&gt;
+          &lt;/nav&gt;
+          &lt;main&gt;{children}&lt;/main&gt;
+        &lt;/body&gt;
+      &lt;/html&gt;
+    );
+  }
+`</span><span class="op">);</span>
+
+<span class="cm">// Home page with client-side interactivity</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/page.tsx'</span><span class="op">,</span> <span class="str">`
+  'use client';
+  import { useState } from 'react';
+
+  export default function Home() {
+    const [count, setCount] = useState(0);
+    return (
+      &lt;div&gt;
+        &lt;h1&gt;Welcome!&lt;/h1&gt;
+        &lt;p&gt;Count: {count}&lt;/p&gt;
+        &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;+&lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+`</span><span class="op">);</span>
+
+<span class="cm">// About page</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/about/page.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function About() {
+    return &lt;h1&gt;About&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span></code></pre>
+
+    <p>The VFS stores everything in memory — no disk I/O, no server. Files written here are what the Next.js dev server will serve.</p>
+
+    <h2>Step 3: Start the Next.js Dev Server</h2>
+    <p>Three things are needed: a <code>NextDevServer</code>, a <code>ServerBridge</code> with its Service Worker, and a registration that connects them:</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> NextDevServer <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/next'</span><span class="op">;</span>
+<span class="kw">import</span> <span class="op">{</span> <span class="fn">getServerBridge</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="cm">// 1. Create the dev server</span>
+<span class="kw">const</span> devServer <span class="op">=</span> <span class="kw">new</span> <span class="fn">NextDevServer</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span> port<span class="op">:</span> <span class="num">3000</span><span class="op">,</span> root<span class="op">:</span> <span class="str">'/'</span> <span class="op">});</span>
+
+<span class="cm">// 2. Initialize the Service Worker bridge</span>
+<span class="kw">const</span> bridge <span class="op">=</span> <span class="fn">getServerBridge</span><span class="op">();</span>
+<span class="kw">await</span> bridge<span class="op">.</span><span class="fn">initServiceWorker</span><span class="op">();</span>
+
+<span class="cm">// 3. Register the server on a port</span>
+bridge<span class="op">.</span><span class="fn">registerServer</span><span class="op">(</span>devServer<span class="op">,</span> <span class="num">3000</span><span class="op">);</span>
+
+<span class="cm">// 4. Start the server (enables file watching for HMR)</span>
+devServer<span class="op">.</span><span class="fn">start</span><span class="op">();</span>
+
+<span class="cm">// 5. Get the URL to load in the iframe</span>
+<span class="kw">const</span> serverUrl <span class="op">=</span> bridge<span class="op">.</span><span class="fn">getServerUrl</span><span class="op">(</span><span class="num">3000</span><span class="op">);</span>
+<span class="cm">// → "http://localhost:5173/__virtual__/3000"</span></code></pre>
+
+    <p>The Service Worker intercepts all requests to <code>/__virtual__/3000/*</code> and forwards them to the <code>NextDevServer</code> which transforms JSX, resolves routes, and returns HTML.</p>
+
+    <div class="callout">
+      <div class="callout-title">Important</div>
+      <p>You must call <code>devServer.start()</code> to enable file watching. Without it, HMR updates won't fire when you write to the VFS.</p>
+    </div>
+
+    <h2>Step 4: Display the Preview</h2>
+    <p>Point the iframe to the server URL and register it as an HMR target:</p>
+
+    <pre><code><span class="kw">const</span> iframe <span class="op">=</span> document<span class="op">.</span><span class="fn">getElementById</span><span class="op">(</span><span class="str">'preview-frame'</span><span class="op">);</span>
+
+<span class="cm">// Connect HMR when iframe loads</span>
+iframe<span class="op">.</span>onload <span class="op">=</span> <span class="op">()</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">)</span> <span class="op">{</span>
+    devServer<span class="op">.</span><span class="fn">setHMRTarget</span><span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">);</span>
+  <span class="op">}</span>
+<span class="op">};</span>
+
+<span class="cm">// Load the preview</span>
+iframe<span class="op">.</span>src <span class="op">=</span> serverUrl <span class="op">+</span> <span class="str">'/'</span><span class="op">;</span></code></pre>
+
+    <p><code>setHMRTarget()</code> tells the dev server where to send HMR updates via <code>postMessage</code>. The iframe's <code>contentWindow</code> receives these messages and React Refresh applies the changes without losing component state.</p>
+
+    <div class="callout">
+      <div class="callout-title">Important</div>
+      <p>You must call <code>setHMRTarget()</code> inside the iframe's <code>onload</code> handler. The <code>contentWindow</code> reference changes every time the iframe navigates, so you need to re-register it.</p>
+    </div>
+
+    <h2>Step 5: Wire Up the Editor</h2>
+    <p>The editor needs two things: file tab switching and saving files to the VFS (which triggers HMR).</p>
+
+    <h3>File Tab Switching</h3>
+    <pre><code><span class="kw">const</span> files <span class="op">=</span> <span class="op">[</span>
+  <span class="op">{</span> path<span class="op">:</span> <span class="str">'/app/page.tsx'</span><span class="op">,</span> label<span class="op">:</span> <span class="str">'page.tsx'</span> <span class="op">},</span>
+  <span class="op">{</span> path<span class="op">:</span> <span class="str">'/app/layout.tsx'</span><span class="op">,</span> label<span class="op">:</span> <span class="str">'layout.tsx'</span> <span class="op">},</span>
+  <span class="op">{</span> path<span class="op">:</span> <span class="str">'/app/about/page.tsx'</span><span class="op">,</span> label<span class="op">:</span> <span class="str">'about/page.tsx'</span> <span class="op">},</span>
+<span class="op">];</span>
+
+<span class="kw">let</span> currentFile <span class="op">=</span> files<span class="op">[</span><span class="num">0</span><span class="op">].</span>path<span class="op">;</span>
+
+<span class="kw">function</span> <span class="fn">loadFile</span><span class="op">(</span>path<span class="op">)</span> <span class="op">{</span>
+  editor<span class="op">.</span>value <span class="op">=</span> vfs<span class="op">.</span><span class="fn">readFileSync</span><span class="op">(</span>path<span class="op">,</span> <span class="str">'utf8'</span><span class="op">);</span>
+  currentFile <span class="op">=</span> path<span class="op">;</span>
+<span class="op">}</span></code></pre>
+
+    <h3>Saving Files (Triggers HMR)</h3>
+    <pre><code><span class="kw">function</span> <span class="fn">saveFile</span><span class="op">()</span> <span class="op">{</span>
+  vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span>currentFile<span class="op">,</span> editor<span class="op">.</span>value<span class="op">);</span>
+  <span class="cm">// HMR triggers automatically — the dev server watches the VFS</span>
+<span class="op">}</span>
+
+<span class="cm">// Keyboard shortcut</span>
+editor<span class="op">.</span><span class="fn">addEventListener</span><span class="op">(</span><span class="str">'keydown'</span><span class="op">,</span> <span class="op">(</span>e<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">((</span>e<span class="op">.</span>ctrlKey <span class="op">||</span> e<span class="op">.</span>metaKey<span class="op">)</span> <span class="op">&amp;&amp;</span> e<span class="op">.</span>key <span class="op">===</span> <span class="str">'s'</span><span class="op">)</span> <span class="op">{</span>
+    e<span class="op">.</span><span class="fn">preventDefault</span><span class="op">();</span>
+    <span class="fn">saveFile</span><span class="op">();</span>
+  <span class="op">}</span>
+<span class="op">});</span></code></pre>
+
+    <p>That's it — writing to the VFS is the only trigger needed. The <code>NextDevServer</code> watches the VFS for changes and sends HMR updates to the iframe automatically.</p>
+
+    <h3>Listening for HMR Events</h3>
+    <p>You can listen for HMR events to show feedback (e.g., a toast notification):</p>
+
+    <pre><code>devServer<span class="op">.</span><span class="fn">on</span><span class="op">(</span><span class="str">'hmr-update'</span><span class="op">,</span> <span class="op">(</span>update<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">'HMR update:'</span><span class="op">,</span> update<span class="op">.</span>path<span class="op">);</span>
+  showToast<span class="op">(</span><span class="str">'Updated!'</span><span class="op">);</span>
+<span class="op">});</span></code></pre>
+
+    <h2>Step 6: Cross-Origin Sandbox</h2>
+    <p>Everything above runs on the <strong>same origin</strong> — the editor and the preview share cookies, localStorage, and DOM access. This is fine for demos, but dangerous if users can edit arbitrary code.</p>
+
+    <div class="callout">
+      <div class="callout-title">Warning</div>
+      <p>If the preview iframe runs on the same origin as your app, user-written code can access your app's cookies, auth tokens, and localStorage. For any user-facing editor, <strong>always use a cross-origin sandbox</strong>.</p>
+    </div>
+
+    <h3>How Cross-Origin Isolation Works</h3>
+    <p>Deploy the preview on a <strong>different origin</strong> (different domain, subdomain, or port). The browser's same-origin policy then prevents the iframe from accessing your app's storage:</p>
+
+    <pre class="arch"><code>
+  Your app:    https://myapp.com        ← cookies, auth, localStorage
+  Sandbox:     https://sandbox.myapp.com ← isolated, no access to myapp.com
+    </code></pre>
+
+    <table>
+      <tr><th>Resource</th><th>Same origin</th><th>Cross-origin sandbox</th></tr>
+      <tr><td>Cookies</td><td>Shared</td><td>Blocked</td></tr>
+      <tr><td>localStorage</td><td>Shared</td><td>Blocked</td></tr>
+      <tr><td>IndexedDB</td><td>Shared</td><td>Blocked</td></tr>
+      <tr><td>DOM access</td><td>Accessible</td><td>Blocked</td></tr>
+      <tr><td>Network requests</td><td>Unrestricted</td><td>Unrestricted (add CSP to restrict)</td></tr>
+    </table>
+
+    <h3>Setting Up the Sandbox</h3>
+    <p>The sandbox needs its own Service Worker and HTML page. Use <code>generateSandboxFiles()</code> to create them:</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">generateSandboxFiles</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+<span class="kw">import</span> fs <span class="kw">from</span> <span class="str">'fs'</span><span class="op">;</span>
+
+<span class="kw">const</span> files <span class="op">=</span> <span class="fn">generateSandboxFiles</span><span class="op">();</span>
+
+fs<span class="op">.</span><span class="fn">mkdirSync</span><span class="op">(</span><span class="str">'sandbox'</span><span class="op">,</span> <span class="op">{</span> recursive<span class="op">:</span> <span class="kw">true</span> <span class="op">});</span>
+<span class="kw">for</span> <span class="op">(</span><span class="kw">const</span> <span class="op">[</span>name<span class="op">,</span> content<span class="op">]</span> <span class="kw">of</span> Object<span class="op">.</span><span class="fn">entries</span><span class="op">(</span>files<span class="op">))</span> <span class="op">{</span>
+  fs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">`sandbox/${name}`</span><span class="op">,</span> content<span class="op">);</span>
+<span class="op">}</span>
+
+<span class="cm">// Deploy to a separate origin:</span>
+<span class="cm">// cd sandbox && vercel --prod</span></code></pre>
+
+    <h3>Connecting Your Editor to the Sandbox</h3>
+    <p>Instead of running the dev server on the same page, the cross-origin sandbox runs almostnode inside the iframe. Communication happens via <code>postMessage</code>:</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS<span class="op">,</span> <span class="fn">createRuntime</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+
+<span class="cm">// Point to your deployed sandbox</span>
+<span class="kw">const</span> runtime <span class="op">=</span> <span class="kw">await</span> <span class="fn">createRuntime</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span>
+  sandbox<span class="op">:</span> <span class="str">'https://sandbox.myapp.com'</span><span class="op">,</span>
+<span class="op">});</span>
+
+<span class="cm">// The runtime handles VFS sync and postMessage automatically</span>
+<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> runtime<span class="op">.</span><span class="fn">execute</span><span class="op">(</span>code<span class="op">);</span></code></pre>
+
+    <h3>Local Development</h3>
+    <p>For local testing, run the sandbox on a different port:</p>
+
+    <pre><code><span class="cm"># Terminal 1: Your editor app</span>
+npm run dev          <span class="cm"># → http://localhost:5173</span>
+
+<span class="cm"># Terminal 2: Sandbox</span>
+npm run sandbox      <span class="cm"># → http://localhost:3002</span></code></pre>
+
+    <p>Then configure the sandbox URL:</p>
+    <pre><code><span class="kw">const</span> runtime <span class="op">=</span> <span class="kw">await</span> <span class="fn">createRuntime</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span>
+  sandbox<span class="op">:</span> <span class="str">'http://localhost:3002/sandbox/'</span><span class="op">,</span>
+<span class="op">});</span></code></pre>
+
+    <p>For the full sandbox deployment guide (Vercel, Nginx, Express, CORS headers), see the <a href="./security.html">Security &amp; Sandbox</a> docs.</p>
+
+    <h2>Complete Code</h2>
+    <p>Here's the full working example in a single <code>&lt;script&gt;</code> block. This is the same-origin version — see Step 6 above for the cross-origin production setup.</p>
+
+    <pre><code><span class="op">&lt;</span>script type<span class="op">=</span><span class="str">"module"</span><span class="op">&gt;</span>
+<span class="kw">import</span> <span class="op">{</span> VirtualFS <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+<span class="kw">import</span> <span class="op">{</span> NextDevServer <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/next'</span><span class="op">;</span>
+<span class="kw">import</span> <span class="op">{</span> <span class="fn">getServerBridge</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="cm">// ── State ──</span>
+<span class="kw">let</span> vfs<span class="op">,</span> devServer<span class="op">,</span> serverUrl<span class="op">;</span>
+<span class="kw">let</span> currentFile <span class="op">=</span> <span class="str">'/app/page.tsx'</span><span class="op">;</span>
+
+<span class="kw">const</span> editor <span class="op">=</span> document<span class="op">.</span><span class="fn">getElementById</span><span class="op">(</span><span class="str">'editor'</span><span class="op">);</span>
+<span class="kw">const</span> iframe <span class="op">=</span> document<span class="op">.</span><span class="fn">getElementById</span><span class="op">(</span><span class="str">'preview-frame'</span><span class="op">);</span>
+
+<span class="kw">const</span> files <span class="op">=</span> <span class="op">[</span>
+  <span class="op">{</span> path<span class="op">:</span> <span class="str">'/app/page.tsx'</span><span class="op">,</span> label<span class="op">:</span> <span class="str">'page.tsx'</span> <span class="op">},</span>
+  <span class="op">{</span> path<span class="op">:</span> <span class="str">'/app/layout.tsx'</span><span class="op">,</span> label<span class="op">:</span> <span class="str">'layout.tsx'</span> <span class="op">},</span>
+  <span class="op">{</span> path<span class="op">:</span> <span class="str">'/app/about/page.tsx'</span><span class="op">,</span> label<span class="op">:</span> <span class="str">'about/page.tsx'</span> <span class="op">},</span>
+<span class="op">];</span>
+
+<span class="cm">// ── 1. Set up VFS with project files ──</span>
+vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+vfs<span class="op">.</span><span class="fn">mkdirSync</span><span class="op">(</span><span class="str">'/app/about'</span><span class="op">,</span> <span class="op">{</span> recursive<span class="op">:</span> <span class="kw">true</span> <span class="op">});</span>
+
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/layout.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function RootLayout({ children }) {
+    return &lt;html&gt;&lt;body&gt;{children}&lt;/body&gt;&lt;/html&gt;;
+  }
+`</span><span class="op">);</span>
+
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/page.tsx'</span><span class="op">,</span> <span class="str">`
+  'use client';
+  import { useState } from 'react';
+  export default function Home() {
+    const [count, setCount] = useState(0);
+    return &lt;div&gt;&lt;h1&gt;Hello!&lt;/h1&gt;&lt;p&gt;{count}&lt;/p&gt;
+      &lt;button onClick={() =&gt; setCount(c =&gt; c+1)}&gt;+&lt;/button&gt;&lt;/div&gt;;
+  }
+`</span><span class="op">);</span>
+
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/about/page.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function About() {
+    return &lt;h1&gt;About&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span>
+
+<span class="cm">// ── 2. Load file into editor ──</span>
+<span class="kw">function</span> <span class="fn">loadFile</span><span class="op">(</span>path<span class="op">)</span> <span class="op">{</span>
+  editor<span class="op">.</span>value <span class="op">=</span> vfs<span class="op">.</span><span class="fn">readFileSync</span><span class="op">(</span>path<span class="op">,</span> <span class="str">'utf8'</span><span class="op">);</span>
+  currentFile <span class="op">=</span> path<span class="op">;</span>
+<span class="op">}</span>
+
+<span class="cm">// ── 3. Save file (triggers HMR automatically) ──</span>
+<span class="kw">function</span> <span class="fn">saveFile</span><span class="op">()</span> <span class="op">{</span>
+  vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span>currentFile<span class="op">,</span> editor<span class="op">.</span>value<span class="op">);</span>
+<span class="op">}</span>
+
+editor<span class="op">.</span><span class="fn">addEventListener</span><span class="op">(</span><span class="str">'keydown'</span><span class="op">,</span> <span class="op">(</span>e<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">((</span>e<span class="op">.</span>ctrlKey <span class="op">||</span> e<span class="op">.</span>metaKey<span class="op">)</span> <span class="op">&amp;&amp;</span> e<span class="op">.</span>key <span class="op">===</span> <span class="str">'s'</span><span class="op">)</span> <span class="op">{</span>
+    e<span class="op">.</span><span class="fn">preventDefault</span><span class="op">();</span>
+    <span class="fn">saveFile</span><span class="op">();</span>
+  <span class="op">}</span>
+<span class="op">});</span>
+
+<span class="cm">// ── 4. Start dev server and preview ──</span>
+<span class="kw">async function</span> <span class="fn">start</span><span class="op">()</span> <span class="op">{</span>
+  devServer <span class="op">=</span> <span class="kw">new</span> <span class="fn">NextDevServer</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span> port<span class="op">:</span> <span class="num">3000</span><span class="op">,</span> root<span class="op">:</span> <span class="str">'/'</span> <span class="op">});</span>
+  devServer<span class="op">.</span><span class="fn">start</span><span class="op">();</span> <span class="cm">// Enable file watching for HMR</span>
+
+  <span class="kw">const</span> bridge <span class="op">=</span> <span class="fn">getServerBridge</span><span class="op">();</span>
+  <span class="kw">await</span> bridge<span class="op">.</span><span class="fn">initServiceWorker</span><span class="op">();</span>
+  bridge<span class="op">.</span><span class="fn">registerServer</span><span class="op">(</span>devServer<span class="op">,</span> <span class="num">3000</span><span class="op">);</span>
+
+  serverUrl <span class="op">=</span> bridge<span class="op">.</span><span class="fn">getServerUrl</span><span class="op">(</span><span class="num">3000</span><span class="op">)</span> <span class="op">+</span> <span class="str">'/'</span><span class="op">;</span>
+
+  devServer<span class="op">.</span><span class="fn">on</span><span class="op">(</span><span class="str">'hmr-update'</span><span class="op">,</span> <span class="op">(</span>u<span class="op">)</span> <span class="op">=&gt;</span> console<span class="op">.</span><span class="fn">log</span><span class="op">(</span><span class="str">'HMR:'</span><span class="op">,</span> u<span class="op">.</span>path<span class="op">));</span>
+
+  iframe<span class="op">.</span>onload <span class="op">=</span> <span class="op">()</span> <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="kw">if</span> <span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">)</span>
+      devServer<span class="op">.</span><span class="fn">setHMRTarget</span><span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">);</span>
+  <span class="op">};</span>
+  iframe<span class="op">.</span>src <span class="op">=</span> serverUrl<span class="op">;</span>
+<span class="op">}</span>
+
+<span class="fn">loadFile</span><span class="op">(</span>currentFile<span class="op">);</span>
+document<span class="op">.</span><span class="fn">getElementById</span><span class="op">(</span><span class="str">'start-btn'</span><span class="op">).</span><span class="fn">addEventListener</span><span class="op">(</span><span class="str">'click'</span><span class="op">,</span> start<span class="op">);</span>
+<span class="op">&lt;/</span>script<span class="op">&gt;</span></code></pre>
+
+    <h2>Next Steps</h2>
+    <ul>
+      <li><strong>Upgrade the editor</strong> — Swap the textarea for <a href="https://codemirror.net/">CodeMirror</a> or <a href="https://microsoft.github.io/monaco-editor/">Monaco Editor</a> for syntax highlighting, autocomplete, and proper indentation.</li>
+      <li><strong>Add a URL bar</strong> — Let users navigate between routes. See the <a href="../examples/next-demo.html">full Next.js demo</a> for an implementation.</li>
+      <li><strong>Install npm packages</strong> — Use <code>PackageManager</code> from almostnode to install packages at runtime. See the <a href="./api-reference.html">API Reference</a>.</li>
+      <li><strong>Deploy the sandbox</strong> — Follow the <a href="./security.html">Security &amp; Sandbox</a> guide to deploy a cross-origin sandbox for production.</li>
+    </ul>
+
+    <div class="page-nav">
+      <a href="./nextjs-guide.html">
+        <div class="label">Previous</div>
+        <div class="title">Next.js Guide</div>
+      </a>
+      <a href="./api-reference.html" class="next">
+        <div class="label">Next</div>
+        <div class="title">API Reference</div>
+      </a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

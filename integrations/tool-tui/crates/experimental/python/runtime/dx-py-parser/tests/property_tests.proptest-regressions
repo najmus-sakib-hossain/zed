@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc cd105c2720fea4e7389c6558590da8f6096e2b8096f90340591f9f242fc85035 # shrinks to expr = BinOp { left: Name { id: "a", location: Location { line: 1, column: 1, offset: 0 } }, op: Add, right: Compare { left: Name { id: "a", location: Location { line: 1, column: 1, offset: 0 } }, ops: [Eq], comparators: [Name { id: "a", location: Location { line: 1, column: 1, offset: 0 } }], location: Location { line: 1, column: 1, offset: 0 } }, location: Location { line: 1, column: 1, offset: 0 } }

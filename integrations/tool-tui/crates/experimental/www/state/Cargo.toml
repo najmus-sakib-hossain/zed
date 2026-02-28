@@ -1,0 +1,37 @@
+[package]
+name = "dx-www-state"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Binary state management - memory slots with dirty tracking"
+keywords = ["wasm", "web", "state", "dx", "reactive"]
+categories = ["wasm", "web-programming"]
+
+[lib]
+name = "dx_www_state"
+path = "src/lib.rs"
+
+[dependencies]
+# Zero-copy casting
+bytemuck = { version = "1.14", features = ["derive"] }
+
+# Atomic operations
+atomic = "0.6"
+
+# Fast mutexes (server-side only)
+parking_lot = { version = "0.12", optional = true }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+
+# Internal
+dx-www-packet = { workspace = true, features = ["std"], optional = true }
+
+[features]
+default = ["std"]
+std = ["dx-www-packet", "parking_lot"]
+
+[dev-dependencies]
+criterion = "0.5"

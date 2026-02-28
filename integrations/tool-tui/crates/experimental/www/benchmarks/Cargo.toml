@@ -1,0 +1,44 @@
+[package]
+name = "dx-www-benchmarks"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Benchmark suite for dx-www framework"
+publish = false
+
+[dependencies]
+# Internal crates to benchmark
+dx-www-binary = { path = "../binary" }
+dx-www-server = { path = "../server" }
+dx-www-packet = { path = "../packet", features = ["std"] }
+dx-www-compiler = { path = "../core" }
+
+# Crypto for HTIP signing
+ed25519-dalek = { workspace = true }
+
+# Hashing
+blake3 = { workspace = true }
+
+# Criterion for benchmarks
+criterion = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[[bench]]
+name = "htip_benchmarks"
+harness = false
+
+[[bench]]
+name = "delta_benchmarks"
+harness = false
+
+[[bench]]
+name = "ssr_benchmarks"
+harness = false
+
+[[bench]]
+name = "parser_benchmarks"
+harness = false

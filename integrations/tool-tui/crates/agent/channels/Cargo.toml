@@ -1,0 +1,52 @@
+[package]
+name = "dx-agent-channels"
+version.workspace = true
+edition.workspace = true
+description = "Messaging channel integrations for DX Agent (Telegram, Discord, Slack, WhatsApp)"
+license.workspace = true
+
+[features]
+default = ["telegram", "discord", "slack"]
+telegram = ["dep:teloxide"]
+discord = ["dep:serenity"]
+slack = ["dep:reqwest"]
+whatsapp = []
+teams = ["dep:reqwest"]
+google-chat = ["dep:reqwest"]
+signal = []
+all-channels = ["telegram", "discord", "slack", "whatsapp", "teams", "google-chat", "signal"]
+
+[dependencies]
+dx-agent-protocol = { path = "../protocol" }
+
+# Async
+tokio = { workspace = true }
+async-trait = "0.1"
+futures-util = "0.3"
+tokio-tungstenite = { workspace = true }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Error handling
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = "0.1"
+
+# Utils
+chrono = { workspace = true }
+uuid = { version = "1", features = ["v4", "serde"] }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+toml = "0.8"
+
+# HTTP client (for Slack and general webhook)
+reqwest = { workspace = true, features = ["json"], optional = true }
+
+# Native Rust channel implementations
+teloxide = { version = "0.13", features = ["macros"], optional = true }
+serenity = { version = "0.12", features = ["client", "gateway", "model", "framework"], optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

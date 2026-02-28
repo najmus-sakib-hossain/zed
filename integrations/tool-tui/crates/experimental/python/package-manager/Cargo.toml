@@ -1,0 +1,34 @@
+[workspace]
+resolver = "2"
+members = [
+    "dx-py-core",
+    "dx-py-package-manager",
+    "dx-py-compat",
+    "dx-py-cli",
+    "dx-py-store",
+    "dx-py-layout",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dx-py/dx-py"
+
+[workspace.dependencies]
+# Core dependencies
+thiserror = "1.0"
+bytemuck = { version = "1.14", features = ["derive"] }
+blake3 = "1.5"
+memmap2 = "0.9"
+dashmap = "5.5"
+hex = "0.4"
+junction = "1.0"
+pubgrub = "0.2"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+
+# Testing
+proptest = "1.4"
+tempfile = "3.10"

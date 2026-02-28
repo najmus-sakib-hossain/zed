@@ -1,0 +1,418 @@
+
+# Implementation Plan: DX-JS Production Complete
+
+## Overview
+
+This implementation plan addresses all 42 identified weaknesses in dx-js to achieve production readiness. The plan is organized into 7 phases spanning 18 weeks, with each task building incrementally on previous work.
+
+## Tasks
+
+### Phase 1: Runtime Foundation (Weeks 1-4)
+
+- Implement Proper Value Representation
+- 1.1 Create NaN-boxed Value type with all JS types-Implement Value struct with NaN-boxing for f64, i32, bool, null, undefined, pointers
+- Add type checking methods (is_number, is_string, is_object, etc.)
+- Add conversion methods (to_string, to_number, to_boolean)
+- Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
+- 1.2 Write property test for type coercion-Property 8: Type Coercion Consistency
+- Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
+- 1.3 Implement GcRef smart pointer for heap objects-Create GcRef with proper lifetime tracking
+- Implement Deref and Drop traits
+- Add write barrier support
+- Requirements: 2.1, 2.2
+- Implement Garbage Collector
+- 2.1 Create GcHeap with generational collection-Implement young generation (nursery) arena
+- Implement old generation arena
+- Add allocation methods for all object types
+- Requirements: 2.1, 2.2, 2.4, 2.5, 2.6
+- 2.2 Write property test for GC safety-Property 2: Garbage Collection Safety
+- Validates: Requirements 2.1, 2.2, 2.6
+- 2.3 Implement mark-and-sweep collection-Add root set tracking
+- Implement mark phase with tricolor marking
+- Implement sweep phase
+- Requirements: 2.1, 2.2
+- 2.4 Remove all Box::leak usage from runtime-Audit simple_exec_ultra.rs for memory leaks
+- Replace leaked strings with GC-managed strings
+- Requirements: 2.3
+- Implement Correct Expression Evaluation
+- 3.1 Create expression evaluator with Pratt parsing-Implement precedence climbing algorithm
+- Handle all binary operators with correct precedence
+- Handle all unary operators
+- Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6
+- 3.2 Write property test for expression evaluation-Property 1: Expression Evaluation Correctness
+- Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6
+- 3.3 Implement short-circuit evaluation for && and ||-Add early return for falsy left operand in &&
+- Add early return for truthy left operand in ||
+- Requirements: 3.4
+- 3.4 Implement nullish coalescing (??) operator-Return left if not null/undefined, else right
+- Requirements: 3.4
+- Implement Control Flow
+- 4.1 Implement if/else statements-Parse and execute if statements
+- Handle else and else-if chains
+- Requirements: 1.5
+- 4.2 Implement for/while/do-while loops-Parse and execute all loop types
+- Handle break and continue
+- Requirements: 1.5
+- 4.3 Implement switch statements-Parse and execute switch with case/default
+- Handle fall-through behavior
+- Requirements: 1.5
+- 4.4 Write property test for control flow-Property: Control flow executes correct branches
+- Validates: Requirements 1.5
+- Checkpoint
+- Phase 1 Complete
+- All 322 tests pass across all test files
+- GC memory management verified
+- Expression evaluation verified
+
+### Phase 2: Runtime Completion (Weeks 5-8)
+
+- Implement Functions and Closures
+- 6.1 Implement function declarations and expressions-Parse function syntax (via OXC parser)
+- Create Function objects with CreateFunction instruction
+- Handle parameters and return values
+- Requirements: 1.4
+- 6.2 Implement closures with captured variables-Track captured variables during parsing (find_captured_variables)
+- Create closure environment on function creation
+- Access captured variables during execution (GetCaptured/SetCaptured)
+- Requirements: 1.4
+- 6.3 Implement arrow functions-Parse arrow function syntax
+- Handle lexical this binding (is_arrow flag)
+- Requirements: 1.4
+- 6.4 Write property test for function behavior-Property: Functions return correct values for all inputs
+- Validates: Requirements 1.4
+- Created runtime/tests/function_property_tests.rs with 24 tests
+- Implement Classes and Inheritance
+- 7.1 Implement class declarations-Parse class syntax with constructor and methods (via OXC parser)
+- Create class prototype chain (CreateClass, GetPrototype instructions)
+- Requirements: 1.8
+- 7.2 Implement class inheritance with extends-Handle super() calls in constructor (CallSuper instruction)
+- Set up prototype chain for inheritance (SetPrototype instruction)
+- Requirements: 1.8
+- 7.3 Implement static methods and properties-Parse static keyword
+- Attach to class object instead of prototype (DefineMethod with is_static)
+- Requirements: 1.8
+- 7.4 Implement getters and setters-Parse get/set syntax
+- Create property descriptors (DefineGetter, DefineSetter instructions)
+- Requirements: 1.8
+- 7.5 Write property tests for class behavior-Created runtime/tests/class_property_tests.rs with 19 tests
+- Implement Event Loop
+- 8.1 Create EventLoop with microtask and macrotask queues-Implement VecDeque for both queues
+- Add timer heap for setTimeout/setInterval
+- Requirements: 5.1, 5.2, 5.7
+- 8.2 Write property test for event loop ordering-Property 3: Event Loop Ordering
+- Validates: Requirements 5.7
+- Created runtime/tests/event_loop_property_tests.rs with 13 tests
+- 8.3 Implement setTimeout and setInterval-Add timer scheduling
+- Handle timer cancellation with clearTimeout/clearInterval
+- Requirements: 5.1, 5.2
+- 8.4 Implement queueMicrotask-Add to microtask queue
+- Process before next macrotask
+- Requirements: 5.7
+- Implement Promises and Async/Await
+- 9.1 Implement Promise constructor and methods-Create Promise with executor function
+- Implement then, catch, finally
+- Implement Promise.resolve, Promise.reject, Promise.all, Promise.race
+- Requirements: 5.3, 5.4
+- 9.2 Implement async functions-Parse async function syntax
+- Return Promise from async function
+- Requirements: 5.4
+- 9.3 Implement await expression-Pause execution at await
+- Resume when promise resolves
+- Handle rejection with try/catch
+- Requirements: 5.4
+- 9.4 Write property test for async behavior-Property: Async operations complete in correct order
+- Validates: Requirements 5.3, 5.4, 5.7
+- Checkpoint
+- Phase 2 Complete
+- Ensure all tests pass, ask the user if questions arise.
+- Verify async code executes correctly
+- Verify classes work with inheritance
+
+### Phase 3: Module System (Weeks 9-10)
+
+- Implement ES Module Loading
+- 11.1 Create ModuleLoader with resolution-Implement specifier resolution (relative, absolute, bare)
+- Handle package.json exports field
+- Requirements: 1.7
+- 11.2 Write property test for module resolution-Property 4: Module Resolution Determinism
+- Validates: Requirements 1.7
+- 11.3 Implement module parsing and linking-Parse import/export declarations
+- Build module graph
+- Link modules in correct order
+- Requirements: 1.7
+- 11.4 Implement dynamic import()-Parse import() expression
+- Return Promise that resolves to module namespace
+- Requirements: 29.1, 29.2
+- Implement CommonJS Compatibility
+- 12.1 Implement require() function-Resolve module path
+- Execute module and cache exports
+- Requirements: 18.1
+- 12.2 Implement module.exports and exports-Create module object with exports property
+- Handle exports reassignment
+- Requirements: 18.1
+- 12.3 Handle ESM/CJS interop-Import CJS from ESM
+- Require ESM from CJS (with limitations)
+- Requirements: 18.1
+- Implement Node.js Core Module Stubs
+- 13.1 Implement fs module (basic operations)-readFile, writeFile, readdir, stat, mkdir, rm
+- Both sync and async versions
+- Requirements: 18.1
+- 13.2 Implement path module-join, resolve, dirname, basename, extname, parse
+- Requirements: 18.2
+- 13.3 Implement process object-env, argv, cwd, exit, platform, arch
+- Requirements: 18.1
+- 13.4 Implement other core modules-http (basic server/client)
+- crypto (basic hashing)
+- events (EventEmitter)
+- child_process (spawn, exec)
+- Requirements: 18.3, 18.4, 18.5, 18.6
+- Checkpoint
+- Phase 3 Complete
+- Ensure all tests pass, ask the user if questions arise.
+- Verify modules load and execute correctly
+- Verify Node.js APIs work for basic use cases
+
+### Phase 4: Bundler Improvements (Weeks 11-12)
+
+- Implement Tree Shaking
+- 15.1 Create TreeShaker with export analysis-Build module graph with import/export relationships
+- Track which exports are used
+- Requirements: 6.3
+- 15.2 Write property test for tree shaking-Property 5: Tree Shaking Correctness
+- Validates: Requirements 6.3
+- 15.3 Implement dead code elimination-Remove unused exports from output
+- Handle side-effect modules
+- Requirements: 6.3
+- Implement Source Map Generation
+- 16.1 Create SourceMapGenerator-Implement VLQ encoding
+- Track source positions through transforms
+- Requirements: 7.1, 7.4
+- 16.2 Write property test for source map round-trip-Property 6: Source Map Round-Trip
+- Validates: Requirements 7.1, 7.2
+- 16.3 Fix bundler pipeline to generate source maps-Replace `source_map: None` with actual generation
+- Merge source maps from multiple modules
+- Requirements: 7.1, 7.2, 7.3
+- Implement Code Splitting
+- 17.1 Detect dynamic imports for split points-Parse import() expressions
+- Mark as chunk boundaries
+- Requirements: 6.5, 29.1
+- 17.2 Generate separate chunks-Create chunk for each dynamic import
+- Handle shared dependencies
+- Requirements: 6.5
+- 17.3 Generate chunk loading runtime-Emit runtime code to load chunks
+- Handle chunk caching
+- Requirements: 6.5, 29.2
+- Implement CSS Bundling
+- 18.1 Parse CSS imports in JavaScript-Detect import './style.css'
+- Extract CSS content
+- Requirements: 6.6, 30.1
+- 18.2 Bundle CSS into output-Concatenate CSS files
+- Handle CSS modules (scoped class names)
+- Requirements: 6.6, 30.3
+- 18.3 Handle asset imports-Copy images/fonts to output directory
+- Rewrite URLs in CSS
+- Requirements: 30.2, 30.4
+- Checkpoint
+- Phase 4 Complete
+- All 40 dx-bundle-core tests pass
+- Tree shaking, code splitting, CSS bundling implemented
+- Source map generation verified
+
+### Phase 5: Package Manager Improvements (Weeks 13-14)
+
+- Implement Lifecycle Scripts
+- 20.1 Create ScriptExecutor-Execute shell commands in package directory
+- Set up npm_* environment variables
+- Requirements: 8.1, 8.2, 8.5
+- 20.2 Write property test for script execution-Property: Lifecycle scripts run in correct order
+- Validates: Requirements 8.1, 8.2, 8.5
+- 20.3 Integrate scripts into install pipeline-Run preinstall before extraction
+- Run install/postinstall after extraction
+- Run prepare for git dependencies
+- Requirements: 8.1, 8.2, 8.3, 8.4
+- Implement Private Registry Support
+- 21.1 Parse.npmrc configuration-Read registry URLs
+- Read auth tokens
+- Handle scoped registries
+- Requirements: 9.1, 9.2, 9.3
+- 21.2 Add authentication to registry requests-Add Authorization header with token
+- Support npm token and basic auth
+- Requirements: 9.2, 9.4
+- Implement Workspace Support
+- 22.1 Discover workspace packages-Parse workspaces field in package.json
+- Glob pattern matching for workspace paths
+- Requirements: 10.1
+- 22.2 Link workspace packages-Create symlinks for local packages
+- Handle workspace: protocol in dependencies
+- Requirements: 10.2, 10.3
+- 22.3 Implement
+- filter flag for scripts-Filter packages by name pattern
+- Run scripts in filtered packages
+- Requirements: 10.4
+- 22.4 Write property test for workspace handling-Property: Workspace dependencies resolve to local packages
+- Validates: Requirements 10.1, 10.2, 10.3
+- Implement Additional Package Manager Features
+- 23.1 Implement dx run
+- Execute script from package.json
+- Support pre/post hooks
+- Requirements: 19.1, 19.5
+- 23.2 Implement bin linking-Link package bin entries to node_modules/.bin
+- Make binaries executable
+- Requirements: 19.2
+- 23.3 Implement dx exec and dx dlx-Run commands with node_modules/.bin in PATH
+- Download and run packages without installing
+- Requirements: 19.3, 19.4
+- 23.4 Implement global installation-Install to global directory
+- Link binaries to system PATH
+- Requirements: 20.1, 20.2, 20.3, 20.4
+- 23.5 Implement peer dependency handling-Auto-install peer dependencies
+- Warn on conflicts
+- Requirements: 26.1, 26.2, 26.3, 26.4
+- 23.6 Implement multiple package add-Parse multiple package names from command line
+- Resolve all together
+- Requirements: 27.1, 27.2
+- Implement Lockfile Integrity
+- 24.1 Add SHA-512 integrity hashes to lockfile-Calculate hash during download
+- Store in lockfile
+- Requirements: 23.3
+- 24.2 Write property test for lockfile reproducibility-Property 7: Lockfile Reproducibility
+- Validates: Requirements 23.1, 23.3
+- 24.3 Verify integrity on install-Check hash before using cached package
+- Fail with clear error on mismatch
+- Requirements: 23.1, 23.2
+- Checkpoint
+- Phase 5 Complete
+- Ensure all tests pass, ask the user if questions arise.
+- Verify lifecycle scripts run for real packages
+- Verify workspaces work with monorepo projects
+
+### Phase 6: Test Runner Improvements (Weeks 15-16)
+
+- Implement Mocking and Spying
+- 26.1 Implement jest.fn() mock functions-Track calls with arguments
+- Support mockReturnValue, mockImplementation
+- Requirements: 11.3, 11.5
+- 26.2 Write property test for mock behavior-Property 9: Test Isolation
+- Validates: Requirements 11.1, 11.2, 11.3
+- 26.3 Implement jest.spyOn()-Wrap existing function
+- Track calls while preserving behavior
+- Requirements: 11.2
+- 26.4 Implement jest.mock() for modules-Replace module exports with mocks
+- Support factory function
+- Requirements: 11.1
+- 26.5 Implement timer mocks-jest.useFakeTimers()
+- jest.advanceTimersByTime()
+- jest.runAllTimers()
+- Requirements: 11.4
+- Implement Code Coverage
+- 27.1 Implement code instrumentation-Insert counters at statement boundaries
+- Track branch coverage
+- Requirements: 12.1
+- 27.2 Write property test for coverage accuracy-Property 10: Coverage Accuracy
+- Validates: Requirements 12.2, 12.3, 12.4
+- 27.3 Generate coverage reports-Calculate line, branch, function percentages
+- Generate HTML, JSON, LCOV formats
+- Requirements: 12.2, 12.3, 12.4, 12.6
+- 27.4 Implement coverage thresholds-Parse
+- coverage-threshold option
+- Fail if below threshold
+- Requirements: 12.5
+- Implement Snapshot Testing
+- 28.1 Implement toMatchSnapshot()-Serialize value to snapshot format
+- Compare with stored snapshot
+- Requirements: 13.1
+- 28.2 Write property test for snapshot determinism-Property 11: Snapshot Determinism
+- Validates: Requirements 13.1, 13.2
+- 28.3 Implement snapshot storage-Store in snapshots directory
+- Name files based on test file
+- Requirements: 13.5
+- 28.4 Implement snapshot updating---updateSnapshot flag
+- Interactive update mode
+- Requirements: 13.4
+- 28.5 Implement snapshot diff display-Show diff on mismatch
+- Colorized output
+- Requirements: 13.3
+- Checkpoint
+- Phase 6 Complete
+- Ensure all tests pass, ask the user if questions arise.
+- Verify mocking works for real test suites
+- Verify coverage reports are accurate
+
+### Phase 7: Polish and Documentation (Weeks 17-18)
+
+- Remove Unsafe Code Patterns
+- 30.1 Replace all static mut with proper synchronization-Use Mutex, RwLock, or atomic types
+- Remove RUNTIME_HEAP static mut
+- Requirements: 15.1, 32.1
+- 30.2 Replace all.unwrap() with proper error handling-Return Result types
+- Provide meaningful error messages
+- Requirements: 16.4, 32.2
+- 30.3 Replace all panic!() with recoverable errors-Return Err instead of panicking
+- Note: All panic!() calls are in test code, which is acceptable
+- Requirements: 32.3
+- 30.4 Audit and document all unsafe blocks-Add safety comments
+- Minimize unsafe scope
+- Requirements: 32.4
+- Unify Runtime Architecture
+- 31.1 Remove simple_exec.rs and simple_exec_ultra.rs-Delete legacy interpreter files
+- Requirements: 33.1
+- 31.2 Use JIT compiler as primary execution path-Route all execution through Cranelift JIT
+- Requirements: 33.2
+- 31.3 Enable all #[ignore] tests-Fix underlying issues (fixed Math builtin detection in lower_call_expression)
+- Remove ignore attributes
+- Requirements: 42.4
+- Implement Remaining Features
+- 32.1 Implement REPL mode-Start REPL when no file argument
+- Maintain state between evaluations
+- Requirements: 36.1, 36.2, 36.3, 36.4
+- 32.2 Implement debugger support---inspect flag to start debug server
+- Chrome DevTools Protocol support
+- Requirements: 35.1, 35.2, 35.3, 35.4
+- 32.3 Implement.env file loading-Load.env,.env.local,.env.production
+- Populate process.env
+- Requirements: 40.1, 40.2, 40.3, 40.4
+- 32.4 Implement JSON and WASM imports-Parse JSON imports
+- Instantiate WASM modules
+- Requirements: 41.1, 41.2, 41.3, 41.4
+- Update Documentation
+- 33.1 Remove false performance claims-Audit all "10x faster" claims
+- Replace with verified benchmarks
+- Requirements: 21.1
+- 33.2 Remove false compatibility claims-Audit all "100% compatible" claims
+- Document actual compatibility level
+- Requirements: 21.2
+- 33.3 Document implemented vs planned features-Create feature matrix
+- Mark experimental features
+- Requirements: 21.3
+- 33.4 Add reproducible benchmarks-Create benchmark suite
+- Document how to run
+- Requirements: 21.4, 37.1, 37.2, 37.3
+- Cross-Platform Testing
+- 34.1 Set up CI for Windows, macOS, Linux-GitHub Actions matrix
+- Requirements: 38.1
+- 34.2 Write property test for path handling-Property 12: Cross-Platform Path Handling
+- Validates: Requirements 38.2, 38.3
+- 34.3 Fix platform-specific issues-Path separators
+- Line endings
+- Requirements: 38.2, 38.3, 38.4
+- Final Checkpoint
+- Ensure all tests pass on all platforms
+- Verify >90% code coverage
+- Run full benchmark suite
+- Requirements: 42.1, 42.2, 42.3, 42.4, 42.5
+
+## Notes
+
+- All tasks including property-based tests are required for comprehensive coverage
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
+
+## Estimated Timeline
+
++-------+----------+-------+
+| Phase | Duration | Focus |
++=======+==========+=======+
+| Phase | 1        | Weeks |
++-------+----------+-------+

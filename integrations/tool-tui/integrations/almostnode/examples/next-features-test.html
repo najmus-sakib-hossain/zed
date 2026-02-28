@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Next.js Features Test Harness</title>
+    <style>
+      body { font-family: monospace; margin: 20px; background: #111; color: #eee; }
+      #status-text { font-weight: bold; }
+      #preview-frame { width: 100%; height: 500px; border: 1px solid #333; background: white; display: none; }
+      button { padding: 8px 16px; background: #0070f3; border: none; border-radius: 6px; color: white; cursor: pointer; margin: 4px; }
+      button:disabled { background: #333; cursor: not-allowed; }
+      #output { background: #000; padding: 10px; max-height: 200px; overflow-y: auto; font-size: 11px; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>Next.js Features Test Harness</h1>
+    <div>Status: <span id="status-text">Initializing...</span></div>
+    <div>
+      <button id="run-btn" disabled>Start Preview</button>
+    </div>
+    <iframe id="preview-frame"></iframe>
+    <div id="output"></div>
+
+    <script type="module">
+      import { VirtualFS, NextDevServer, createRuntime, PackageManager } from '../src/next-demo.ts';
+      import { getServerBridge } from '../src/server-bridge.ts';
+      import { Buffer } from '../src/shims/stream.ts';
+
+      const statusText = document.getElementById('status-text');
+      const runBtn = document.getElementById('run-btn');
+      const previewFrame = document.getElementById('preview-frame');
+      const outputEl = document.getElementById('output');
+
+      function log(msg) {
+        const line = document.createElement('div');
+        line.textContent = msg;
+        outputEl.appendChild(line);
+        outputEl.scrollTop = outputEl.scrollHeight;
+        console.log('[Test]', msg);
+      }
+
+      // Create VFS with all test features
+      const vfs = new VirtualFS();
+      window.__TEST_VFS = vfs;
+
+      // === Package.json ===
+      vfs.writeFileSync('/package.json', JSON.stringify({
+        name: 'next-features-test',
+        version: '1.0.0',
+        dependencies: { next: '^14.0.0', react: '^18.2.0', 'react-dom': '^18.2.0' }
+      }, null, 2));
+
+      // === CSS Module files ===
+      vfs.mkdirSync('/app', { recursive: true });
+      vfs.mkdirSync('/app/css-test', { recursive: true });
+
+      vfs.writeFileSync('/app/css-test/styles.module.css', `.title {
+  color: red;
+  font-size: 24px;
+}
+.card {
+  background: blue;
+  padding: 16px;
+  border-radius: 8px;
+}
+.active {
+  border: 2px solid green;
+}`);
+
+      vfs.writeFileSync('/app/css-test/page.jsx', `'use client';
+import React from 'react';
+import styles from './styles.module.css';
+
+export default function CssTestPage() {
+  return (
+    <div>
+      <h1 className={styles.title} id="css-title">CSS Modules Test</h1>
+      <div className={styles.card} id="css-card">This card uses CSS Module classes</div>
+      <div className={styles.active} id="css-active">Active element</div>
+      <div id="css-classes">{JSON.stringify(styles)}</div>
+    </div>
+  );
+}`);
+
+      // === App Router API Routes (route.ts) ===
+      vfs.mkdirSync('/app/api', { recursive: true });
+      vfs.mkdirSync('/app/api/hello', { recursive: true });
+      vfs.mkdirSync('/app/api/data', { recursive: true });
+
+      vfs.writeFileSync('/app/api/hello/route.js', `export async function GET(request) {
+  return new Response(JSON.stringify({ message: 'Hello from App Router API!', method: 'GET' }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
+
+export async function POST(request) {
+  const body = await request.text();
+  return new Response(JSON.stringify({ message: 'Posted!', body, method: 'POST' }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}`);
+
+      vfs.writeFileSync('/app/api/data/route.js', `export async function GET(request) {
+  const url = new URL(request.url);
+  const id = url.searchParams.get('id') || 'none';
+  return new Response(JSON.stringify({ id, items: [1, 2, 3] }), {
+    headers: { 'Content-Type': 'application/json' }
+  });
+}`);
+
+      // === Route Groups ===
+      vfs.mkdirSync('/app/(marketing)', { recursive: true });
+      vfs.mkdirSync('/app/(marketing)/about', { recursive: true });
+      vfs.mkdirSync('/app/(marketing)/pricing', { recursive: true });
+      vfs.mkdirSync('/app/(auth)', { recursive: true });
+      vfs.mkdirSync('/app/(auth)/login', { recursive: true });
+
+      vfs.writeFileSync('/app/(marketing)/about/page.jsx', `'use client';
+import React from 'react';
+export default function AboutPage() {
+  return <div><h1 id="about-heading">About Page (Marketing Group)</h1></div>;
+}`);
+
+      vfs.writeFileSync('/app/(marketing)/pricing/page.jsx', `'use client';
+import React from 'react';
+export default function PricingPage() {
+  return <div><h1 id="pricing-heading">Pricing Page</h1></div>;
+}`);
+
+      vfs.writeFileSync('/app/(auth)/login/page.jsx', `'use client';
+import React from 'react';
+export default function LoginPage() {
+  return <div><h1 id="login-heading">Login Page (Auth Group)</h1></div>;
+}`);
+
+      // === Dynamic routes with useParams ===
+      vfs.mkdirSync('/app/posts', { recursive: true });
+      vfs.mkdirSync('/app/posts/[slug]', { recursive: true });
+
+      vfs.writeFileSync('/app/posts/[slug]/page.jsx', `'use client';
+import React from 'react';
+import { useParams, usePathname } from 'next/navigation';
+
+export default function PostPage() {
+  const params = useParams();
+  const pathname = usePathname();
+  return (
+    <div>
+      <h1 id="post-heading">Post Page</h1>
+      <div id="post-params">{JSON.stringify(params)}</div>
+      <div id="post-pathname">{pathname}</div>
+    </div>
+  );
+}`);
+
+      // === loading.tsx, error.tsx, not-found.tsx ===
+      vfs.mkdirSync('/app/slow', { recursive: true });
+
+      vfs.writeFileSync('/app/slow/loading.jsx', `import React from 'react';
+export default function Loading() {
+  return <div id="loading-indicator">Loading slow page...</div>;
+}`);
+
+      vfs.writeFileSync('/app/slow/page.jsx', `'use client';
+import React from 'react';
+export default function SlowPage() {
+  return <div><h1 id="slow-heading">Slow Page Loaded</h1></div>;
+}`);
+
+      vfs.writeFileSync('/app/slow/error.jsx', `'use client';
+import React from 'react';
+export default function ErrorBoundary({ error }) {
+  return <div id="error-boundary">Error: {error?.message || 'Unknown error'}</div>;
+}`);
+
+      vfs.writeFileSync('/app/not-found.jsx', `import React from 'react';
+export default function NotFound() {
+  return <div id="not-found-page">Custom 404 - Page Not Found</div>;
+}`);
+
+      // === Root layout ===
+      vfs.writeFileSync('/app/layout.jsx', `import React from 'react';
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <head><title>Features Test</title></head>
+      <body>
+        <nav id="test-nav">
+          <a href="/">Home</a> |
+          <a href="/about">About</a> |
+          <a href="/css-test">CSS Test</a> |
+          <a href="/posts/hello-world">Post</a>
+        </nav>
+        <main id="test-main">{children}</main>
+      </body>
+    </html>
+  );
+}`);
+
+      // === Home page ===
+      vfs.writeFileSync('/app/page.jsx', `'use client';
+import React from 'react';
+
+export default function HomePage() {
+  return (
+    <div>
+      <h1 id="home-heading">Features Test Home</h1>
+      <p>Testing CSS Modules, Route Groups, API Routes, useParams, loading/error/not-found</p>
+    </div>
+  );
+}`);
+
+      // === Public files ===
+      vfs.mkdirSync('/public', { recursive: true });
+      vfs.writeFileSync('/public/favicon.ico', 'favicon placeholder');
+
+      // Expose VFS on window
+      log('VFS created with all test files');
+      statusText.textContent = 'Ready';
+      runBtn.disabled = false;
+
+      let devServer = null;
+      let devServerUrl = null;
+
+      async function doStartPreview() {
+        try {
+          runBtn.disabled = true;
+          statusText.textContent = 'Starting dev server...';
+
+          const server = new NextDevServer(vfs, { port: 3002, root: '/' });
+          devServer = server;
+          window.__TEST_SERVER = server;
+
+          const bridge = getServerBridge();
+
+          try {
+            await bridge.initServiceWorker();
+            log('Service Worker ready');
+          } catch (error) {
+            log('SW init failed: ' + error);
+          }
+
+          const httpServer = {
+            listening: true,
+            address: () => ({ port: 3002, address: '0.0.0.0', family: 'IPv4' }),
+            async handleRequest(method, url, headers, body) {
+              const bodyBuffer = body ? (typeof body === 'string' ? Buffer.from(body) : body) : undefined;
+              return server.handleRequest(method, url, headers, bodyBuffer);
+            },
+          };
+
+          bridge.registerServer(httpServer, 3002);
+          server.start();
+
+          devServerUrl = bridge.getServerUrl(3002) + '/';
+          window.__TEST_URL = devServerUrl;
+          log('Dev server URL: ' + devServerUrl);
+
+          previewFrame.style.display = 'block';
+          previewFrame.onload = () => {
+            if (devServer && previewFrame.contentWindow) {
+              devServer.setHMRTarget(previewFrame.contentWindow);
+            }
+          };
+          previewFrame.src = devServerUrl;
+
+          statusText.textContent = 'Dev server running';
+          log('Dev server running on port 3002');
+        } catch (e) {
+          statusText.textContent = 'Error: ' + e.message;
+          log('Error: ' + e.message);
+          console.error(e);
+          runBtn.disabled = false;
+        }
+      }
+
+      runBtn.addEventListener('click', doStartPreview);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,52 @@
+[submodule "submodules/rumdl"]
+	path = submodules/rumdl
+	url = https://github.com/najmus-sakib-hossain/rumdl.git
+	branch = forge
+[submodule "submodules/taplo"]
+	path = submodules/taplo
+	url = https://github.com/najmus-sakib-hossain/taplo.git
+	branch = forge
+[submodule "submodules/biome"]
+	path = submodules/biome
+	url = https://github.com/najmus-sakib-hossain/biome.git
+	branch = forge
+[submodule "submodules/oxc"]
+	path = submodules/oxc
+	url = https://github.com/najmus-sakib-hossain/oxc.git
+	branch = forge
+[submodule "submodules/ruff"]
+	path = submodules/ruff
+	url = https://github.com/najmus-sakib-hossain/ruff
+	branch = forge
+[submodule "submodules/cpp-linter-rs"]
+	path = submodules/cpp-linter-rs
+	url = https://github.com/najmus-sakib-hossain/cpp-linter-rs
+	branch = forge
+[submodule "submodules/gofmt.rs"]
+	path = submodules/gofmt.rs
+	url = https://github.com/najmus-sakib-hossain/gofmt.rs
+	branch = forge
+[submodule "submodules/gold"]
+	path = submodules/gold
+	url = https://github.com/najmus-sakib-hossain/gold
+	branch = forge
+[submodule "submodules/rustfmt"]
+	path = submodules/rustfmt
+	url = https://github.com/najmus-sakib-hossain/rustfmt
+	branch = forge
+[submodule "submodules/rust-clippy"]
+	path = submodules/rust-clippy
+	url = https://github.com/najmus-sakib-hossain/rust-clippy
+	branch = forge
+[submodule "submodules/mago"]
+	path = submodules/mago
+	url = https://github.com/najmus-sakib-hossain/mago
+	branch = forge
+[submodule "submodules/ktlint"]
+	path = submodules/ktlint
+	url = https://github.com/najmus-sakib-hossain/ktlint
+	branch = forge
+[submodule "submodules/turborepo"]
+	path = submodules/turborepo
+	url = https://github.com/najmus-sakib-hossain/turborepo
+	branch = forge

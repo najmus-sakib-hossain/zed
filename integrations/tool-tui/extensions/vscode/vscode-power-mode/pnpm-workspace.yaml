@@ -1,0 +1,29 @@
+packages: []
+catalogs:
+  build:
+    tsdown: ^0.16.0
+  cli:
+    '@vscode/vsce': ^3.6.2
+    bumpp: ^10.3.1
+    pncat: ^0.7.4
+    taze: ^19.9.0
+    vsxpub: ^0.1.2
+  lint:
+    '@antfu/eslint-config': ^6.2.0
+    eslint: ^9.39.1
+    lint-staged: ^16.2.6
+    simple-git-hooks: ^2.13.1
+  test:
+    vitest: ^4.0.7
+  tsc:
+    typescript: ^5.9.3
+  types:
+    '@types/node': ^24.10.0
+  vscode:
+    reactive-vscode: ^0.4.1
+    vscode-ext-gen: ^1.4.0
+onlyBuiltDependencies:
+  - esbuild
+  - simple-git-hooks
+  - '@vscode/vsce-sign'
+  - keytar

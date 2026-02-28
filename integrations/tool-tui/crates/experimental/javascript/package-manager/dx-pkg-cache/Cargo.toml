@@ -1,0 +1,14 @@
+[package]
+name = "dx-pkg-cache"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+tokio = { version = "1.35", features = ["full"] }
+lru = "0.12"
+bloomfilter = "1.0"
+memmap2 = "0.9"
+thiserror = "2.0"

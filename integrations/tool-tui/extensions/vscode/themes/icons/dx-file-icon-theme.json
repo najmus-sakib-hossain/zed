@@ -1,0 +1,1128 @@
+{
+  "fonts": [
+    {
+      "id": "fi",
+      "src": [
+        {
+          "path": "./fonts/file-icons.woff2",
+          "format": "woff2"
+        }
+      ],
+      "weight": "normal",
+      "style": "normal",
+      "size": "100%"
+    },
+    {
+      "id": "devicons",
+      "src": [
+        {
+          "path": "./fonts/devopicons.woff2",
+          "format": "woff2"
+        }
+      ],
+      "weight": "normal",
+      "style": "normal",
+      "size": "100%"
+    },
+    {
+      "id": "fa",
+      "src": [
+        {
+          "path": "./fonts/fontawesome.woff2",
+          "format": "woff2"
+        }
+      ],
+      "weight": "normal",
+      "style": "normal",
+      "size": "100%"
+    },
+    {
+      "id": "mf",
+      "src": [
+        {
+          "path": "./fonts/mfixx.woff2",
+          "format": "woff2"
+        }
+      ],
+      "weight": "normal",
+      "style": "normal",
+      "size": "100%"
+    },
+    {
+      "id": "octicons",
+      "src": [
+        {
+          "path": "./fonts/octicons.woff2",
+          "format": "woff2"
+        }
+      ],
+      "weight": "normal",
+      "style": "normal",
+      "size": "100%"
+    }
+  ],
+  "file": "_file",
+  "folder": "_folder",
+  "folderExpanded": "_folder_expanded",
+  "rootFolder": "_repo",
+  "iconDefinitions": {
+    "_file": {
+      "fontId": "octicons",
+      "fontCharacter": "\\f011",
+      "fontColor": "#fff",
+      "fontSize": "114%"
+    },
+    "_file_light": {
+      "fontId": "octicons",
+      "fontCharacter": "\\f011",
+      "fontColor": "#000",
+      "fontSize": "114%"
+    },
+    "_folder": {
+      "iconPath": "./macos/folder-generic.svg"
+    },
+    "_folder_light": {
+      "iconPath": "./macos/folder-generic-light.svg"
+    },
+    "_folder_expanded": {
+      "iconPath": "./macos/folder-generic.svg"
+    },
+    "_folder_expanded_light": {
+      "iconPath": "./macos/folder-generic-light.svg"
+    },
+    "_repo": {
+      "fontId": "octicons",
+      "fontCharacter": "\\f001",
+      "fontColor": "#fff",
+      "fontSize": "114%"
+    },
+    "_repo_light": {
+      "fontId": "octicons",
+      "fontCharacter": "\\f001",
+      "fontColor": "#000",
+      "fontSize": "114%"
+    },
+    "_dx": {
+      "iconPath": "./dx-file-dark.svg"
+    },
+    "_dx_light": {
+      "iconPath": "./dx-file-light.svg"
+    },
+    "_js": {
+      "fontCharacter": "\\f129",
+      "fontId": "mf"
+    },
+    "_ts": {
+      "fontCharacter": "\\2a6",
+      "fontId": "fi"
+    },
+    "_tsx": {
+      "fontCharacter": "\\e9e7",
+      "fontId": "fi"
+    },
+    "_jsx": {
+      "fontCharacter": "\\e9e6",
+      "fontId": "fi"
+    },
+    "_json": {
+      "fontCharacter": "\\eabe",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_html5": {
+      "fontCharacter": "\\f13b",
+      "fontId": "fa",
+      "fontSize": "107%"
+    },
+    "_css3": {
+      "fontCharacter": "\\f13c",
+      "fontId": "fa",
+      "fontSize": "93%"
+    },
+    "_sass": {
+      "fontCharacter": "\\e64b",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_markdown": {
+      "fontCharacter": "\\f0c9",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_python": {
+      "fontCharacter": "\\e606",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_rust": {
+      "fontCharacter": "\\e9a0",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_go": {
+      "fontCharacter": "\\eaae",
+      "fontId": "fi",
+      "fontSize": "129%"
+    },
+    "_java": {
+      "fontCharacter": "\\f126",
+      "fontId": "mf",
+      "fontSize": "114%"
+    },
+    "_c": {
+      "fontCharacter": "\\f106",
+      "fontId": "mf",
+      "fontSize": "93%"
+    },
+    "_cpp": {
+      "fontCharacter": "\\f10b",
+      "fontId": "mf"
+    },
+    "_csharp": {
+      "fontCharacter": "\\f10c",
+      "fontId": "mf"
+    },
+    "_ruby": {
+      "fontCharacter": "\\e605",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_php": {
+      "fontCharacter": "\\f147",
+      "fontId": "fi"
+    },
+    "_swift": {
+      "fontCharacter": "\\e655",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_kotlin": {
+      "fontCharacter": "\\e989",
+      "fontId": "fi"
+    },
+    "_scala": {
+      "fontCharacter": "\\f154",
+      "fontId": "mf"
+    },
+    "_dart": {
+      "fontCharacter": "\\e698",
+      "fontId": "devicons",
+      "fontSize": "107%"
+    },
+    "_vue": {
+      "fontCharacter": "\\e906",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_angular": {
+      "fontCharacter": "\\e653",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_react": {
+      "fontCharacter": "\\e625",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_svelte": {
+      "fontCharacter": "\\33dc",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_docker": {
+      "fontCharacter": "\\f106",
+      "fontId": "fi",
+      "fontSize": "129%"
+    },
+    "_yaml": {
+      "fontCharacter": "y",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_toml": {
+      "fontCharacter": "\\1f143",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_xml": {
+      "fontCharacter": "\\f05f",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_sql": {
+      "fontCharacter": "\\f10e",
+      "fontId": "mf"
+    },
+    "_git": {
+      "fontCharacter": "\\e602",
+      "fontId": "devicons",
+      "fontSize": "107%"
+    },
+    "_npm": {
+      "fontCharacter": "\\e91c",
+      "fontId": "fi",
+      "fontSize": "121%"
+    },
+    "_node": {
+      "fontCharacter": "\\e618",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_terminal": {
+      "fontCharacter": "\\f0c8",
+      "fontId": "fi"
+    },
+    "_config": {
+      "fontCharacter": "\\f07c",
+      "fontId": "fi"
+    },
+    "_image": {
+      "fontCharacter": "\\f012",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_video": {
+      "fontCharacter": "\\f057",
+      "fontId": "fi"
+    },
+    "_audio": {
+      "fontCharacter": "\\f028",
+      "fontId": "fa",
+      "fontSize": "107%"
+    },
+    "_pdf": {
+      "fontId": "octicons",
+      "fontCharacter": "\\f014",
+      "fontSize": "114%"
+    },
+    "_zip": {
+      "fontCharacter": "\\f013",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_binary": {
+      "fontCharacter": "\\f094",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_font": {
+      "fontCharacter": "\\eaaa",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_book": {
+      "fontCharacter": "\\f007",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_text": {
+      "fontCharacter": "\\f011",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_code": {
+      "fontCharacter": "\\f05f",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_database": {
+      "fontCharacter": "\\f096",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_key": {
+      "fontCharacter": "\\f049",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_lock": {
+      "fontCharacter": "\\f06a",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_gear": {
+      "fontCharacter": "\\f02f",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_checklist": {
+      "fontCharacter": "\\f076",
+      "fontId": "octicons",
+      "fontSize": "121%"
+    },
+    "_test": {
+      "fontCharacter": "\\ea63",
+      "fontId": "fi",
+      "fontSize": "121%"
+    },
+    "_eslint": {
+      "fontCharacter": "\\ea0f",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_prettier": {
+      "fontCharacter": "\\e9d0",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_webpack": {
+      "fontCharacter": "\\ea61",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_babel": {
+      "fontCharacter": "\\e91f",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_graphql": {
+      "fontCharacter": "\\e97c",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_jest": {
+      "fontCharacter": "\\ea39",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_storybook": {
+      "fontCharacter": "\\eadf",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_elixir": {
+      "fontCharacter": "\\f113",
+      "fontId": "mf"
+    },
+    "_erlang": {
+      "fontCharacter": "\\e6b1",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_haskell": {
+      "fontCharacter": "\\f121",
+      "fontId": "mf",
+      "fontSize": "114%"
+    },
+    "_clojure": {
+      "fontCharacter": "\\e668",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_lua": {
+      "fontCharacter": "\\e91b",
+      "fontId": "fi"
+    },
+    "_perl": {
+      "fontCharacter": "\\e669",
+      "fontId": "devicons",
+      "fontSize": "107%"
+    },
+    "_r": {
+      "fontCharacter": "\\e905",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_julia": {
+      "fontCharacter": "\\26ec",
+      "fontId": "fi"
+    },
+    "_tex": {
+      "fontCharacter": "\\e600",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_shell": {
+      "fontCharacter": "\\f0c8",
+      "fontId": "fi"
+    },
+    "_powershell": {
+      "fontCharacter": "\\e9da",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_windows": {
+      "fontCharacter": "\\e60f",
+      "fontId": "devicons"
+    },
+    "_apple": {
+      "fontCharacter": "\\e925",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_linux": {
+      "fontCharacter": "\\e612",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_android": {
+      "fontCharacter": "\\f17b",
+      "fontId": "fa",
+      "fontSize": "114%"
+    },
+    "_gradle": {
+      "fontCharacter": "\\e903",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_maven": {
+      "fontCharacter": "\\e93e",
+      "fontId": "fi",
+      "fontSize": "129%"
+    },
+    "_terraform": {
+      "fontCharacter": "\\e916",
+      "fontId": "fi"
+    },
+    "_kubernetes": {
+      "fontCharacter": "\\2388",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_nginx": {
+      "fontCharacter": "\\f146b",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_apache": {
+      "fontCharacter": "\\f102",
+      "fontId": "mf",
+      "fontSize": "107%"
+    },
+    "_vscode": {
+      "fontCharacter": "\\e60c",
+      "fontId": "devicons"
+    },
+    "_github": {
+      "fontCharacter": "\\f00a",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_gitlab": {
+      "fontCharacter": "\\ea3c",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_bitbucket": {
+      "fontCharacter": "\\e603",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_jenkins": {
+      "fontCharacter": "\\e667",
+      "fontId": "fi",
+      "fontSize": "129%"
+    },
+    "_circleci": {
+      "fontCharacter": "\\ea12",
+      "fontId": "fi"
+    },
+    "_travis": {
+      "fontCharacter": "\\e9d3",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_firebase": {
+      "fontCharacter": "\\ea7f",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_aws": {
+      "fontCharacter": "\\e6ad",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_azure": {
+      "fontCharacter": "\\1f680",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_heroku": {
+      "fontCharacter": "\\e67b",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_netlify": {
+      "fontCharacter": "\\eabf",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_vercel": {
+      "fontCharacter": "\\25B2",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_prisma": {
+      "fontCharacter": "\\eb1d",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_mongodb": {
+      "fontCharacter": "\\e6a4",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_redis": {
+      "fontCharacter": "\\e6c6",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_postgresql": {
+      "fontCharacter": "\\f14a",
+      "fontId": "mf",
+      "fontSize": "114%"
+    },
+    "_mysql": {
+      "fontCharacter": "\\f136",
+      "fontId": "mf",
+      "fontSize": "107%"
+    },
+    "_sqlite": {
+      "fontCharacter": "\\e9dd",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_graphviz": {
+      "fontCharacter": "\\e97d",
+      "fontId": "fi",
+      "fontSize": "121%"
+    },
+    "_mermaid": {
+      "fontCharacter": "\\eb84",
+      "fontId": "fi",
+      "fontSize": "121%"
+    },
+    "_tailwind": {
+      "fontCharacter": "\\301c",
+      "fontId": "fi",
+      "fontSize": "121%"
+    },
+    "_postcss": {
+      "fontCharacter": "\\e910",
+      "fontId": "fi"
+    },
+    "_less": {
+      "fontCharacter": "\\e60b",
+      "fontId": "devicons",
+      "fontSize": "114%"
+    },
+    "_stylus": {
+      "fontCharacter": "s",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_electron": {
+      "fontCharacter": "\\ea27",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_nextjs": {
+      "fontCharacter": "\\24c3",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_nuxt": {
+      "fontCharacter": "\\eaca",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_gatsby": {
+      "fontCharacter": "\\24bc",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_vite": {
+      "fontCharacter": "\\2607",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_rollup": {
+      "fontCharacter": "\\ea9c",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_parcel": {
+      "fontCharacter": "\\eab0",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_esbuild": {
+      "fontCharacter": "\\eb6f",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_deno": {
+      "fontCharacter": "\\eaef",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_bun": {
+      "fontCharacter": "\\1f35e",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_pnpm": {
+      "fontCharacter": "\\eb86",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_yarn": {
+      "fontCharacter": "\\ea1a",
+      "fontId": "fi",
+      "fontSize": "114%"
+    },
+    "_editorconfig": {
+      "fontCharacter": "\\ea1b",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_license": {
+      "fontCharacter": "\\f007",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_readme": {
+      "fontCharacter": "\\f007",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_changelog": {
+      "fontCharacter": "\\f007",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_contributing": {
+      "fontCharacter": "\\f007",
+      "fontId": "octicons",
+      "fontSize": "114%"
+    },
+    "_env": {
+      "fontCharacter": "\\ebb8",
+      "fontId": "fi",
+      "fontSize": "107%"
+    },
+    "_ignore": {
+      "fontCharacter": "\\e602",
+      "fontId": "devicons",
+      "fontSize": "107%"
+    }
+  },
+  "light": {
+    "file": "_file_light",
+    "folder": "_folder_light",
+    "folderExpanded": "_folder_expanded_light",
+    "rootFolder": "_repo_light",
+    "fileExtensions": {
+      "dx": "_dx_light",
+      "cp": "_dx_light",
+      "pg": "_dx_light",
+      "sr": "_dx_light"
+    },
+    "fileNames": {
+      "dx": "_dx_light"
+    }
+  },
+  "fileExtensions": {
+    "dx": "_dx",
+    "cp": "_dx",
+    "pg": "_dx",
+    "sr": "_dx",
+    "js": "_js",
+    "mjs": "_js",
+    "cjs": "_js",
+    "ts": "_ts",
+    "mts": "_ts",
+    "cts": "_ts",
+    "tsx": "_tsx",
+    "jsx": "_jsx",
+    "json": "_json",
+    "json5": "_json",
+    "jsonc": "_json",
+    "html": "_html5",
+    "htm": "_html5",
+    "xhtml": "_html5",
+    "css": "_css3",
+    "scss": "_sass",
+    "sass": "_sass",
+    "less": "_less",
+    "styl": "_stylus",
+    "stylus": "_stylus",
+    "md": "_markdown",
+    "markdown": "_markdown",
+    "mdx": "_markdown",
+    "py": "_python",
+    "pyw": "_python",
+    "pyx": "_python",
+    "pyi": "_python",
+    "rs": "_rust",
+    "go": "_go",
+    "java": "_java",
+    "class": "_java",
+    "jar": "_java",
+    "c": "_c",
+    "h": "_c",
+    "cpp": "_cpp",
+    "cc": "_cpp",
+    "cxx": "_cpp",
+    "hpp": "_cpp",
+    "hxx": "_cpp",
+    "cs": "_csharp",
+    "rb": "_ruby",
+    "rake": "_ruby",
+    "gemspec": "_ruby",
+    "php": "_php",
+    "phtml": "_php",
+    "swift": "_swift",
+    "kt": "_kotlin",
+    "kts": "_kotlin",
+    "scala": "_scala",
+    "sc": "_scala",
+    "dart": "_dart",
+    "vue": "_vue",
+    "svelte": "_svelte",
+    "dockerfile": "_docker",
+    "yaml": "_yaml",
+    "yml": "_yaml",
+    "toml": "_toml",
+    "xml": "_xml",
+    "xsl": "_xml",
+    "xslt": "_xml",
+    "sql": "_sql",
+    "pgsql": "_postgresql",
+    "mysql": "_mysql",
+    "sqlite": "_sqlite",
+    "sqlite3": "_sqlite",
+    "db": "_database",
+    "png": "_image",
+    "jpg": "_image",
+    "jpeg": "_image",
+    "gif": "_image",
+    "bmp": "_image",
+    "ico": "_image",
+    "svg": "_image",
+    "webp": "_image",
+    "avif": "_image",
+    "mp4": "_video",
+    "webm": "_video",
+    "mov": "_video",
+    "avi": "_video",
+    "mkv": "_video",
+    "mp3": "_audio",
+    "wav": "_audio",
+    "ogg": "_audio",
+    "flac": "_audio",
+    "aac": "_audio",
+    "pdf": "_pdf",
+    "zip": "_zip",
+    "tar": "_zip",
+    "gz": "_zip",
+    "bz2": "_zip",
+    "xz": "_zip",
+    "7z": "_zip",
+    "rar": "_zip",
+    "exe": "_binary",
+    "dll": "_binary",
+    "so": "_binary",
+    "dylib": "_binary",
+    "bin": "_binary",
+    "ttf": "_font",
+    "otf": "_font",
+    "woff": "_font",
+    "woff2": "_font",
+    "eot": "_font",
+    "txt": "_text",
+    "log": "_text",
+    "pem": "_key",
+    "key": "_key",
+    "crt": "_key",
+    "cer": "_key",
+    "pub": "_key",
+    "lock": "_lock",
+    "sh": "_shell",
+    "bash": "_shell",
+    "zsh": "_shell",
+    "fish": "_shell",
+    "ps1": "_powershell",
+    "psm1": "_powershell",
+    "psd1": "_powershell",
+    "bat": "_windows",
+    "cmd": "_windows",
+    "ex": "_elixir",
+    "exs": "_elixir",
+    "erl": "_erlang",
+    "hrl": "_erlang",
+    "hs": "_haskell",
+    "lhs": "_haskell",
+    "clj": "_clojure",
+    "cljs": "_clojure",
+    "cljc": "_clojure",
+    "edn": "_clojure",
+    "lua": "_lua",
+    "pl": "_perl",
+    "pm": "_perl",
+    "r": "_r",
+    "rmd": "_r",
+    "jl": "_julia",
+    "tex": "_tex",
+    "latex": "_tex",
+    "bib": "_tex",
+    "tf": "_terraform",
+    "tfvars": "_terraform",
+    "hcl": "_terraform",
+    "graphql": "_graphql",
+    "gql": "_graphql",
+    "prisma": "_prisma",
+    "env": "_env",
+    "env.local": "_env",
+    "env.development": "_env",
+    "env.production": "_env",
+    "env.test": "_env"
+  },
+  "fileNames": {
+    "dx": "_dx",
+    "package.json": "_npm",
+    "package-lock.json": "_npm",
+    ".npmrc": "_npm",
+    "npm-shrinkwrap.json": "_npm",
+    "yarn.lock": "_yarn",
+    ".yarnrc": "_yarn",
+    ".yarnrc.yml": "_yarn",
+    "pnpm-lock.yaml": "_pnpm",
+    ".pnpmfile.cjs": "_pnpm",
+    "pnpm-workspace.yaml": "_pnpm",
+    "bun.lockb": "_bun",
+    "bunfig.toml": "_bun",
+    "deno.json": "_deno",
+    "deno.jsonc": "_deno",
+    "deno.lock": "_deno",
+    "tsconfig.json": "_ts",
+    "jsconfig.json": "_js",
+    ".babelrc": "_babel",
+    ".babelrc.json": "_babel",
+    "babel.config.js": "_babel",
+    "babel.config.json": "_babel",
+    ".eslintrc": "_eslint",
+    ".eslintrc.js": "_eslint",
+    ".eslintrc.json": "_eslint",
+    ".eslintrc.yml": "_eslint",
+    ".eslintrc.yaml": "_eslint",
+    "eslint.config.js": "_eslint",
+    "eslint.config.mjs": "_eslint",
+    ".prettierrc": "_prettier",
+    ".prettierrc.js": "_prettier",
+    ".prettierrc.json": "_prettier",
+    ".prettierrc.yml": "_prettier",
+    ".prettierrc.yaml": "_prettier",
+    "prettier.config.js": "_prettier",
+    "prettier.config.mjs": "_prettier",
+    ".prettierignore": "_prettier",
+    "webpack.config.js": "_webpack",
+    "webpack.config.ts": "_webpack",
+    "webpack.config.mjs": "_webpack",
+    "webpack.config.cjs": "_webpack",
+    "vite.config.js": "_vite",
+    "vite.config.ts": "_vite",
+    "vite.config.mjs": "_vite",
+    "rollup.config.js": "_rollup",
+    "rollup.config.ts": "_rollup",
+    "rollup.config.mjs": "_rollup",
+    "jest.config.js": "_jest",
+    "jest.config.ts": "_jest",
+    "jest.config.mjs": "_jest",
+    "jest.config.json": "_jest",
+    "vitest.config.js": "_test",
+    "vitest.config.ts": "_test",
+    "vitest.config.mjs": "_test",
+    ".gitignore": "_git",
+    ".gitattributes": "_git",
+    ".gitmodules": "_git",
+    ".gitkeep": "_git",
+    ".gitlab-ci.yml": "_gitlab",
+    "dockerfile": "_docker",
+    "Dockerfile": "_docker",
+    "docker-compose.yml": "_docker",
+    "docker-compose.yaml": "_docker",
+    ".dockerignore": "_docker",
+    "Makefile": "_checklist",
+    "makefile": "_checklist",
+    "GNUmakefile": "_checklist",
+    "CMakeLists.txt": "_checklist",
+    "Cargo.toml": "_rust",
+    "Cargo.lock": "_rust",
+    "go.mod": "_go",
+    "go.sum": "_go",
+    "Gemfile": "_ruby",
+    "Gemfile.lock": "_ruby",
+    "requirements.txt": "_python",
+    "setup.py": "_python",
+    "pyproject.toml": "_python",
+    "Pipfile": "_python",
+    "Pipfile.lock": "_python",
+    "poetry.lock": "_python",
+    "composer.json": "_php",
+    "composer.lock": "_php",
+    "build.gradle": "_gradle",
+    "build.gradle.kts": "_gradle",
+    "settings.gradle": "_gradle",
+    "settings.gradle.kts": "_gradle",
+    "pom.xml": "_maven",
+    "next.config.js": "_nextjs",
+    "next.config.mjs": "_nextjs",
+    "next.config.ts": "_nextjs",
+    "nuxt.config.js": "_nuxt",
+    "nuxt.config.ts": "_nuxt",
+    "gatsby-config.js": "_gatsby",
+    "gatsby-config.ts": "_gatsby",
+    "svelte.config.js": "_svelte",
+    "tailwind.config.js": "_tailwind",
+    "tailwind.config.ts": "_tailwind",
+    "tailwind.config.mjs": "_tailwind",
+    "postcss.config.js": "_postcss",
+    "postcss.config.mjs": "_postcss",
+    ".postcssrc": "_postcss",
+    ".postcssrc.json": "_postcss",
+    ".editorconfig": "_editorconfig",
+    "LICENSE": "_license",
+    "LICENSE.md": "_license",
+    "LICENSE.txt": "_license",
+    "LICENCE": "_license",
+    "LICENCE.md": "_license",
+    "LICENCE.txt": "_license",
+    "README": "_readme",
+    "README.md": "_readme",
+    "README.txt": "_readme",
+    "CHANGELOG": "_changelog",
+    "CHANGELOG.md": "_changelog",
+    "CHANGELOG.txt": "_changelog",
+    "CONTRIBUTING": "_contributing",
+    "CONTRIBUTING.md": "_contributing",
+    ".env": "_env",
+    ".env.local": "_env",
+    ".env.development": "_env",
+    ".env.production": "_env",
+    ".env.test": "_env",
+    ".env.example": "_env",
+    "firebase.json": "_firebase",
+    "firestore.rules": "_firebase",
+    "firestore.indexes.json": "_firebase",
+    ".firebaserc": "_firebase",
+    "netlify.toml": "_netlify",
+    "vercel.json": "_vercel",
+    "now.json": "_vercel",
+    "heroku.yml": "_heroku",
+    "Procfile": "_heroku",
+    "kubernetes.yaml": "_kubernetes",
+    "kubernetes.yml": "_kubernetes",
+    "k8s.yaml": "_kubernetes",
+    "k8s.yml": "_kubernetes",
+    "nginx.conf": "_nginx",
+    ".htaccess": "_apache",
+    "httpd.conf": "_apache",
+    "Jenkinsfile": "_jenkins",
+    ".travis.yml": "_travis",
+    "circle.yml": "_circleci",
+    ".circleci/config.yml": "_circleci",
+    "azure-pipelines.yml": "_azure",
+    ".github/workflows/*.yml": "_github",
+    ".github/workflows/*.yaml": "_github",
+    "schema.prisma": "_prisma",
+    "schema.graphql": "_graphql",
+    ".graphqlrc": "_graphql",
+    ".graphqlrc.json": "_graphql",
+    ".graphqlrc.yml": "_graphql",
+    ".graphqlrc.yaml": "_graphql"
+  },
+  "folderNames": {
+    "node_modules": "_folder",
+    ".git": "_folder",
+    ".github": "_folder",
+    ".vscode": "_folder",
+    "src": "_folder",
+    "lib": "_folder",
+    "dist": "_folder",
+    "build": "_folder",
+    "out": "_folder",
+    "bin": "_folder",
+    "test": "_folder",
+    "tests": "_folder",
+    "__tests__": "_folder",
+    "spec": "_folder",
+    "specs": "_folder",
+    "docs": "_folder",
+    "doc": "_folder",
+    "public": "_folder",
+    "static": "_folder",
+    "assets": "_folder",
+    "images": "_folder",
+    "img": "_folder",
+    "icons": "_folder",
+    "fonts": "_folder",
+    "styles": "_folder",
+    "css": "_folder",
+    "scripts": "_folder",
+    "js": "_folder",
+    "components": "_folder",
+    "pages": "_folder",
+    "views": "_folder",
+    "layouts": "_folder",
+    "templates": "_folder",
+    "utils": "_folder",
+    "helpers": "_folder",
+    "hooks": "_folder",
+    "services": "_folder",
+    "api": "_folder",
+    "config": "_folder",
+    "configs": "_folder",
+    "types": "_folder",
+    "interfaces": "_folder",
+    "models": "_folder",
+    "entities": "_folder",
+    "controllers": "_folder",
+    "middleware": "_folder",
+    "middlewares": "_folder",
+    "routes": "_folder",
+    "store": "_folder",
+    "stores": "_folder",
+    "state": "_folder",
+    "reducers": "_folder",
+    "actions": "_folder",
+    "selectors": "_folder",
+    "context": "_folder",
+    "contexts": "_folder",
+    "providers": "_folder",
+    "plugins": "_folder",
+    "modules": "_folder",
+    "packages": "_folder",
+    "vendor": "_folder",
+    "third_party": "_folder",
+    "external": "_folder",
+    "internal": "_folder",
+    "core": "_folder",
+    "common": "_folder",
+    "shared": "_folder",
+    "features": "_folder",
+    "domain": "_folder",
+    "data": "_folder",
+    "database": "_folder",
+    "db": "_folder",
+    "migrations": "_folder",
+    "seeds": "_folder",
+    "fixtures": "_folder",
+    "mocks": "_folder",
+    "__mocks__": "_folder",
+    "stubs": "_folder",
+    "snapshots": "_folder",
+    "__snapshots__": "_folder",
+    "coverage": "_folder",
+    "reports": "_folder",
+    "logs": "_folder",
+    "tmp": "_folder",
+    "temp": "_folder",
+    "cache": "_folder",
+    ".cache": "_folder",
+    "backup": "_folder",
+    "backups": "_folder",
+    "archive": "_folder",
+    "archives": "_folder"
+  }
+}

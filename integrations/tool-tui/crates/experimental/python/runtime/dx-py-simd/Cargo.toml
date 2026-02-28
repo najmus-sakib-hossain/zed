@@ -1,0 +1,27 @@
+[package]
+name = "dx-py-simd"
+description = "SIMD-Accelerated String Operations for DX-Py-Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+thiserror.workspace = true
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+
+[features]
+default = []
+# Enable runtime SIMD detection (recommended)
+runtime-detection = []
+# Force AVX2 (requires AVX2 CPU)
+avx2 = []
+# Force AVX-512 (requires AVX-512 CPU)
+avx512 = []
+
+[[bench]]
+name = "simd_benchmarks"
+harness = false

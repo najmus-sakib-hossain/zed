@@ -1,0 +1,37 @@
+[package]
+name = "dx-cli-onboard"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.42", features = ["full"] }
+
+# Serialization/Deserialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Error handling
+thiserror = "1.0"
+
+# CLI prompts and UI
+console = "0.15"
+dialoguer = "0.11"
+crossterm = "0.28"
+ratatui = "0.29"
+
+# For dynamic provider discovery
+url = "2.5"
+
+# For native genai crate integration (if applicable for specific providers)
+# genai = "0.1" # Placeholder - specific version and features to be determined by web search
+
+# Environment variables
+dotenvy = "0.15"
+
+# Utility
+anyhow = "1.0"
+async-trait = "0.1"

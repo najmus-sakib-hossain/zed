@@ -1,0 +1,11 @@
+[package]
+name = "vision-select"
+version.workspace = true
+edition.workspace = true
+description = "Adaptive ROI vision selection — 60-80% savings via smart cropping"
+
+[dependencies]
+dx-core = { workspace = true }
+image = { workspace = true }
+async-trait = { workspace = true }
+vision-compress = { workspace = true }

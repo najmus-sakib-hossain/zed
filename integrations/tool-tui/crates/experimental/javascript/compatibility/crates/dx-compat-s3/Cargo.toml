@@ -1,0 +1,20 @@
+[package]
+name = "dx-compat-s3"
+version = "0.0.1"
+edition = "2021"
+description = "S3-compatible object storage for DX"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# Using rust-s3 instead of aws-sdk-s3 to avoid aws-lc-sys build issues on Windows
+# rust-s3 with tokio-native-tls uses SChannel on Windows, SecureTransport on macOS, OpenSSL on Linux
+rust-s3 = { version = "0.37", default-features = false, features = ["tokio-native-tls", "fail-on-err"] }
+tokio = { version = "1.41", features = ["full"] }
+bytes = "1.9"
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[dev-dependencies]
+proptest = "1.4"
+tokio = { version = "1.41", features = ["full", "test-util"] }

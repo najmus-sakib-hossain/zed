@@ -1,0 +1,10 @@
+[package]
+name = "rlm"
+version.workspace = true
+edition.workspace = true
+description = "Recursive Language Model — 90% savings on large file contexts"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+tokio = { workspace = true, features = ["fs"] }

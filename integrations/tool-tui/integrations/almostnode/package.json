@@ -1,0 +1,119 @@
+{
+  "name": "almostnode",
+  "version": "0.2.14",
+  "description": "Node.js in your browser. Just like that.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "node",
+    "browser",
+    "runtime",
+    "virtual-filesystem",
+    "sandbox",
+    "vite",
+    "nextjs",
+    "hmr",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/macaly/almostnode.git"
+  },
+  "homepage": "https://github.com/macaly/almostnode#readme",
+  "bugs": {
+    "url": "https://github.com/macaly/almostnode/issues"
+  },
+  "author": "",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./vite": {
+      "import": {
+        "types": "./dist/vite-plugin.d.ts",
+        "default": "./dist/vite-plugin.mjs"
+      },
+      "require": {
+        "types": "./dist/vite-plugin.d.ts",
+        "default": "./dist/vite-plugin.cjs"
+      }
+    },
+    "./next": {
+      "import": {
+        "types": "./dist/next-plugin.d.ts",
+        "default": "./dist/next-plugin.mjs"
+      },
+      "require": {
+        "types": "./dist/next-plugin.d.ts",
+        "default": "./dist/next-plugin.cjs"
+      }
+    }
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:lib": "vite build --config vite.lib.config.js",
+    "build:types": "tsc --project tsconfig.build.json",
+    "build:publish": "npm run build:lib && npm run build:types",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "sandbox": "vite --port 3002 --config vite.sandbox.config.js",
+    "sandbox:demo": "echo 'Run in two terminals:\\n  Terminal 1: npm run sandbox (serves sandbox on port 3002)\\n  Terminal 2: npm run dev (serves main app on port 5173)\\nThen open: http://localhost:5173/examples/sandbox-next-demo.html'",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run test:run && npm run build:publish"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.28",
+    "@ai-sdk/react": "^3.0.87",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "acorn": "^8.15.0",
+    "acorn-jsx": "^5.3.2",
+    "ai": "^6.0.85",
+    "brotli": "^1.3.3",
+    "brotli-wasm": "^3.0.1",
+    "comlink": "^4.4.2",
+    "css-tree": "^3.1.0",
+    "just-bash": "^2.7.0",
+    "pako": "^2.1.0",
+    "resolve.exports": "^2.0.3",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.5.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/css-tree": "^2.3.11",
+    "@types/node": "^25.0.10",
+    "@types/pako": "^2.0.4",
+    "dotenv": "^17.3.1",
+    "esbuild": "^0.27.2",
+    "jsdom": "^27.4.0",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.0",
+    "vitest": "^4.0.18"
+  }
+}

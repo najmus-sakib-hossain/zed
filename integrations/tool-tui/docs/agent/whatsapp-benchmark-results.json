@@ -1,0 +1,24 @@
+{
+  "results": [
+    {
+      "avg_ms": 0.0027862620000000003,
+      "failed": 0,
+      "iterations": 100000,
+      "kind": "synthetic",
+      "mode": "cloud",
+      "p95_ms": 0.0029,
+      "successful": 100000,
+      "total_ms": 341
+    },
+    {
+      "avg_ms": 0.002906587,
+      "failed": 0,
+      "iterations": 100000,
+      "kind": "synthetic",
+      "mode": "baileys",
+      "p95_ms": 0.003,
+      "successful": 100000,
+      "total_ms": 352
+    }
+  ]
+}

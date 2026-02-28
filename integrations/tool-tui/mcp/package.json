@@ -1,0 +1,25 @@
+{
+  "name": "dx-mcp",
+  "displayName": "DX",
+  "description": "Enhanced Development Experience",
+  "icon": "media/logo.png",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "bun src/server.ts",
+    "dev": "bun --watch src/server.ts",
+    "test:mcp": "bun src/test_client.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "open": "latest",
+    "playwright": "latest",
+    "screenshot-desktop": "latest",
+    "tesseract.js": "^7.0.0",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "bun-types": "latest",
+    "typescript": "latest"
+  }
+}

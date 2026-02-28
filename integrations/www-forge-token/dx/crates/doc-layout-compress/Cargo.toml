@@ -1,0 +1,13 @@
+[package]
+name = "doc-layout-compress"
+version.workspace = true
+edition.workspace = true
+description = "Layout-aware document compression — structure + content optimization"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+regex-lite = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

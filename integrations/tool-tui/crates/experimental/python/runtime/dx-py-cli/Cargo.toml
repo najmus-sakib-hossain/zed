@@ -1,0 +1,27 @@
+[package]
+name = "dx-py-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "Command-line interface for DX-Py runtime"
+
+[[bin]]
+name = "dx-py"
+path = "src/main.rs"
+
+[dependencies]
+dx-py-interpreter = { path = "../dx-py-interpreter" }
+dx-py-core = { path = "../dx-py-core" }
+dx-py-bytecode = { path = "../dx-py-bytecode" }
+dx-py-modules = { path = "../dx-py-modules" }
+dx-py-cache = { path = "../dx-py-cache" }
+dx-py-pcc = { path = "../dx-py-pcc" }
+dx-py-compiler = { path = "../dx-py-compiler" }
+dx-py-parser = { path = "../dx-py-parser" }
+clap.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+proptest.workspace = true

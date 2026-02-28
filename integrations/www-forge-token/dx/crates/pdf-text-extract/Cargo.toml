@@ -1,0 +1,12 @@
+[package]
+name = "pdf-text-extract"
+version.workspace = true
+edition.workspace = true
+description = "PDF text extraction — bypasses image-based tokens entirely"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

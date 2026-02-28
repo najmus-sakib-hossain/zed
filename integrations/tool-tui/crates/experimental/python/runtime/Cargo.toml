@@ -1,0 +1,110 @@
+[workspace]
+resolver = "2"
+members = [
+    "dx-py-bytecode",
+    "dx-py-simd",
+    "dx-py-gc",
+    "dx-py-jit",
+    "dx-py-types",
+    "dx-py-ffi",
+    "dx-py-modules",
+    "dx-py-parallel",
+    "dx-py-stack",
+    "dx-py-ipc",
+    "dx-py-cache",
+    "dx-py-collections",
+    "dx-py-decorators",
+    "dx-py-pcc",
+    "dx-py-entangled",
+    "dx-py-core",
+    "dx-py-interpreter",
+    "dx-py-cli",
+    "dx-py-reactor",
+    "dx-py-parser",
+    "dx-py-compiler",
+    "dx-py-ext-loader",
+    "dx-py-validator",
+    "dx-py-django",
+    "dx-py-flask",
+    "dx-py-fastapi",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["DX-Py Team"]
+
+[workspace.dependencies]
+# Core dependencies
+memmap2 = "0.9"
+blake3 = "1.5"
+dashmap = "5.5"
+crossbeam = "0.8"
+rayon = "1.8"
+parking_lot = "0.12"
+bitflags = "2.4"
+
+# SIMD and low-level
+core_affinity = "0.8"
+
+# JIT compilation
+cranelift-codegen = "0.103"
+cranelift-frontend = "0.103"
+cranelift-jit = "0.103"
+cranelift-module = "0.103"
+cranelift-native = "0.103"
+
+# FFI
+pyo3 = { version = "0.20", features = ["extension-module"] }
+numpy = "0.20"
+
+# Testing
+proptest = "1.4"
+criterion = "0.5"
+
+# Serialization
+bincode = "1.3"
+
+# Temp files
+tempfile = "3.9"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# File watching
+notify = "6.1"
+
+# CPU detection
+num_cpus = "1.16"
+
+
+# UUID generation
+uuid = { version = "1.6", features = ["v4"] }
+
+# CLI
+clap = { version = "4.4", features = ["derive"] }
+
+# simd-json for fast JSON parsing
+simd-json = "0.13"
+
+# Regex support
+regex = "1.10"
+
+# Lazy static initialization
+once_cell = "1.19"
+
+# Dynamic library loading
+libloading = "0.8"
+
+# Serde for serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Chrono for timestamps
+chrono = { version = "0.4", features = ["serde"] }
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+futures = "0.3"

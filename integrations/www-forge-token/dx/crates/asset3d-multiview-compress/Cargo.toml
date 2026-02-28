@@ -1,0 +1,12 @@
+[package]
+name = "asset3d-multiview-compress"
+version.workspace = true
+edition.workspace = true
+description = "Multi-view 3D asset compression — minimize viewpoint redundancy"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

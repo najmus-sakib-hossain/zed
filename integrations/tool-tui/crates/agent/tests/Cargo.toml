@@ -1,0 +1,48 @@
+[package]
+name = "dx-agent-tests"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+# Agent crates to test
+dx-agent-protocol = { path = "../protocol" }
+dx-agent-tools = { path = "../tools" }
+
+# Google Gemini API
+google-gemini-rs = "0.3"
+
+# Async runtime
+tokio = { version = "1.42", features = ["full"] }
+tokio-test = "0.4"
+
+# Testing
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Environment
+dotenvy = "0.15"
+
+# HTTP for direct API calls
+reqwest = { version = "0.12", features = ["json"] }
+
+[[test]]
+name = "gemini_integration"
+path = "tests/gemini_integration.rs"
+
+[[test]]
+name = "agent_features"
+path = "tests/agent_features.rs"
+
+[[test]]
+name = "tool_calling"
+path = "tests/tool_calling.rs"
+
+[[test]]
+name = "self_updating"
+path = "tests/self_updating.rs"
+
+[[test]]
+name = "gemma_tools"
+path = "tests/gemma_tools.rs"

@@ -1,0 +1,63 @@
+[workspace]
+members = [
+    "crates/dx-test-core",
+    "crates/dx-test-cache",
+    "crates/dx-test-vm",
+    "crates/dx-test-executor",
+    "crates/dx-test-cli",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.0.1"
+edition = "2021"
+authors = ["Dx Team"]
+license = "MIT"
+
+[workspace.dependencies]
+# Core dependencies
+blake3 = "1.5"
+memmap2 = "0.9"
+bytemuck = { version = "1.14", features = ["derive"] }
+crossbeam = "0.8"
+parking_lot = "0.12"
+once_cell = "1.19"
+
+# Async/parallel
+rayon = "1.8"
+tokio = { version = "1.35", features = ["full"] }
+crossbeam-deque = "0.8"
+num_cpus = "1.16"
+
+# Parsing
+swc_common = "0.33"
+swc_ecma_parser = "0.145"
+swc_ecma_ast = "0.113"
+regex = "1.10"
+
+# CLI
+clap = { version = "4.4", features = ["derive"] }
+colored = "2.1"
+
+# Utils
+walkdir = "2.4"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Watch mode
+notify = "6.1"
+notify-debouncer-mini = "0.4"
+
+# Coverage
+lcov = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.bench]
+inherits = "release"

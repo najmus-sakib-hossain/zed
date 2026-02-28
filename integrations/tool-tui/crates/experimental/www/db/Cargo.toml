@@ -1,0 +1,51 @@
+[package]
+name = "dx-www-db"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Zero-copy database layer with compile-time SQL verification"
+keywords = ["database", "sql", "zero-copy", "dx", "postgres"]
+categories = ["database"]
+
+[lib]
+name = "dx_www_db"
+path = "src/lib.rs"
+
+[dependencies]
+# Database drivers
+sqlx = { version = "0.8", default-features = false, features = [
+    "postgres",
+    "runtime-tokio-rustls",
+], optional = true }
+tokio-postgres = { version = "0.7", optional = true }
+
+# Connection pooling
+deadpool-postgres = { version = "0.12", optional = true }
+
+# Zero-copy operations
+bytes = "1.5"
+zerocopy = { version = "0.7", features = ["derive"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Async runtime
+tokio = { version = "1.35", features = ["sync"], optional = true }
+
+# Error handling
+thiserror = "1.0"
+
+# Internal
+dx-www-packet = { workspace = true, features = ["std"], optional = true }
+
+[features]
+default = ["postgres"]
+postgres = ["sqlx", "tokio-postgres", "deadpool-postgres", "tokio"]
+std = ["dx-www-packet"]
+
+[dev-dependencies]
+tokio = { version = "1.35", features = ["full", "test-util"] }
+proptest = { workspace = true }

@@ -1,0 +1,1 @@
+rule:7[language              = py category=suspicious severity=warn fixable=false recommended=false description=Disallow the use of print\(\) statements. Use proper logging instead of print for production code. Print statements should only be used in scripts and debugging. docs url=https://dx.dev/rules/no-print]

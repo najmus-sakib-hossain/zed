@@ -1,0 +1,9 @@
+{
+    "name": "medium-test-suite",
+    "version": "1.0.0",
+    "description": "Medium test suite fixture (150 tests) for benchmark comparison",
+    "scripts": {
+        "test": "bun test",
+        "test:dx": "dx-test"
+    }
+}

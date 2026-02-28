@@ -1,0 +1,38 @@
+{
+  "name": "@midday/documents",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./loader": "./src/loaders/loader.ts",
+    "./classifier": "./src/classifier/classifier.ts",
+    "./embed": "./src/embed/embed.ts",
+    "./utils": "./src/utils.ts"
+  },
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test --exit src"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "catalog:",
+    "@ai-sdk/mistral": "^2.0.26",
+    "@langchain/community": "1.0.3",
+    "@langchain/core": "1.0.5",
+    "@midday/utils": "workspace:*",
+    "ai": "catalog:",
+    "canvas": "^3.2.0",
+    "langchain": "^1.0.5",
+    "mammoth": "^1.11.0",
+    "officeparser": "5.2.2",
+    "unpdf": "^1.4.0",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

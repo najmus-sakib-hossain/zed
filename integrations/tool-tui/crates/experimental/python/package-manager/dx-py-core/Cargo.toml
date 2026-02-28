@@ -1,0 +1,16 @@
+[package]
+name = "dx-py-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core types and binary format definitions for DX-Py package manager"
+
+[dependencies]
+thiserror.workspace = true
+bytemuck.workspace = true
+blake3.workspace = true
+atty = "0.2"
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile = "3.10"

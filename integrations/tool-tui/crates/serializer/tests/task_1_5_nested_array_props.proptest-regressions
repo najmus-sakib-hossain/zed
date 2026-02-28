@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 7e7ecfe82c3074c8d17f2d9decc038dfdb896d37d4f2bff8e8eef6765a3812e5 # shrinks to (section_name, nested_arrays, simple_fields) = ("a", [("m", ["a"])], [("m", "a")])
+cc 3e3aeb3ce5b29521d9d6a6640ab9b285edc6d71e8b665bad79fe05a48033ecc8 # shrinks to (section_name, nested_arrays, simple_fields) = ("a", [("w_", ["A"]), ("w_", ["A"])], [])

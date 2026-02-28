@@ -1,0 +1,14 @@
+[package]
+name = "governor"
+version.workspace = true
+edition.workspace = true
+description = "Circuit breaker for tool calls — prevents runaway tool spirals"
+
+[dependencies]
+dx-core = { workspace = true }
+blake3 = { workspace = true }
+async-trait = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

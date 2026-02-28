@@ -1,0 +1,20 @@
+[package]
+name = "dx-www-client-tiny"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Ultra-tiny WASM runtime for dx-www - NO_STD Integer DOM (< 2 KB)"
+keywords = ["wasm", "web", "no-std", "dx", "tiny"]
+categories = ["wasm", "no-std"]
+
+[lib]
+crate-type = ["cdylib"]
+# Disable tests for this crate - it only runs in WASM environment
+# Tests for WASM client functionality are in the tests/ crate with mock host functions
+test = false
+doctest = false
+
+[dependencies]
+# ZERO dependencies - pure NO_STD

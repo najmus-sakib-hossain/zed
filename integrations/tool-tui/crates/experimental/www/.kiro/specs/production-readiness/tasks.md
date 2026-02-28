@@ -1,0 +1,270 @@
+
+# Implementation Plan: Production Readiness
+
+## Overview
+
+This implementation plan transforms dx-www from a pre-alpha framework into a production-ready system. The work is organized into phases: foundational error handling first, then security features, ecosystem completion, and finally comprehensive testing. Each task builds incrementally on previous work.
+
+## Tasks
+
+- Foundational Error Handling
+- 1.1 Create SafeMutex wrapper in error crate-Implement `SafeMutex<T>` that recovers from poisoning
+- Add `SafeRwLock<T>` for read-write scenarios
+- Include logging on poisoning recovery
+- Requirements: 2.1, 2.2
+- 1.2 Write property test for mutex poisoning recovery-Property 6: Mutex Poisoning Recovery
+- Validates: Requirements 2.1
+- 1.3 Create structured error types in error crate-Implement `DxError` enum with all error categories
+- Add error codes, messages, and recovery suggestions
+- Implement `From` traits for common error types
+- Requirements: 2.5
+- 1.4 Write property test for error structure completeness-Property 8: Structured Error Completeness
+- Validates: Requirements 2.5
+- 1.5 Replace.lock().unwrap() calls throughout codebase-Update error/src/lib.rs (10+ instances)
+- Update state/src/lib.rs
+- Update server/src/handlers.rs
+- Replace Arc::get_mut().expect() with Result
+- Requirements: 2.2, 2.6
+- 1.6 Write property test for error isolation-Property 7: Error Isolation
+- Validates: Requirements 2.4
+- -Checkpoint
+- Error Handling Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Authentication System Hardening
+- 3.1 Implement production TokenGenerator in auth crate-Create `AuthToken` struct with jti, sub, iat, exp, typ, sig fields
+- Implement Ed25519 signing using existing auth infrastructure
+- Add configurable TTL for access and refresh tokens
+- Requirements: 1.2
+- 3.2 Write property test for token signature integrity-Property 2: Token Signature Integrity
+- Validates: Requirements 1.2, 1.3, 1.5
+- 3.3 Implement PasswordHasher with Argon2id-Create `PasswordHasher` struct with configurable parameters
+- Implement hash() and verify() methods
+- Use secure defaults (Argon2id, memory=64MB, iterations=3)
+- Requirements: 1.1
+- 3.4 Write property test for password hash round-trip-Property 1: Password Hash Round-Trip
+- Validates: Requirements 1.1
+- 3.5 Implement CredentialStore trait and in-memory implementation-Define async trait for credential storage
+- Implement in-memory store for testing
+- Add methods for password hash lookup and token revocation
+- Requirements: 1.1, 1.7
+- 3.6 Update auth_middleware.rs with real verification-Replace placeholder verify_credentials with PasswordHasher
+- Implement proper token verification with signature check
+- Add token expiration validation
+- Return proper HTTP 401 with error details
+- Requirements: 1.1, 1.3, 1.4
+- 3.7 Write property test for token expiration enforcement-Property 3: Token Expiration Enforcement
+- Validates: Requirements 1.3, 1.4
+- 3.8 Implement token refresh endpoint-Add /auth/refresh endpoint
+- Validate refresh token and issue new access token
+- Implement grace period logic
+- Requirements: 1.6
+- 3.9 Write property test for token refresh validity-Property 4: Token Refresh Validity
+- Validates: Requirements 1.6
+- 3.10 Implement token revocation-Add revoked token storage to CredentialStore
+- Check revocation status during token verification
+- Add /auth/logout endpoint
+- Requirements: 1.7
+- 3.11 Write property test for token revocation effectiveness-Property 5: Token Revocation Effectiveness
+- Validates: Requirements 1.7
+- -Checkpoint
+- Authentication Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Security Middleware
+- 5.1 Create security headers middleware in server crate-Implement `SecurityConfig` struct with all header options
+- Create middleware that adds headers to all responses
+- Support production and development configurations
+- Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7
+- 5.2 Write property test for security headers presence-Property 12: Security Headers Presence
+- Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
+- 5.3 Implement rate limiter in server crate-Create `RateLimiter` struct with sliding window algorithm
+- Implement `RateLimitStore` trait with in-memory backend
+- Support different limits per endpoint category
+- Add Retry-After header on 429 responses
+- Requirements: 5.1, 5.2, 5.3, 5.4, 5.5
+- 5.4 Write property test for rate limit counting accuracy-Property 13: Rate Limit Counting Accuracy
+- Validates: Requirements 5.1
+- 5.5 Write property test for rate limit enforcement-Property 14: Rate Limit Enforcement
+- Validates: Requirements 5.2, 5.3
+- 5.6 Write property test for sliding window correctness-Property 15: Sliding Window Correctness
+- Validates: Requirements 5.5
+- 5.7 Implement CSRF protection in server crate-Create `CsrfManager` with HMAC-based token generation
+- Implement token validation middleware
+- Support tokens in form fields and headers
+- Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6
+- 5.8 Write property test for CSRF token uniqueness-Property 16: CSRF Token Uniqueness
+- Validates: Requirements 6.1
+- 5.9 Write property test for CSRF validation strictness-Property 17: CSRF Validation Strictness
+- Validates: Requirements 6.3, 6.4, 6.5
+- 5.10 Write property test for CSRF token location flexibility-Property 18: CSRF Token Location Flexibility
+- Validates: Requirements 6.6
+- -Checkpoint
+- Security Middleware Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Server Error Handling
+- 7.1 Remove demo HTML fallback from handlers.rs-Return HTTP 500 when index.html is missing
+- Add clear error message explaining the issue
+- Log the error with full context
+- Requirements: 7.1
+- 7.2 Implement configurable error pages-Create `ErrorPageConfig` struct
+- Support custom HTML templates for 404, 500, etc.
+- Include request ID in error responses
+- Requirements: 7.2, 7.3
+- 7.3 Implement error response sanitization-Create production error handler that hides internal details
+- Create development error handler with full diagnostics
+- Switch based on environment configuration
+- Requirements: 7.5
+- 7.4 Write property test for error response sanitization-Property 26: Error Response Sanitization
+- Validates: Requirements 7.5
+- 7.5 Add request context logging-Log path, method, headers, timing for all errors
+- Include request ID for correlation
+- Requirements: 7.4
+- -Checkpoint
+- Server Error Handling Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -WASM Client Test Coverage
+- 9.1 Create test harness with mock host functions-Implement `MockHost` struct in client crate tests
+- Mock all FFI functions (host_clone_template, host_append, etc.)
+- Add DOM operation logging for verification
+- Requirements: 3.1
+- 9.2 Write unit tests for HTIP opcode handlers-Test OP_CLONE handler
+- Test OP_PATCH_TEXT handler
+- Test OP_PATCH_ATTR handler
+- Test OP_CLASS_TOGGLE handler
+- Test OP_REMOVE handler
+- Test OP_EVENT handler
+- Test OP_TEMPLATE_DEF handler
+- Requirements: 3.1
+- 9.3 Write property test for delta patch round-trip-Property 9: Delta Patch Round-Trip
+- Validates: Requirements 3.2
+- 9.4 Write property test for allocator non-overlap-Property 10: Allocator Non-Overlap
+- Validates: Requirements 3.3
+- 9.5 Write property test for malformed stream resilience-Property 11: Malformed Stream Resilience
+- Validates: Requirements 3.4, 3.5
+- 9.6 Write integration tests for end-to-end rendering-Test complete HTIP stream processing
+- Verify DOM operations match expected output
+- Requirements: 3.6
+- -Checkpoint
+- WASM Client Tests Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Query Module Completion
+- 11.1 Add database integration to query module-Add sqlx dependency with postgres feature
+- Create `ProductionQueryClient` struct
+- Implement connection pooling
+- Requirements: 8.1, 8.3
+- 11.2 Implement parameterized query execution-Create type-safe query builder
+- Ensure all user input is parameterized
+- Requirements: 8.2
+- 11.3 Write property test for SQL injection prevention-Property 19: SQL Injection Prevention
+- Validates: Requirements 8.2
+- 11.4 Write property test for connection pool reuse-Property 20: Connection Pool Reuse
+- Validates: Requirements 8.3
+- 11.5 Implement query error handling-Create `QueryError` enum with context
+- Add timeout support with configurable duration
+- Requirements: 8.4, 8.5
+- 11.6 Write property test for query error structure-Property 21: Query Error Structure
+- Validates: Requirements 8.4
+- 11.7 Implement stale-while-revalidate caching-Add stale_time configuration to QueryOptions
+- Return stale data while revalidating in background
+- Requirements: 8.6
+- -Checkpoint
+- Query Module Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Sync Module Completion
+- 13.1 Implement WebSocket connection management-Create `WebSocketManager` struct
+- Handle connection lifecycle (connect, disconnect, reconnect)
+- Implement automatic reconnection with exponential backoff
+- Requirements: 9.1
+- 13.2 Implement channel-based pub/sub-Enhance existing `ChannelManager`
+- Add subscription tracking per connection
+- Implement message routing to subscribers
+- Requirements: 9.2
+- 13.3 Write property test for pub/sub delivery-Property 22: Pub/Sub Delivery
+- Validates: Requirements 9.2
+- 13.4 Implement message buffering for offline support-Create `MessageBuffer` struct
+- Buffer messages during disconnection
+- Replay buffered messages on reconnection
+- Requirements: 9.3
+- 13.5 Write property test for message buffer replay-Property 23: Message Buffer Replay
+- Validates: Requirements 9.3
+- 13.6 Implement presence tracking-Create `PresenceTracker` struct
+- Track connected users per channel
+- Broadcast presence updates on join/leave
+- Requirements: 9.4
+- 13.7 Write property test for presence accuracy-Property 24: Presence Accuracy
+- Validates: Requirements 9.4
+- 13.8 Implement message acknowledgment-Add ack tracking to message delivery
+- Implement retry logic for unacked messages
+- Notify on delivery failure after max retries
+- Requirements: 9.5, 9.6
+- 13.9 Write property test for acknowledgment guarantee-Property 25: Acknowledgment Guarantee
+- Validates: Requirements 9.5
+- -Checkpoint
+- Sync Module Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Integration Test Suite
+- 15.1 Write end-to-end authentication tests-Test login flow with valid credentials
+- Test login flow with invalid credentials
+- Test token refresh flow
+- Test logout and token revocation
+- Requirements: 10.1
+- 15.2 Write SSR and bot detection tests-Test bot user-agent detection
+- Test SSR HTML generation for bots
+- Test SPA shell serving for humans
+- Requirements: 10.2
+- 15.3 Write binary streaming tests-Test full binary stream serving
+- Test delta patch generation and serving
+- Test 304 Not Modified responses
+- Requirements: 10.3
+- 15.4 Write error handling tests-Test 404 responses
+- Test 500 responses
+- Test auth failure responses
+- Test rate limit responses
+- Requirements: 10.4
+- 15.5 Write security header tests-Verify all security headers present
+- Verify CSRF validation
+- Verify rate limiting behavior
+- Requirements: 10.6
+- -Checkpoint
+- Integration Tests Complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Deployment Documentation
+- 17.1 Create Docker deployment guide-Write production-optimized Dockerfile
+- Document multi-stage build process
+- Include docker-compose example
+- Requirements: 11.1
+- 17.2 Create systemd service configuration-Write systemd unit file
+- Document service management commands
+- Include logging configuration
+- Requirements: 11.2
+- 17.3 Create reverse proxy configuration-Write nginx configuration example
+- Document SSL/TLS setup
+- Include WebSocket proxy configuration
+- Requirements: 11.3
+- 17.4 Create environment variable reference-Document all configuration options
+- Include default values and descriptions
+- Provide example.env file
+- Requirements: 11.4
+- 17.5 Create monitoring setup guide-Add Prometheus metrics endpoint
+- Document key metrics to monitor
+- Include Grafana dashboard example
+- Requirements: 11.5
+- 17.6 Create troubleshooting guide-Document common issues and solutions
+- Include debugging tips
+- Add FAQ section
+- Requirements: 11.6
+- -Final Checkpoint
+- Production Ready
+- Ensure all tests pass
+- Verify minimum 80% coverage on critical modules
+- Review all documentation
+- Ask the user if questions arise
+
+## Notes
+
+- All tasks are required for comprehensive production readiness
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties (26 properties total)
+- Unit tests validate specific examples and edge cases
+- The implementation order ensures dependencies are satisfied (error handling before auth, auth before security middleware)
+- Estimated total effort: ~80 tasks across 7 phases

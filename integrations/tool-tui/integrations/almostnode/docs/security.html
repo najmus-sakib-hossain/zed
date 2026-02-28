@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security &amp; Sandbox — almostnode docs</title>
+  <meta name="description" content="Security best practices for almostnode: cross-origin sandboxed iframes, isolation modes, and service worker setup.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://almostnode.dev/docs/security.html">
+  <meta property="og:title" content="Security &amp; Sandbox — almostnode docs">
+  <meta property="og:description" content="Security best practices for almostnode: cross-origin sandboxed iframes, isolation modes, and service worker setup.">
+  <meta property="og:image" content="https://almostnode.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Security &amp; Sandbox — almostnode docs">
+  <meta name="twitter:description" content="Security best practices for almostnode: cross-origin sandboxed iframes, isolation modes, and service worker setup.">
+  <meta name="twitter:image" content="https://almostnode.dev/og-image.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <label class="menu-toggle" for="sidebar-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </label>
+  <a href="../" class="topbar-logo"><span>almostnode</span></a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-section">Docs</span>
+  <ul class="topbar-links">
+    <li><a href="https://github.com/macaly/almostnode">GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/almostnode">npm</a></li>
+  </ul>
+</div>
+
+<input type="checkbox" id="sidebar-check">
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-label">Guide</div>
+      <a href="./">Getting Started</a>
+      <a href="./core-concepts.html">Core Concepts</a>
+      <a href="./security.html" class="active">Security</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Frameworks</div>
+      <a href="./nextjs-guide.html">Next.js</a>
+      <a href="./vite-guide.html">Vite</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Tutorials</div>
+      <a href="./tutorial-editor.html">Editor + Preview</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Reference</div>
+      <a href="./api-reference.html">API Reference</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Security &amp; Sandbox</h1>
+    <p class="lead">Run untrusted code safely with cross-origin isolation, Web Worker execution, and sandboxed iframes.</p>
+
+    <h2>Security Modes</h2>
+    <p>almostnode provides three execution modes with different security levels. Use <code>createRuntime()</code> to select a mode:</p>
+
+    <table>
+      <tr>
+        <th>Mode</th>
+        <th>Option</th>
+        <th>Security</th>
+        <th>Use Case</th>
+      </tr>
+      <tr>
+        <td>Cross-origin sandbox</td>
+        <td><code>sandbox: 'https://...'</code></td>
+        <td>Highest</td>
+        <td>Production, untrusted code</td>
+      </tr>
+      <tr>
+        <td>Same-origin Worker</td>
+        <td><code>dangerouslyAllowSameOrigin: true, useWorker: true</code></td>
+        <td>Medium</td>
+        <td>Demos with trusted code</td>
+      </tr>
+      <tr>
+        <td>Same-origin main thread</td>
+        <td><code>dangerouslyAllowSameOrigin: true</code></td>
+        <td>Lowest</td>
+        <td>Trusted code only</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Secure by default</div>
+      <p><code>createRuntime()</code> throws an error if neither <code>sandbox</code> nor <code>dangerouslyAllowSameOrigin</code> is provided. You must explicitly choose a security level.</p>
+    </div>
+
+    <h3>Cross-Origin Sandbox (Recommended)</h3>
+    <p>The most secure option. Code runs in a cross-origin iframe, fully isolated from your main application:</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createRuntime</span><span class="op">,</span> VirtualFS <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+
+<span class="kw">const</span> runtime <span class="op">=</span> <span class="kw">await</span> <span class="fn">createRuntime</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span>
+  sandbox<span class="op">:</span> <span class="str">'https://your-sandbox.vercel.app'</span><span class="op">,</span>
+<span class="op">});</span>
+
+<span class="cm">// Safe to run untrusted code</span>
+<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> runtime<span class="op">.</span><span class="fn">execute</span><span class="op">(</span>untrustedCode<span class="op">);</span></code></pre>
+
+    <h3>Same-Origin with Worker</h3>
+    <p>Runs code in a Web Worker on the same origin. Offloads execution from the main thread but shares the origin with your app:</p>
+    <pre><code><span class="kw">const</span> runtime <span class="op">=</span> <span class="kw">await</span> <span class="fn">createRuntime</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span>
+  dangerouslyAllowSameOrigin<span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
+  useWorker<span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
+<span class="op">});</span></code></pre>
+
+    <h3>Same-Origin Main Thread</h3>
+    <p>Runs code directly on the main thread. Simplest setup but provides no isolation — only use with fully trusted code:</p>
+    <pre><code><span class="kw">const</span> runtime <span class="op">=</span> <span class="kw">await</span> <span class="fn">createRuntime</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span>
+  dangerouslyAllowSameOrigin<span class="op">:</span> <span class="kw">true</span><span class="op">,</span>
+<span class="op">});</span></code></pre>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>The <code>createContainer()</code> helper always uses same-origin main thread execution. For secure sandboxing, use <code>createRuntime()</code> directly.</p>
+    </div>
+
+    <h3>REPL &amp; eval() Security</h3>
+    <p>The <code>runtime.createREPL()</code> method uses <code>eval()</code> internally to return expression values. While the eval runs in an isolated generator closure (not the global scope), it shares the same security boundary as <code>execute()</code>:</p>
+
+    <table>
+      <tr>
+        <th>Execution Context</th>
+        <th>eval() Safety</th>
+        <th>Risk</th>
+      </tr>
+      <tr>
+        <td>Cross-origin sandbox iframe</td>
+        <td>Safe</td>
+        <td>Code cannot access host page cookies, localStorage, or DOM</td>
+      </tr>
+      <tr>
+        <td>Same-origin Worker</td>
+        <td>Moderate</td>
+        <td>Code can access IndexedDB and make network requests, but not the DOM</td>
+      </tr>
+      <tr>
+        <td>Same-origin main thread</td>
+        <td>Dangerous for untrusted input</td>
+        <td>Code can access cookies, localStorage, DOM, and all page APIs</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Warning</div>
+      <p>If you let users type arbitrary code into a REPL on the main thread or in a same-origin iframe, that code can access everything your page can: cookies, auth tokens, localStorage, the DOM, and network APIs. For any user-facing REPL or code editor, <strong>always use a cross-origin sandboxed iframe</strong>.</p>
+    </div>
+
+    <h2>Sandbox Setup</h2>
+    <p>The cross-origin sandbox must be deployed at a <strong>different origin</strong> (different domain, subdomain, or port) from your main application.</p>
+
+    <h3>Quick Setup (Vercel)</h3>
+    <p>Use <code>generateSandboxFiles()</code> to create all required files, then deploy to Vercel:</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">generateSandboxFiles</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+<span class="kw">import</span> fs <span class="kw">from</span> <span class="str">'fs'</span><span class="op">;</span>
+
+<span class="kw">const</span> files <span class="op">=</span> <span class="fn">generateSandboxFiles</span><span class="op">();</span>
+
+fs<span class="op">.</span><span class="fn">mkdirSync</span><span class="op">(</span><span class="str">'sandbox'</span><span class="op">,</span> <span class="op">{</span> recursive<span class="op">:</span> <span class="kw">true</span> <span class="op">});</span>
+<span class="kw">for</span> <span class="op">(</span><span class="kw">const</span> <span class="op">[</span>filename<span class="op">,</span> content<span class="op">]</span> <span class="kw">of</span> Object<span class="op">.</span><span class="fn">entries</span><span class="op">(</span>files<span class="op">))</span> <span class="op">{</span>
+  fs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">`sandbox/${filename}`</span><span class="op">,</span> content<span class="op">);</span>
+<span class="op">}</span>
+
+<span class="cm">// Deploy: cd sandbox && vercel --prod</span></code></pre>
+
+    <h4>Generated Files</h4>
+    <table>
+      <tr><th>File</th><th>Purpose</th></tr>
+      <tr><td><code>index.html</code></td><td>Sandbox page that loads almostnode and registers the service worker</td></tr>
+      <tr><td><code>vercel.json</code></td><td>CORS headers for cross-origin iframe embedding</td></tr>
+      <tr><td><code>__sw__.js</code></td><td>Service worker for intercepting dev server requests</td></tr>
+    </table>
+
+    <h3>Manual Setup (Any Platform)</h3>
+    <p>If you're not using Vercel, you need two things: a sandbox HTML page and the correct CORS headers.</p>
+
+    <h4>1. Sandbox HTML Page</h4>
+    <p>Create an <code>index.html</code> that loads almostnode and handles <code>postMessage</code> communication with your main app:</p>
+    <pre><code><span class="op">&lt;</span>script type<span class="op">=</span><span class="str">"module"</span><span class="op">&gt;</span>
+  <span class="kw">import</span> <span class="op">{</span> VirtualFS<span class="op">,</span> Runtime <span class="op">}</span> <span class="kw">from</span> <span class="str">'https://unpkg.com/almostnode/dist/index.js'</span><span class="op">;</span>
+
+  <span class="kw">let</span> vfs <span class="op">=</span> <span class="kw">null</span><span class="op">;</span>
+  <span class="kw">let</span> runtime <span class="op">=</span> <span class="kw">null</span><span class="op">;</span>
+
+  window<span class="op">.</span><span class="fn">addEventListener</span><span class="op">(</span><span class="str">'message'</span><span class="op">,</span> <span class="kw">async</span> <span class="op">(</span>event<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+    <span class="kw">const</span> <span class="op">{</span> type<span class="op">,</span> id<span class="op">,</span> code<span class="op">,</span> vfsSnapshot<span class="op">,</span> options <span class="op">}</span> <span class="op">=</span> event<span class="op">.</span>data<span class="op">;</span>
+
+    <span class="kw">switch</span> <span class="op">(</span>type<span class="op">)</span> <span class="op">{</span>
+      <span class="kw">case</span> <span class="str">'init'</span><span class="op">:</span>
+        vfs <span class="op">=</span> VirtualFS<span class="op">.</span><span class="fn">fromSnapshot</span><span class="op">(</span>vfsSnapshot<span class="op">);</span>
+        runtime <span class="op">=</span> <span class="kw">new</span> <span class="fn">Runtime</span><span class="op">(</span>vfs<span class="op">,</span> options<span class="op">);</span>
+        <span class="kw">break</span><span class="op">;</span>
+      <span class="kw">case</span> <span class="str">'execute'</span><span class="op">:</span>
+        <span class="kw">const</span> result <span class="op">=</span> runtime<span class="op">.</span><span class="fn">execute</span><span class="op">(</span>code<span class="op">);</span>
+        parent<span class="op">.</span><span class="fn">postMessage</span><span class="op">({</span> type<span class="op">:</span> <span class="str">'result'</span><span class="op">,</span> id<span class="op">,</span> result <span class="op">},</span> <span class="str">'*'</span><span class="op">);</span>
+        <span class="kw">break</span><span class="op">;</span>
+    <span class="op">}</span>
+  <span class="op">});</span>
+
+  parent<span class="op">.</span><span class="fn">postMessage</span><span class="op">({</span> type<span class="op">:</span> <span class="str">'ready'</span> <span class="op">},</span> <span class="str">'*'</span><span class="op">);</span>
+<span class="op">&lt;/</span>script<span class="op">&gt;</span></code></pre>
+
+    <h4>2. CORS Headers</h4>
+    <p>The sandbox server must include these headers to allow cross-origin iframe embedding:</p>
+    <pre><code>Access-Control-Allow-Origin: *
+Cross-Origin-Resource-Policy: cross-origin</code></pre>
+
+    <p>Example server configurations:</p>
+
+    <p><strong>Nginx:</strong></p>
+    <pre><code>server <span class="op">{</span>
+    listen <span class="num">3002</span><span class="op">;</span>
+    root /path/to/sandbox<span class="op">;</span>
+    location / <span class="op">{</span>
+        add_header Access-Control-Allow-Origin *<span class="op">;</span>
+        add_header Cross-Origin-Resource-Policy cross-origin<span class="op">;</span>
+    <span class="op">}</span>
+<span class="op">}</span></code></pre>
+
+    <p><strong>Express.js:</strong></p>
+    <pre><code>app<span class="op">.</span><span class="fn">use</span><span class="op">((</span>req<span class="op">,</span> res<span class="op">,</span> next<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  res<span class="op">.</span><span class="fn">setHeader</span><span class="op">(</span><span class="str">'Access-Control-Allow-Origin'</span><span class="op">,</span> <span class="str">'*'</span><span class="op">);</span>
+  res<span class="op">.</span><span class="fn">setHeader</span><span class="op">(</span><span class="str">'Cross-Origin-Resource-Policy'</span><span class="op">,</span> <span class="str">'cross-origin'</span><span class="op">);</span>
+  <span class="fn">next</span><span class="op">();</span>
+<span class="op">});</span>
+app<span class="op">.</span><span class="fn">use</span><span class="op">(</span>express<span class="op">.</span><span class="fn">static</span><span class="op">(</span><span class="str">'sandbox'</span><span class="op">));</span></code></pre>
+
+    <h3>What the Sandbox Protects</h3>
+    <table>
+      <tr><th>Threat</th><th>Status</th></tr>
+      <tr><td>Cookies</td><td>Blocked (different origin)</td></tr>
+      <tr><td>localStorage</td><td>Blocked (different origin)</td></tr>
+      <tr><td>IndexedDB</td><td>Blocked (different origin)</td></tr>
+      <tr><td>DOM access</td><td>Blocked (cross-origin iframe)</td></tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>Network requests from the sandbox are still possible. Add Content Security Policy headers for additional protection.</p>
+    </div>
+
+    <h3>Local Development</h3>
+    <p>For local testing, run the sandbox on a different port:</p>
+    <pre><code><span class="cm"># Terminal 1: Main app on port 5173</span>
+npm run dev
+
+<span class="cm"># Terminal 2: Sandbox on port 3002</span>
+npm run sandbox</code></pre>
+    <p>Then use <code>sandbox: 'http://localhost:3002/sandbox/'</code> in your app.</p>
+
+    <h2>Service Worker Setup</h2>
+    <p>almostnode uses a service worker to intercept HTTP requests and route them to virtual dev servers. The service worker is required when using <code>ServerBridge</code> with dev servers.</p>
+
+    <div class="callout">
+      <div class="callout-title">When is it needed?</div>
+      <p>The service worker is only needed if you're using dev servers with URL access (e.g., <code>/__virtual__/3000/</code>). If you're only executing code with <code>runtime.execute()</code>, you don't need it.</p>
+    </div>
+
+    <table>
+      <tr><th>Use Case</th><th>Setup</th></tr>
+      <tr><td>Cross-origin sandbox</td><td><code>generateSandboxFiles()</code> — includes everything</td></tr>
+      <tr><td>Same-origin with Vite</td><td><code>almostnodePlugin</code> from <code>almostnode/vite</code></td></tr>
+      <tr><td>Same-origin with Next.js</td><td><code>getServiceWorkerContent</code> from <code>almostnode/next</code></td></tr>
+      <tr><td>Other frameworks</td><td>Manual copy to public directory</td></tr>
+    </table>
+
+    <h3>Vite Plugin</h3>
+    <p>For same-origin setups with Vite, use the built-in plugin:</p>
+    <pre><code><span class="cm">// vite.config.ts</span>
+<span class="kw">import</span> <span class="op">{</span> defineConfig <span class="op">}</span> <span class="kw">from</span> <span class="str">'vite'</span><span class="op">;</span>
+<span class="kw">import</span> <span class="op">{</span> almostnodePlugin <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/vite'</span><span class="op">;</span>
+
+<span class="kw">export default</span> <span class="fn">defineConfig</span><span class="op">({</span>
+  plugins<span class="op">:</span> <span class="op">[</span><span class="fn">almostnodePlugin</span><span class="op">()]</span>
+<span class="op">});</span></code></pre>
+    <p>The plugin automatically serves <code>/__sw__.js</code> during development. You can customize the path:</p>
+    <pre><code><span class="fn">almostnodePlugin</span><span class="op">({</span> swPath<span class="op">:</span> <span class="str">'/custom/__sw__.js'</span> <span class="op">})</span>
+
+<span class="cm">// Then in your app:</span>
+<span class="kw">await</span> bridge<span class="op">.</span><span class="fn">initServiceWorker</span><span class="op">({</span> swUrl<span class="op">:</span> <span class="str">'/custom/__sw__.js'</span> <span class="op">});</span></code></pre>
+
+    <h3>Next.js Route Handler</h3>
+    <p>For same-origin setups with Next.js:</p>
+
+    <h4>App Router</h4>
+    <pre><code><span class="cm">// app/__sw__.js/route.ts</span>
+<span class="kw">import</span> <span class="op">{</span> <span class="fn">getServiceWorkerContent</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/next'</span><span class="op">;</span>
+
+<span class="kw">export async function</span> <span class="fn">GET</span><span class="op">()</span> <span class="op">{</span>
+  <span class="kw">return new</span> <span class="fn">Response</span><span class="op">(</span><span class="fn">getServiceWorkerContent</span><span class="op">(),</span> <span class="op">{</span>
+    headers<span class="op">:</span> <span class="op">{</span>
+      <span class="str">'Content-Type'</span><span class="op">:</span> <span class="str">'application/javascript'</span><span class="op">,</span>
+      <span class="str">'Cache-Control'</span><span class="op">:</span> <span class="str">'no-cache'</span><span class="op">,</span>
+    <span class="op">},</span>
+  <span class="op">});</span>
+<span class="op">}</span></code></pre>
+
+    <h4>Pages Router</h4>
+    <pre><code><span class="cm">// pages/api/__sw__.ts</span>
+<span class="kw">import</span> <span class="op">{</span> <span class="fn">getServiceWorkerContent</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/next'</span><span class="op">;</span>
+<span class="kw">import</span> type <span class="op">{</span> NextApiRequest<span class="op">,</span> NextApiResponse <span class="op">}</span> <span class="kw">from</span> <span class="str">'next'</span><span class="op">;</span>
+
+<span class="kw">export default function</span> <span class="fn">handler</span><span class="op">(</span>req<span class="op">:</span> NextApiRequest<span class="op">,</span> res<span class="op">:</span> NextApiResponse<span class="op">)</span> <span class="op">{</span>
+  res<span class="op">.</span><span class="fn">setHeader</span><span class="op">(</span><span class="str">'Content-Type'</span><span class="op">,</span> <span class="str">'application/javascript'</span><span class="op">);</span>
+  res<span class="op">.</span><span class="fn">setHeader</span><span class="op">(</span><span class="str">'Cache-Control'</span><span class="op">,</span> <span class="str">'no-cache'</span><span class="op">);</span>
+  res<span class="op">.</span><span class="fn">send</span><span class="op">(</span><span class="fn">getServiceWorkerContent</span><span class="op">());</span>
+<span class="op">}</span></code></pre>
+
+    <h3>Manual Setup</h3>
+    <p>For other frameworks, copy the service worker to your public directory:</p>
+    <pre><code>cp node_modules/almostnode/dist/__sw__.js ./public/</code></pre>
+    <p>Or programmatically:</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">getServiceWorkerPath</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/next'</span><span class="op">;</span>
+<span class="kw">import</span> fs <span class="kw">from</span> <span class="str">'fs'</span><span class="op">;</span>
+
+fs<span class="op">.</span><span class="fn">copyFileSync</span><span class="op">(</span><span class="fn">getServiceWorkerPath</span><span class="op">(),</span> <span class="str">'./public/__sw__.js'</span><span class="op">);</span></code></pre>
+
+    <h2>HMR with Sandboxed Iframes</h2>
+    <p>Hot module replacement works with sandboxed iframes using <code>postMessage</code> for communication between your main page and the preview iframe.</p>
+
+    <h3>Iframe Setup</h3>
+    <pre><code><span class="cm">// Create sandboxed iframe for security</span>
+<span class="kw">const</span> iframe <span class="op">=</span> document<span class="op">.</span><span class="fn">createElement</span><span class="op">(</span><span class="str">'iframe'</span><span class="op">);</span>
+iframe<span class="op">.</span>src <span class="op">=</span> <span class="str">'/__virtual__/3000/'</span><span class="op">;</span>
+iframe<span class="op">.</span>sandbox <span class="op">=</span> <span class="str">'allow-forms allow-scripts allow-same-origin allow-popups'</span><span class="op">;</span>
+container<span class="op">.</span><span class="fn">appendChild</span><span class="op">(</span>iframe<span class="op">);</span>
+
+<span class="cm">// Register as HMR target after load</span>
+iframe<span class="op">.</span>onload <span class="op">=</span> <span class="op">()</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">)</span> <span class="op">{</span>
+    devServer<span class="op">.</span><span class="fn">setHMRTarget</span><span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">);</span>
+  <span class="op">}</span>
+<span class="op">};</span></code></pre>
+
+    <h4>Sandbox Permissions</h4>
+    <ul>
+      <li><code>allow-scripts</code> — required for JavaScript execution</li>
+      <li><code>allow-same-origin</code> — allows cookies, localStorage, IndexedDB access (omit for better isolation)</li>
+      <li><code>allow-forms</code> — if your app uses forms</li>
+      <li><code>allow-popups</code> — if your app opens new windows/tabs</li>
+    </ul>
+
+    <h3>Manual HMR Triggering</h3>
+    <p>If you need to manually trigger HMR updates after programmatic file changes:</p>
+    <pre><code><span class="kw">function</span> <span class="fn">triggerHMR</span><span class="op">(</span>path<span class="op">:</span> <span class="ty">string</span><span class="op">,</span> iframe<span class="op">:</span> <span class="ty">HTMLIFrameElement</span><span class="op">)</span> <span class="op">{</span>
+  <span class="kw">if</span> <span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">)</span> <span class="op">{</span>
+    iframe<span class="op">.</span>contentWindow<span class="op">.</span><span class="fn">postMessage</span><span class="op">({</span>
+      type<span class="op">:</span> <span class="str">'update'</span><span class="op">,</span>
+      path<span class="op">,</span>
+      timestamp<span class="op">:</span> Date<span class="op">.</span><span class="fn">now</span><span class="op">(),</span>
+      channel<span class="op">:</span> <span class="str">'next-hmr'</span><span class="op">,</span> <span class="cm">// Use 'vite-hmr' for Vite</span>
+    <span class="op">},</span> <span class="str">'*'</span><span class="op">);</span>
+  <span class="op">}</span>
+<span class="op">}</span>
+
+<span class="cm">// After writing a file</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/page.tsx'</span><span class="op">,</span> newContent<span class="op">);</span>
+<span class="fn">triggerHMR</span><span class="op">(</span><span class="str">'/app/page.tsx'</span><span class="op">,</span> iframe<span class="op">);</span></code></pre>
+
+    <h3>Supported File Types</h3>
+    <table>
+      <tr><th>File Type</th><th>HMR Behavior</th></tr>
+      <tr><td><code>.jsx</code>, <code>.tsx</code></td><td>React Refresh (preserves state)</td></tr>
+      <tr><td><code>.js</code>, <code>.ts</code></td><td>Full module reload</td></tr>
+      <tr><td><code>.css</code></td><td>Style injection (no reload)</td></tr>
+      <tr><td><code>.json</code></td><td>Full page reload</td></tr>
+    </table>
+
+    <div class="page-nav">
+      <a href="./core-concepts.html">
+        <div class="label">Previous</div>
+        <div class="title">Core Concepts</div>
+      </a>
+      <a href="./nextjs-guide.html" class="next">
+        <div class="label">Next</div>
+        <div class="title">Next.js Guide</div>
+      </a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

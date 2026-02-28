@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DX-WWW Framework - Binary-first web framework built in Rust with WebAssembly. Achieve 100/100 Lighthouse scores with zero-cost abstractions.">
+    <meta name="theme-color" content="#0066cc">
+    <link rel="canonical" href="http://localhost:3000/">
+    <title>DX-WWW Framework - Binary-First Web Performance</title>
+    <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,-apple-system,sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f5f5f5;line-height:1.6}.container{background:#fff;padding:30px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.1)}h1{color:#333;font-size:2rem}p{margin:10px 0}.counter{font-size:4rem;font-weight:700;color:#06c;margin:20px 0;font-variant-numeric:tabular-nums}button{background:#06c;color:#fff;border:0;padding:12px 24px;font-size:1rem;border-radius:4px;cursor:pointer;margin:5px;min-width:44px;min-height:44px}button:hover{background:#05a}button:focus{outline:2px solid #06c;outline-offset:2px}.status{margin-top:20px;padding:15px;background:#e8f5e9;border-radius:4px;color:#2e7d32}.status strong{display:inline-block;min-width:120px}</style>
+</head>
+<body>
+    <div class="container">
+        <h1>DX-WWW Framework</h1>
+        <p>Binary-first web framework built in Rust with WebAssembly</p>
+        
+        <div class="counter" id="counter" aria-live="polite" aria-atomic="true">0</div>
+        
+        <div role="group" aria-label="Counter controls">
+            <button onclick="increment()" aria-label="Increment counter">Increment</button>
+            <button onclick="decrement()" aria-label="Decrement counter">Decrement</button>
+            <button onclick="reset()" aria-label="Reset counter">Reset</button>
+        </div>
+        
+        <div class="status" role="status">
+            <strong>Runtime:</strong> <span id="runtime-info">dx-www-client</span><br>
+            <strong>WASM Size:</strong> <span id="wasm-size">1.5 KB</span><br>
+            <strong>Status:</strong> <span id="status">Active</span>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        const counterEl = document.getElementById('counter');
+        const statusEl = document.getElementById('status');
+        const runtimeInfo = document.getElementById('runtime-info');
+
+        window.increment = () => {
+            count++;
+            counterEl.textContent = count;
+        };
+
+        window.decrement = () => {
+            count--;
+            counterEl.textContent = count;
+        };
+
+        window.reset = () => {
+            count = 0;
+            counterEl.textContent = count;
+        };
+
+        // Defer WASM loading to not block render
+        function initWasm() {
+            fetch('/dx_www_client.wasm')
+                .then(r => r.arrayBuffer())
+                .then(bytes => {
+                    const memory = new WebAssembly.Memory({ initial: 1, maximum: 10 });
+                    return WebAssembly.instantiate(bytes, {
+                        env: {
+                            memory: memory,
+                            host_clone_template: id => id,
+                            host_cache_template: () => {},
+                            host_append: () => {},
+                            host_remove: () => {},
+                            host_set_text: () => {},
+                            host_set_attr: () => {},
+                            host_toggle_class: () => {},
+                            host_listen: () => {},
+                            host_get_cached_base: () => 0,
+                            host_store_patched: () => {},
+                            host_log: v => console.log('WASM:', v)
+                        }
+                    });
+                })
+                .then(wasm => {
+                    const { init, get_node_count, get_template_count } = wasm.instance.exports;
+                    init();
+                    const nodes = get_node_count();
+                    const templates = get_template_count();
+                    console.log('DX-WWW initialized - Nodes:', nodes, 'Templates:', templates);
+                    statusEl.textContent = 'WASM Active';
+                })
+                .catch(err => {
+                    console.log('Using JS fallback');
+                    statusEl.textContent = 'JS Fallback';
+                });
+        }
+
+        // Load WASM after page is interactive
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(initWasm, { timeout: 2000 });
+        } else {
+            setTimeout(initWasm, 100);
+        }
+    </script>
+</body>
+</html>

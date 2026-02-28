@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>almostnode — Node.js in your browser</title>
+    <meta name="description" content="A lightweight JavaScript library that runs Node.js, Next.js, Vite, and Express entirely in the browser. ~250KB gzipped, instant startup, no server required.">
+    <meta name="keywords" content="nodejs, browser, javascript, runtime, nextjs, vite, express, npm, wasm, webcontainers, sandbox, playground">
+    <meta name="author" content="Macaly">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://almostnode.dev/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://almostnode.dev/">
+    <meta property="og:title" content="almostnode — Node.js in your browser">
+    <meta property="og:description" content="Run Node.js, Next.js, Vite, and Express entirely in the browser. ~250KB gzipped, instant startup, no server required.">
+    <meta property="og:image" content="https://almostnode.dev/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="almostnode">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="almostnode — Node.js in your browser">
+    <meta name="twitter:description" content="Run Node.js, Next.js, Vite, and Express entirely in the browser. ~250KB gzipped, instant startup, no server required.">
+    <meta name="twitter:image" content="https://almostnode.dev/og-image.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --black: #0c0c0c;
+        --surface: #141414;
+        --surface-2: #1a1a1a;
+        --border: #2a2a2a;
+        --border-bright: #3a3a3a;
+        --text: #c0c0c0;
+        --text-bright: #f0f0f0;
+        --text-dim: #999;
+        --accent: #00ff88;
+        --accent-dim: #00cc6a;
+        --accent-bg: rgba(0, 255, 136, 0.06);
+        --accent-border: rgba(0, 255, 136, 0.15);
+        --mono: 'IBM Plex Mono', 'Menlo', monospace;
+        --sans: 'Instrument Sans', system-ui, sans-serif;
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: var(--sans);
+        background: var(--black);
+        color: var(--text);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        position: relative;
+      }
+
+      /* Scanline overlay */
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0,0,0,0.03) 2px,
+          rgba(0,0,0,0.03) 4px
+        );
+        pointer-events: none;
+        z-index: 9999;
+      }
+
+      /* ── Nav ── */
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(12, 12, 12, 0.92);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+      }
+      .nav-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .nav-logo {
+        font-family: var(--mono);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--accent);
+        text-decoration: none;
+        letter-spacing: -0.01em;
+      }
+      .nav-links {
+        display: flex;
+        gap: 24px;
+        list-style: none;
+      }
+      .nav-links a {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--text-dim);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        transition: color 0.15s;
+      }
+      .nav-links a:hover { color: var(--text-bright); }
+
+      /* ── Hero ── */
+      .hero {
+        padding: 96px 24px 72px;
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 48px;
+      }
+      .hero-content {
+        flex: 1;
+        min-width: 0;
+      }
+      .hero-visual {
+        flex: 0 0 400px;
+        height: 400px;
+        position: relative;
+      }
+      .hero-visual canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .hero-label {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .hero-label::before {
+        content: '';
+        width: 20px;
+        height: 1px;
+        background: var(--accent);
+      }
+      .hero h1 {
+        font-family: var(--sans);
+        font-size: clamp(2.8rem, 7vw, 4.5rem);
+        font-weight: 700;
+        color: var(--text-bright);
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+        margin-bottom: 24px;
+        max-width: 700px;
+      }
+      .hero .subtitle {
+        font-size: 1.1rem;
+        color: var(--text);
+        line-height: 1.65;
+        max-width: 520px;
+        margin-bottom: 40px;
+      }
+
+      /* Install box */
+      .install-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 14px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 14px 18px;
+        margin-bottom: 28px;
+        font-family: var(--mono);
+        font-size: 0.88rem;
+      }
+      .install-box .prompt { color: var(--accent); user-select: none; }
+      .install-box code { color: var(--text-bright); }
+      .install-box button {
+        background: none;
+        border: 1px solid var(--border);
+        color: var(--text-dim);
+        cursor: pointer;
+        padding: 4px 6px;
+        display: flex;
+        align-items: center;
+        transition: color 0.15s, border-color 0.15s;
+      }
+      .install-box button:hover {
+        color: var(--accent);
+        border-color: var(--accent-border);
+      }
+      .install-box button svg { width: 14px; height: 14px; }
+
+      /* CTA row */
+      .cta-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 32px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        font-weight: 500;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        transition: all 0.15s;
+        border: 1px solid transparent;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: var(--black);
+      }
+      .btn-primary:hover {
+        background: #00ffaa;
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+      }
+      .btn-secondary {
+        background: transparent;
+        border-color: var(--border);
+        color: var(--text);
+      }
+      .btn-secondary:hover {
+        border-color: var(--text-dim);
+        color: var(--text-bright);
+      }
+      .btn svg { width: 15px; height: 15px; }
+
+      /* Badges */
+      .badges {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .badges a { text-decoration: none; line-height: 0; }
+      .badges img { height: 20px; }
+
+      /* ── Section ── */
+      .section {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .section-header {
+        padding: 80px 0 48px;
+        border-top: 1px solid var(--border);
+      }
+      .section-label {
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--text-dim);
+        margin-bottom: 12px;
+      }
+      .section-header h2 {
+        font-family: var(--sans);
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--text-bright);
+        letter-spacing: -0.02em;
+      }
+
+      /* ── Code examples ── */
+      .code-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        margin-bottom: 80px;
+      }
+      @media (max-width: 900px) {
+        .code-grid { grid-template-columns: 1fr; }
+      }
+      .code-card {
+        background: var(--surface);
+        overflow: hidden;
+      }
+      .code-card:hover { background: var(--surface-2); }
+      .code-tab {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text-dim);
+      }
+      .code-tab .indicator {
+        width: 6px;
+        height: 6px;
+        background: var(--accent);
+      }
+      .code-card pre {
+        padding: 16px;
+        overflow-x: auto;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        line-height: 1.7;
+        color: var(--text);
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      /* Syntax — muted, monochrome-forward with accent pops */
+      .kw { color: var(--accent); }
+      .str { color: #e8c872; }
+      .fn { color: var(--text-bright); }
+      .cm { color: #888; }
+      .op { color: #888; }
+      .num { color: #e8c872; }
+
+      /* ── Features ── */
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        margin-bottom: 80px;
+      }
+      @media (max-width: 768px) {
+        .features-grid { grid-template-columns: 1fr; }
+      }
+      @media (min-width: 769px) and (max-width: 1024px) {
+        .features-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      .feature-card {
+        background: var(--surface);
+        padding: 28px 24px;
+        transition: background 0.15s;
+      }
+      .feature-card:hover { background: var(--surface-2); }
+      .feature-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        border: 1px solid var(--accent-border);
+        background: var(--accent-bg);
+      }
+      .feature-icon svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--accent);
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .feature-card h3 {
+        font-family: var(--mono);
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        margin-bottom: 8px;
+        letter-spacing: -0.01em;
+      }
+      .feature-card p {
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        line-height: 1.55;
+      }
+
+      /* ── Demos ── */
+      .demos-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        margin-bottom: 80px;
+      }
+      @media (max-width: 900px) {
+        .demos-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+      @media (max-width: 520px) {
+        .demos-grid { grid-template-columns: 1fr; }
+      }
+      .demo-card {
+        display: block;
+        background: var(--surface);
+        padding: 24px 20px;
+        text-decoration: none;
+        color: inherit;
+        transition: background 0.15s;
+      }
+      .demo-card:hover {
+        background: var(--surface-2);
+      }
+      .demo-card:hover h3 { color: var(--accent); }
+      .demo-card h3 {
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-bright);
+        margin-bottom: 8px;
+        transition: color 0.15s;
+      }
+      .demo-card p {
+        font-size: 0.82rem;
+        color: var(--text-dim);
+        line-height: 1.5;
+        margin-bottom: 14px;
+      }
+      .demo-tag {
+        display: inline-block;
+        padding: 2px 8px;
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background: var(--accent-bg);
+        color: var(--accent-dim);
+        border: 1px solid var(--accent-border);
+      }
+
+      /* ── FAQ ── */
+      .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+      }
+      .faq-item {
+        background: var(--surface);
+      }
+      .faq-item summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        font-family: var(--sans);
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: var(--text);
+        cursor: pointer;
+        list-style: none;
+        transition: color 0.15s, background 0.15s;
+      }
+      .faq-item summary::-webkit-details-marker { display: none; }
+      .faq-item summary::before {
+        content: '+';
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        color: var(--text-dim);
+        flex-shrink: 0;
+        width: 18px;
+        text-align: center;
+        transition: color 0.15s;
+      }
+      .faq-item[open] summary::before {
+        content: '\2212';
+        color: var(--accent);
+      }
+      .faq-item summary:hover {
+        color: var(--text-bright);
+        background: rgba(255,255,255,0.02);
+      }
+      .faq-item[open] summary {
+        color: var(--text-bright);
+        border-bottom: 1px solid var(--border);
+      }
+      .faq-answer {
+        padding: 16px 20px 16px 50px;
+        font-size: 0.88rem;
+        line-height: 1.7;
+        color: var(--text);
+      }
+      .faq-answer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .faq-answer a:hover { text-decoration: underline; }
+      .faq-answer code {
+        font-family: var(--mono);
+        font-size: 0.82em;
+        background: var(--black);
+        border: 1px solid var(--border);
+        padding: 1px 5px;
+        color: var(--accent);
+      }
+
+      /* ── Footer ── */
+      footer {
+        border-top: 1px solid var(--border);
+        padding: 28px 24px;
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      footer .footer-links {
+        display: flex;
+        gap: 20px;
+      }
+      footer a {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        transition: color 0.15s;
+      }
+      footer a:hover { color: var(--text-bright); }
+      footer .footer-byline {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--text-dim);
+      }
+      footer .footer-byline a {
+        color: var(--accent);
+        text-transform: none;
+        letter-spacing: 0;
+      }
+      footer .license {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--text-dim);
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 900px) {
+        .hero-visual { display: none; }
+      }
+      @media (max-width: 600px) {
+        .nav-links { gap: 14px; }
+        .nav-links a { font-size: 0.7rem; }
+        .hero { padding: 64px 20px 56px; }
+        .hero h1 { font-size: 2.2rem; }
+        .cta-row { flex-direction: column; }
+        .btn { justify-content: center; }
+        footer { flex-direction: column; gap: 12px; text-align: center; }
+      }
+
+      /* ── Playground ── */
+      .pg {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px 80px;
+      }
+      .pg-shell {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        overflow: hidden;
+      }
+      .pg-tabs {
+        display: flex;
+        align-items: stretch;
+        background: var(--black);
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+        scrollbar-width: none;
+      }
+      .pg-tabs::-webkit-scrollbar { display: none; }
+      .pg-tab {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 20px;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: color 0.15s, border-color 0.15s, background 0.15s;
+      }
+      .pg-tab:hover {
+        color: var(--text);
+        background: rgba(255,255,255,0.02);
+      }
+      .pg-tab.active {
+        color: var(--text-bright);
+        border-bottom-color: var(--accent);
+      }
+      .pg-tab .dot {
+        width: 6px;
+        height: 6px;
+        background: var(--text-dim);
+        border-radius: 0;
+        flex-shrink: 0;
+        transition: background 0.3s;
+      }
+      .pg-tab.active .dot { background: var(--accent); }
+      .pg-tab.running .dot {
+        background: var(--accent);
+        animation: pulse-dot 1.2s ease infinite;
+      }
+      .pg-tab.error .dot { background: #ff6b6b; }
+      @keyframes pulse-dot {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+      }
+      .pg-status {
+        margin-left: auto;
+        padding: 0 16px;
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-dim);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+      .pg-body {
+        display: grid;
+        grid-template-columns: 55fr 45fr;
+        height: 480px;
+      }
+      .pg-code-panel {
+        display: flex;
+        flex-direction: column;
+        border-right: 1px solid var(--border);
+        min-width: 0;
+        overflow: hidden;
+      }
+      .pg-code-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(0,0,0,0.2);
+      }
+      .pg-code-header .filename {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--text-dim);
+      }
+      .pg-code-wrap {
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+        position: relative;
+      }
+      .pg-code-wrap textarea {
+        width: 100%;
+        height: 100%;
+        padding: 16px;
+        margin: 0;
+        border: none;
+        resize: none;
+        background: transparent;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        line-height: 1.7;
+        color: var(--accent);
+        tab-size: 2;
+        outline: none;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+      .pg-code-wrap textarea::selection {
+        background: rgba(0, 255, 136, 0.15);
+      }
+      .pg-code-panel[hidden] { display: none; }
+      .pg-run-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-top: 1px solid var(--border);
+        background: var(--black);
+      }
+      .pg-run-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 20px;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        background: var(--accent);
+        color: var(--black);
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s, box-shadow 0.15s;
+      }
+      .pg-run-btn:hover {
+        background: #00ffaa;
+        box-shadow: 0 0 16px rgba(0, 255, 136, 0.2);
+      }
+      .pg-run-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+      .pg-run-btn svg { width: 12px; height: 12px; }
+      .pg-run-hint {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        color: var(--text-dim);
+      }
+      .pg-output-panel {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        overflow: hidden;
+      }
+      .pg-terminal-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(0,0,0,0.2);
+      }
+      .pg-terminal-header .label {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+      }
+      .pg-terminal {
+        flex: 1;
+        padding: 12px 16px;
+        font-family: var(--mono);
+        font-size: 0.73rem;
+        line-height: 1.65;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+        min-height: 0;
+      }
+      .pg-terminal .t-info { color: var(--text-dim); }
+      .pg-terminal .t-ok { color: var(--accent); }
+      .pg-terminal .t-err { color: #ff6b6b; }
+      .pg-terminal .t-ts {
+        color: #555;
+        user-select: none;
+        margin-right: 6px;
+      }
+      .pg-terminal .t-log { color: var(--text); }
+      .pg-preview-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        background: rgba(0,0,0,0.2);
+      }
+      .pg-preview-header .label {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+      }
+      .pg-preview-url {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        color: var(--accent-dim);
+        margin-left: auto;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .pg-preview-url.visible { opacity: 1; }
+      .pg-preview {
+        flex: 0 0 200px;
+        background: #0e0e1a;
+        position: relative;
+      }
+      .pg-preview iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+      }
+      .pg-preview-placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: #444;
+        pointer-events: none;
+      }
+      .pg-preview-placeholder.hidden { display: none; }
+      @media (max-width: 768px) {
+        .pg-body {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+        .pg-code-panel { border-right: none; border-bottom: 1px solid var(--border); max-height: 360px; }
+        .pg-output-panel { max-height: 360px; }
+        .pg-preview { flex: 0 0 180px; }
+      }
+
+      /* ── Entrance animations ── */
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .hero-label, .hero h1, .hero .subtitle,
+      .install-box, .cta-row, .badges {
+        animation: fadeUp 0.5s ease both;
+      }
+      .hero h1 { animation-delay: 0.05s; }
+      .hero .subtitle { animation-delay: 0.1s; }
+      .install-box { animation-delay: 0.15s; }
+      .cta-row { animation-delay: 0.2s; }
+      .badges { animation-delay: 0.25s; }
+    </style>
+  </head>
+  <body>
+
+    <!-- Nav -->
+    <nav>
+      <div class="nav-inner">
+        <a href="./" class="nav-logo">almostnode</a>
+        <ul class="nav-links">
+          <li><a href="./docs/">Docs</a></li>
+          <li><a href="#demos">Examples</a></li>
+          <li><a href="https://github.com/macaly/almostnode">GitHub</a></li>
+          <li><a href="https://www.npmjs.com/package/almostnode">npm</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-content">
+      <div class="hero-label">Open Source</div>
+      <h1>Node.js in your browser</h1>
+      <p class="subtitle">Run Node.js, Next.js, Vite, and Express entirely in the browser. No server required.</p>
+
+      <div class="install-box">
+        <span class="prompt">$</span>
+        <code>npm install almostnode</code>
+        <button onclick="navigator.clipboard.writeText('npm install almostnode').then(()=>{this.innerHTML='<svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot;><polyline points=&quot;20 6 9 17 4 12&quot;/></svg>';setTimeout(()=>{this.innerHTML='<svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot;><rect x=&quot;9&quot; y=&quot;9&quot; width=&quot;13&quot; height=&quot;13&quot; rx=&quot;2&quot;/><path d=&quot;M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1&quot;/></svg>'},1500)})" aria-label="Copy">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+
+      <div class="cta-row">
+        <a href="./docs/" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/macaly/almostnode" class="btn btn-secondary">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </a>
+      </div>
+
+      <div class="badges">
+        <a href="https://www.npmjs.com/package/almostnode"><img src="https://img.shields.io/npm/v/almostnode?style=flat-square&color=2a2a2a&labelColor=1a1a1a" alt="npm version"></a>
+        <a href="https://github.com/macaly/almostnode"><img src="https://img.shields.io/github/stars/macaly/almostnode?style=flat-square&color=2a2a2a&labelColor=1a1a1a" alt="GitHub stars"></a>
+        <a href="https://github.com/macaly/almostnode/blob/main/LICENSE"><img src="https://img.shields.io/github/license/macaly/almostnode?style=flat-square&color=2a2a2a&labelColor=1a1a1a" alt="License"></a>
+      </div>
+      </div>
+      <div class="hero-visual">
+        <canvas id="hero-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- Playground -->
+    <div class="pg">
+      <div class="pg-shell">
+        <div class="pg-tabs">
+          <button class="pg-tab active" data-tab="http"><span class="dot"></span>HTTP Server</button>
+          <button class="pg-tab" data-tab="express"><span class="dot"></span>Express</button>
+          <button class="pg-tab" data-tab="nextjs"><span class="dot"></span>Next.js</button>
+          <span class="pg-status" id="pg-status"></span>
+        </div>
+        <div class="pg-body">
+          <!-- Code panels -->
+          <div class="pg-code-panel" id="pg-code-http">
+            <div class="pg-code-header"><span class="filename">server.js</span></div>
+            <div class="pg-code-wrap">
+              <textarea id="pg-editor-http" spellcheck="false">const http = require('http');
+
+const server = http.createServer((req, res) => {
+  if (req.url === '/api/time') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ time: new Date().toISOString() }));
+    return;
+  }
+  res.writeHead(200, { 'Content-Type': 'text/html' });
+  res.end(`
+    <body style="font-family:system-ui;padding:2rem;background:#f8f9fa">
+      <h1>Hello from the browser!</h1>
+      <p>This server runs entirely in your browser.</p>
+      <a href="/api/time">Check /api/time →</a>
+    </body>
+  `);
+});
+
+server.listen(3000);</textarea>
+            </div>
+            <div class="pg-run-bar">
+              <button class="pg-run-btn" id="pg-run"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run</button>
+              <span class="pg-run-hint">⌘S to re-run</span>
+            </div>
+          </div>
+
+          <div class="pg-code-panel" id="pg-code-express" hidden>
+            <div class="pg-code-header"><span class="filename">app.js</span></div>
+            <div class="pg-code-wrap">
+              <textarea id="pg-editor-express" spellcheck="false">const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send(`
+    <body style="font-family:system-ui;padding:2rem;background:#f8f9fa">
+      <h1>Express in the browser</h1>
+      <p>Installed from npm, running client-side.</p>
+      <a href="/api/hello">Try the API →</a>
+    </body>
+  `);
+});
+
+app.get('/api/hello', (req, res) => {
+  res.json({
+    message: 'Hello from Express!',
+    runtime: 'almostnode'
+  });
+});
+
+app.listen(3000);</textarea>
+            </div>
+            <div class="pg-run-bar">
+              <button class="pg-run-btn" id="pg-run-express"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run</button>
+              <span class="pg-run-hint">Auto-installs Express · ⌘S to re-run</span>
+            </div>
+          </div>
+
+          <div class="pg-code-panel" id="pg-code-nextjs" hidden>
+            <div class="pg-code-header"><span class="filename">app/page.tsx</span></div>
+            <div class="pg-code-wrap">
+              <textarea id="pg-editor-nextjs" spellcheck="false">export default function Home() {
+  return (
+    <main>
+      <h1>Next.js in the browser</h1>
+      <p>
+        App Router with file-based routing,
+        running entirely client-side.
+      </p>
+    </main>
+  );
+}</textarea>
+            </div>
+            <div class="pg-run-bar">
+              <button class="pg-run-btn" id="pg-run-nextjs"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> Run</button>
+              <span class="pg-run-hint">Full Next.js dev server · ⌘S to re-run</span>
+            </div>
+          </div>
+
+          <!-- Output panel -->
+          <div class="pg-output-panel">
+            <div class="pg-terminal-header"><span class="label">Terminal</span></div>
+            <div class="pg-terminal" id="pg-terminal">
+              <div class="t-info">Click <span style="color:var(--accent)">Run</span> to start the server.</div>
+            </div>
+            <div class="pg-preview-header">
+              <span class="label">Preview</span>
+              <span class="pg-preview-url" id="pg-preview-url">localhost:3000</span>
+            </div>
+            <div class="pg-preview">
+              <div class="pg-preview-placeholder" id="pg-placeholder">output appears here</div>
+              <iframe id="pg-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { createContainer, VirtualFS, NextDevServer, getServerBridge, resetServerBridge } from '/src/index.ts';
+
+      const terminal = document.getElementById('pg-terminal');
+      const iframe = document.getElementById('pg-iframe');
+      const placeholder = document.getElementById('pg-placeholder');
+      const previewUrl = document.getElementById('pg-preview-url');
+      const statusEl = document.getElementById('pg-status');
+      const tabs = document.querySelectorAll('.pg-tab');
+      const panels = {
+        http: document.getElementById('pg-code-http'),
+        express: document.getElementById('pg-code-express'),
+        nextjs: document.getElementById('pg-code-nextjs'),
+      };
+
+      let activeTab = 'http';
+      let running = false;
+      let currentBridge = null;
+      let currentPort = null;
+
+      const editors = {
+        http: document.getElementById('pg-editor-http'),
+        express: document.getElementById('pg-editor-express'),
+        nextjs: document.getElementById('pg-editor-nextjs'),
+      };
+
+      function ts() {
+        return new Date().toLocaleTimeString('en-US', { hour12: false });
+      }
+
+      function log(msg, type = 'info') {
+        const d = document.createElement('div');
+        d.className = 't-' + type;
+        d.innerHTML = '<span class="t-ts">[' + ts() + ']</span>' + escapeHtml(msg);
+        terminal.appendChild(d);
+        terminal.scrollTop = terminal.scrollHeight;
+      }
+
+      function escapeHtml(s) {
+        return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      }
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      function setTabState(tabId, state) {
+        const tab = document.querySelector(`.pg-tab[data-tab="${tabId}"]`);
+        tab.classList.remove('running', 'error');
+        if (state) tab.classList.add(state);
+      }
+
+      // Tab switching
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const id = tab.dataset.tab;
+          if (id === activeTab) return;
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          Object.entries(panels).forEach(([k, p]) => {
+            p.hidden = k !== id;
+          });
+          activeTab = id;
+        });
+      });
+
+      function getAllRunBtns() {
+        return document.querySelectorAll('.pg-run-btn');
+      }
+
+      function setRunning(isRunning) {
+        running = isRunning;
+        getAllRunBtns().forEach(b => b.disabled = isRunning);
+      }
+
+      // Load preview via serverBridge.handleRequest
+      async function loadPreview(bridge, port, path) {
+        try {
+          const resp = await bridge.handleRequest(port, 'GET', path, {
+            host: 'localhost',
+            'user-agent': 'almostnode-playground',
+          });
+          const ct = resp.headers['content-type'] || 'text/plain';
+          const body = resp.body.toString();
+          let html;
+          if (ct.includes('text/html')) {
+            html = injectNav(body);
+          } else if (ct.includes('application/json')) {
+            html = `<!DOCTYPE html><html><head><style>body{font-family:monospace;padding:1rem;background:#0e0e1a;color:#00ff88;}pre{white-space:pre-wrap;}</style></head><body><pre>${escapeHtml(JSON.stringify(JSON.parse(body), null, 2))}</pre></body></html>`;
+          } else {
+            html = `<!DOCTYPE html><html><head><style>body{font-family:monospace;padding:1rem;background:#0e0e1a;color:#eee;}pre{white-space:pre-wrap;}</style></head><body><pre>${escapeHtml(body)}</pre></body></html>`;
+          }
+          const blob = new Blob([html], { type: 'text/html' });
+          iframe.src = URL.createObjectURL(blob);
+          placeholder.classList.add('hidden');
+          previewUrl.classList.add('visible');
+          previewUrl.textContent = 'localhost:3000' + path;
+        } catch (e) {
+          log('Preview error: ' + e.message, 'err');
+        }
+      }
+
+      function injectNav(html) {
+        const script = `<script>document.addEventListener('click',function(e){var a=e.target.closest('a');if(a){e.preventDefault();var h=a.getAttribute('href');if(h){var p=h.startsWith('/')?h:'/'+h;window.parent.postMessage({type:'pg-nav',path:p},'*');}}});<\/script>`;
+        if (html.includes('</body>')) return html.replace('</body>', script + '</body>');
+        return html + script;
+      }
+
+      window.addEventListener('message', (e) => {
+        if (e.data?.type === 'pg-nav' && currentBridge && currentPort) {
+          log('GET ' + e.data.path, 'info');
+          loadPreview(currentBridge, currentPort, e.data.path);
+        }
+      });
+
+      // Run HTTP or Express
+      async function runSimple(tabId) {
+        terminal.innerHTML = '';
+        iframe.src = 'about:blank';
+        placeholder.classList.remove('hidden');
+        previewUrl.classList.remove('visible');
+        setRunning(true);
+        setTabState(tabId, 'running');
+        setStatus('Starting...');
+
+        try {
+          const container = createContainer();
+          container.runtime.onConsole = (method, args) => {
+            const msg = args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ');
+            log(msg, method === 'error' ? 'err' : 'log');
+          };
+
+          if (tabId === 'express') {
+            log('Installing express from npm...', 'info');
+            setStatus('Installing npm packages...');
+            await container.npm.install('express', {
+              onProgress: (msg) => log(msg, 'info'),
+            });
+            log('Express installed', 'ok');
+          }
+
+          resetServerBridge();
+          const bridge = getServerBridge({
+            baseUrl: window.location.origin,
+            onServerReady: (port) => {
+              currentBridge = bridge;
+              currentPort = port;
+              log('Server listening on port ' + port, 'ok');
+              setStatus('Running');
+              setTabState(tabId, 'running');
+              loadPreview(bridge, port, '/');
+            },
+          });
+
+          const code = editors[tabId].value;
+          log('Executing code...', 'info');
+          setStatus('Executing...');
+          container.runtime.execute(code, '/server.js');
+          log('Code executed', 'ok');
+
+          setTimeout(() => {
+            setRunning(false);
+          }, 500);
+        } catch (e) {
+          log('Error: ' + e.message, 'err');
+          setStatus('Error');
+          setTabState(tabId, 'error');
+          setRunning(false);
+        }
+      }
+
+      // Run Next.js
+      async function runNextjs() {
+        terminal.innerHTML = '';
+        iframe.src = 'about:blank';
+        placeholder.classList.remove('hidden');
+        previewUrl.classList.remove('visible');
+        setRunning(true);
+        setTabState('nextjs', 'running');
+        setStatus('Starting Next.js...');
+
+        try {
+          log('Creating Next.js dev server...', 'info');
+          const vfs = new VirtualFS();
+
+          const pageCode = editors.nextjs.value;
+          vfs.mkdirSync('/app', { recursive: true });
+          vfs.writeFileSync('/app/layout.tsx', `export default function RootLayout({ children }) {\n  return (\n    <html lang="en">\n      <body style={{ fontFamily: 'system-ui, sans-serif', padding: '2rem', maxWidth: '600px', margin: '0 auto', background: '#f8f9fa' }}>{children}</body>\n    </html>\n  );\n}`);
+          vfs.writeFileSync('/app/page.tsx', pageCode);
+
+          const server = new NextDevServer(vfs, { port: 3000, root: '/' });
+          const httpServer = {
+            listening: true,
+            address: () => ({ port: 3000, address: '0.0.0.0', family: 'IPv4' }),
+            handleRequest: (method, url, headers, body) => server.handleRequest(method, url, headers, body ? (typeof body === 'string' ? new TextEncoder().encode(body) : body) : undefined),
+          };
+
+          log('Initializing service worker...', 'info');
+          setStatus('Service worker...');
+          resetServerBridge();
+          const bridge = getServerBridge({ baseUrl: window.location.origin });
+          await bridge.initServiceWorker();
+          log('Service worker ready', 'ok');
+
+          bridge.registerServer(httpServer, 3000);
+          log('Next.js server registered on port 3000', 'ok');
+          setStatus('Running');
+
+          currentBridge = bridge;
+          currentPort = 3000;
+
+          // Load via service worker URL
+          iframe.src = '/__virtual__/3000/';
+          placeholder.classList.add('hidden');
+          previewUrl.classList.add('visible');
+          previewUrl.textContent = 'localhost:3000/';
+          setRunning(false);
+        } catch (e) {
+          log('Error: ' + e.message, 'err');
+          setStatus('Error');
+          setTabState('nextjs', 'error');
+          setRunning(false);
+        }
+      }
+
+      // Wire up all Run buttons
+      document.getElementById('pg-run').addEventListener('click', () => runSimple('http'));
+      document.getElementById('pg-run-express').addEventListener('click', () => runSimple('express'));
+      document.getElementById('pg-run-nextjs').addEventListener('click', () => runNextjs());
+
+      function runActive() {
+        if (running) return;
+        if (activeTab === 'nextjs') runNextjs();
+        else runSimple(activeTab);
+      }
+
+      // Cmd+S / Ctrl+S to re-run
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+          // Only intercept if focus is inside the playground
+          const pg = document.querySelector('.pg-shell');
+          if (pg && pg.contains(document.activeElement)) {
+            e.preventDefault();
+            runActive();
+          }
+        }
+      });
+
+      // Tab key support in textareas (insert 2 spaces)
+      Object.values(editors).forEach(ta => {
+        ta.addEventListener('keydown', (e) => {
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = ta.selectionStart;
+            const end = ta.selectionEnd;
+            ta.value = ta.value.substring(0, start) + '  ' + ta.value.substring(end);
+            ta.selectionStart = ta.selectionEnd = start + 2;
+          }
+        });
+      });
+    </script>
+
+    <!-- Features -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-label">01 / Features</div>
+        <h2>Everything you need</h2>
+      </div>
+      <div class="features-grid">
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          </div>
+          <h3>Virtual Filesystem</h3>
+          <p>POSIX-compatible in-memory filesystem with watch, stat, and recursive operations.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          </div>
+          <h3>Node.js Runtime</h3>
+          <p>Execute JS/TS with 40+ shimmed modules — fs, path, http, crypto, streams, and more.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <h3>npm in the Browser</h3>
+          <p>Install real npm packages, resolve dependencies, extract tarballs — all client-side.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>Framework Dev Servers</h3>
+          <p>Built-in Next.js and Vite dev servers with file-based routing and React support.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          </div>
+          <h3>Hot Module Replacement</h3>
+          <p>React Refresh, CSS Modules, and instant file updates without page reload.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3>Security Modes</h3>
+          <p>Cross-origin sandbox, Web Worker isolation, or same-origin main thread execution.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Demos -->
+    <div class="section" id="demos">
+      <div class="section-header">
+        <div class="section-label">02 / Demos</div>
+        <h2>Try it live</h2>
+      </div>
+      <div class="demos-grid">
+
+        <a class="demo-card" href="./examples/index.html">
+          <h3>HTTP Server</h3>
+          <p>Run a Node.js HTTP server in the browser. Edit the code, hit Run, and see it serve pages live.</p>
+          <span class="demo-tag">http · require()</span>
+        </a>
+
+        <a class="demo-card" href="./examples/next-demo.html">
+          <h3>Next.js App</h3>
+          <p>A full Next.js development server with App Router, file-based routing, and HMR.</p>
+          <span class="demo-tag">next.js · app router · hmr</span>
+        </a>
+
+        <a class="demo-card" href="./examples/vite-demo.html">
+          <h3>Vite Dev Server</h3>
+          <p>Vite running in the browser with React, hot module replacement, and npm packages.</p>
+          <span class="demo-tag">vite · react · hmr</span>
+        </a>
+
+        <a class="demo-card" href="./examples/express-demo.html">
+          <h3>Express Server</h3>
+          <p>Express.js with routing, middleware, and JSON APIs — entirely in your browser.</p>
+          <span class="demo-tag">express · npm install</span>
+        </a>
+
+        <a class="demo-card" href="./examples/npm-scripts-demo.html">
+          <h3>npm Scripts</h3>
+          <p>Interactive terminal to run package.json scripts with npm run, lifecycle hooks, and bash.</p>
+          <span class="demo-tag">npm run · bash · terminal</span>
+        </a>
+
+        <a class="demo-card" href="./examples/vitest-demo.html">
+          <h3>Vitest Testing</h3>
+          <p>Run real vitest unit tests in the browser with npm run test — using @vitest/expect assertions.</p>
+          <span class="demo-tag">vitest · npm run test</span>
+        </a>
+
+        <a class="demo-card" href="./examples/demo-convex-app.html">
+          <h3>Convex Todo App</h3>
+          <p>Real-time todo list with Next.js and Convex — deploy and sync from the browser.</p>
+          <span class="demo-tag">next.js · convex</span>
+        </a>
+
+        <a class="demo-card" href="./examples/demo-vercel-ai-sdk.html">
+          <h3>Vercel AI SDK</h3>
+          <p>Streaming AI chatbot with Next.js and OpenAI — real-time token streaming.</p>
+          <span class="demo-tag">next.js · ai sdk · openai</span>
+        </a>
+
+        <a class="demo-card" href="./examples/agent-workbench.html">
+          <h3>Agent Workbench</h3>
+          <p>AI coding agent that builds Next.js pages live — with file editing, bash, and HMR preview.</p>
+          <span class="demo-tag">ai agent · tool-calling · next.js</span>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-label">03 / FAQ</div>
+        <h2>Common questions</h2>
+      </div>
+      <div class="faq-list">
+
+        <details class="faq-item">
+          <summary>What is almostnode for?</summary>
+          <div class="faq-answer">Running demos and playgrounds of Node.js projects directly in the browser — no backend server needed. Think interactive documentation, code tutorials, and live examples that work from a static HTML page.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Can I use this for AI coding agents?</summary>
+          <div class="faq-answer">Yes. An AI agent can write code, execute it via almostnode, inspect output, and iterate — all client-side. No sandbox server to provision or manage. For untrusted AI-generated code, run it in a <a href="./docs/security.html">sandboxed cross-origin iframe</a>.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Is this production-ready?</summary>
+          <div class="faq-answer">No. almostnode is experimental. It covers common Node.js APIs but not all edge cases. Expect bugs, especially with complex npm packages that rely on native modules or Node.js internals. Please <a href="https://github.com/macaly/almostnode/issues">file issues on GitHub</a>.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>How should I handle security?</summary>
+          <div class="faq-answer">Always run untrusted code in a cross-origin sandboxed iframe (<code>sandbox="allow-scripts"</code>). almostnode supports both same-origin and cross-origin modes via the service worker bridge. See the <a href="./docs/security.html">Security docs</a> for setup details.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>How does this differ from WebContainers?</summary>
+          <div class="faq-answer">almostnode is ~250KB gzipped (vs ~2MB), starts instantly (vs 2-5s), and runs on the main thread or a Web Worker. WebContainers provide a full Linux kernel with real TCP/IP and native module support. almostnode is better for lightweight playgrounds and demos; WebContainers for full dev environments.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>What Node.js modules are supported?</summary>
+          <div class="faq-answer">40+ shimmed modules including <code>fs</code>, <code>path</code>, <code>http</code>, <code>crypto</code>, <code>stream</code>, <code>buffer</code>, <code>events</code>, <code>url</code>, <code>zlib</code>, and more. These are browser-compatible implementations — not the full Node.js API, but enough for most web frameworks and npm packages. See the <a href="./docs/api-reference.html">API Reference</a>.</div>
+        </details>
+
+        <details class="faq-item">
+          <summary>Does it work offline?</summary>
+          <div class="faq-answer">The runtime works offline once loaded. However, <code>npm.install()</code> fetches packages from the npm registry, so it requires an internet connection. You can pre-populate the virtual filesystem with package files for offline use.</div>
+        </details>
+
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <div class="footer-links">
+        <a href="https://github.com/macaly/almostnode">GitHub</a>
+        <a href="https://www.npmjs.com/package/almostnode">npm</a>
+        <a href="./docs/">Docs</a>
+      </div>
+      <span class="footer-byline">Built by the creators of <a href="https://macaly.com">Macaly.com</a></span>
+      <span class="license">MIT License</span>
+    </footer>
+
+    <!-- ASCII Donut -->
+    <script>
+    (function() {
+      var cvs = document.getElementById('hero-canvas');
+      if (!cvs) return;
+
+      function init() {
+        var par = cvs.parentElement;
+        var W = par.clientWidth;
+        var H = par.clientHeight;
+        if (!W || !H) return;
+        var dpr = window.devicePixelRatio || 1;
+
+        cvs.width = W * dpr;
+        cvs.height = H * dpr;
+
+        var ctx = cvs.getContext('2d');
+        ctx.scale(dpr, dpr);
+
+        var CHARS = '.,-~:;=!*#$@';
+        var CL = CHARS.length;
+        var COLS = 40, ROWS = 22;
+        var cw = W / COLS, ch = H / ROWS;
+        var fs = Math.max(11, Math.min(cw * 1.4, ch * 0.95));
+
+        var A = 0.5, B = 0.3;
+        var running = true;
+        var raf = 0;
+
+        function render() {
+          if (!running) return;
+
+          ctx.clearRect(0, 0, W, H);
+
+          // Subtle radial glow
+          var grad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, W * 0.45);
+          grad.addColorStop(0, 'rgba(0, 255, 136, 0.04)');
+          grad.addColorStop(1, 'transparent');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, W, H);
+
+          var out = new Int8Array(COLS * ROWS);
+          var zb = new Float32Array(COLS * ROWS);
+          for (var k = 0; k < out.length; k++) out[k] = -1;
+
+          var sA = Math.sin(A), cA = Math.cos(A);
+          var sB = Math.sin(B), cB = Math.cos(B);
+
+          for (var t = 0; t < 6.28; t += 0.07) {
+            var st = Math.sin(t), ct = Math.cos(t);
+            for (var p = 0; p < 6.28; p += 0.02) {
+              var sp = Math.sin(p), cp = Math.cos(p);
+              var h = ct + 2;
+              var D = 1 / (sp * h * sA + st * cA + 5);
+              var T = sp * h * cA - st * sA;
+
+              var x = (COLS / 2 + 28 * D * (cp * h * cB - T * sB)) | 0;
+              var y = (ROWS / 2 + 14 * D * (cp * h * sB + T * cB)) | 0;
+
+              var N = (8 * ((st * sA - sp * ct * cA) * cB
+                       - sp * ct * sA - st * cA - cp * ct * sB)) | 0;
+
+              var idx = x + COLS * y;
+              if (y >= 0 && y < ROWS && x >= 0 && x < COLS && D > zb[idx]) {
+                zb[idx] = D;
+                out[idx] = N > 0 ? N : 0;
+              }
+            }
+          }
+
+          ctx.font = fs + "px 'IBM Plex Mono',monospace";
+          ctx.textBaseline = 'middle';
+          ctx.textAlign = 'center';
+
+          for (var j = 0; j < ROWS; j++) {
+            for (var i = 0; i < COLS; i++) {
+              var ci = out[i + COLS * j];
+              if (ci >= 0) {
+                var b = ci / (CL - 1);
+                ctx.fillStyle = 'rgba(0,255,136,' + (0.15 + b * 0.85).toFixed(2) + ')';
+                if (b > 0.5) {
+                  ctx.shadowColor = '#00ff88';
+                  ctx.shadowBlur = 2 + b * 6;
+                } else {
+                  ctx.shadowBlur = 0;
+                }
+                ctx.fillText(CHARS[ci], i * cw + cw / 2, j * ch + ch / 2);
+              }
+            }
+          }
+          ctx.shadowBlur = 0;
+
+          A += 0.007;
+          B += 0.005;
+          raf = requestAnimationFrame(render);
+        }
+
+        // Only animate when visible
+        var obs = new IntersectionObserver(function(entries) {
+          if (entries[0].isIntersecting) {
+            running = true;
+            render();
+          } else {
+            running = false;
+            cancelAnimationFrame(raf);
+          }
+        });
+        obs.observe(cvs);
+      }
+
+      document.fonts.ready.then(init);
+    })();
+    </script>
+
+  </body>
+</html>

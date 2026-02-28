@@ -1,0 +1,86 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "globalDependencies": ["**/.env"],
+  "ui": "stream",
+  "tasks": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "build": {
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "dependsOn": ["^build"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "next-env.d.ts",
+        ".expo/**",
+        "dist/**",
+        "build/**",
+        "lib/**"
+      ],
+      "passThroughEnv": [
+        "SUPABASE_SERVICE_KEY",
+        "RESEND_API_KEY",
+        "RESEND_AUDIENCE_ID",
+        "GOCARDLESS_SECRET_ID",
+        "GOCARDLESS_SECRET_KEY",
+        "POLAR_WEBHOOK_SECRET",
+        "POLAR_ACCESS_TOKEN",
+        "POLAR_ENVIRONMENT",
+        "FILE_KEY_SECRET",
+        "TELLER_CERTIFICATE",
+        "TELLER_CERTIFICATE_PRIVATE_KEY",
+        "PLAID_CLIENT_ID",
+        "PLAID_SECRET",
+        "GITHUB_TOKEN",
+        "PLAIN_API_KEY",
+        "OPENAI_API_KEY",
+        "OPENPANEL_SECRET_KEY",
+        "SLACK_CLIENT_SECRET",
+        "SLACK_CLIENT_ID",
+        "SLACK_SIGNING_SECRET",
+        "WHATSAPP_PHONE_NUMBER_ID",
+        "WHATSAPP_BUSINESS_ACCOUNT_ID",
+        "WHATSAPP_ACCESS_TOKEN",
+        "WHATSAPP_VERIFY_TOKEN",
+        "WHATSAPP_APP_SECRET",
+        "GMAIL_CLIENT_ID",
+        "GMAIL_CLIENT_SECRET",
+        "GMAIL_REDIRECT_URI",
+        "OUTLOOK_CLIENT_ID",
+        "OUTLOOK_CLIENT_SECRET",
+        "OUTLOOK_REDIRECT_URI",
+        "MIDDAY_ENCRYPTION_KEY",
+        "NEXT_PUBLIC_URL",
+        "SENTRY_AUTH_TOKEN",
+        "SENTRY_ORG",
+        "SENTRY_PROJECT",
+        "SENTRY_RELEASE",
+        "NEXT_PUBLIC_SENTRY_DSN",
+        "GIT_COMMIT_SHA"
+      ]
+    },
+    "start": {
+      "cache": false
+    },
+    "test": {
+      "cache": false
+    },
+    "dev": {
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "persistent": true,
+      "cache": false
+    },
+    "jobs": {
+      "persistent": true,
+      "cache": false
+    },
+    "format": {},
+    "lint": {
+      "dependsOn": ["^topo"]
+    },
+    "typecheck": {
+      "outputs": []
+    }
+  }
+}

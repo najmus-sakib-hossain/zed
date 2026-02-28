@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 826b1e03e142ebf4616bc01ef93ccbc05fb5d8bc515c44396b4f84f7dc269c71 # shrinks to table1_name = "jg9a", table2_name = "z_j157u6c", schema1 = ["m", "o3_", "uss_"], schema2 = ["mwsz64jf9_7", "o2z__", "p_", "xwz5v8_c", "y"], rows1 = [["a2CKJ", "false", "false", "true"], ["x", "-368", "true", "-100"], ["-885", "75.22"], ["false", "IUmeo_"], ["false", "nlb", "-43.68", "625", "21.64"]], rows2 = [["p", "17", "1.91"], ["Nh_H__e", "-575"]], (sep1_name, sep1_str) = ("newline", "\n"), (sep2_name, sep2_str) = ("colon", ": ")

@@ -1,0 +1,17 @@
+[package]
+name = "dx-pkg-workspace"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+dx-pkg-compat = { path = "../dx-pkg-compat" }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+glob = "0.3"
+
+[dev-dependencies]
+proptest = { workspace = true }

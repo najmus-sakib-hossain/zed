@@ -1,0 +1,24 @@
+[package]
+name = "dx-test-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "dx-test"
+path = "src/main.rs"
+
+[dependencies]
+dx-test-core = { path = "../dx-test-core" }
+dx-test-cache = { path = "../dx-test-cache" }
+dx-test-vm = { path = "../dx-test-vm" }
+dx-test-executor = { path = "../dx-test-executor" }
+clap = { workspace = true }
+colored = { workspace = true }
+tokio = { workspace = true }
+notify = { workspace = true }
+notify-debouncer-mini = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+walkdir = { workspace = true }

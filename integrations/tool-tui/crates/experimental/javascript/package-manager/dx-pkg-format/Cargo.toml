@@ -1,0 +1,19 @@
+[package]
+name = "dx-pkg-format"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+memmap2 = { workspace = true }
+bytemuck = { workspace = true }
+lz4_flex = { workspace = true }
+zstd = { workspace = true }
+thiserror = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+criterion = { workspace = true }

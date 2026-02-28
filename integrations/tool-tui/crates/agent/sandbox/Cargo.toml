@@ -1,0 +1,45 @@
+[package]
+name = "dx-agent-sandbox"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX Agent sandbox - Docker, native OS, and WASM isolation for secure execution"
+
+[dependencies]
+# Async
+tokio = { version = "1.42", features = ["full"] }
+async-trait = "0.1"
+futures-util = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+
+# Container management
+bollard = "0.17"  # Docker API client
+
+# Utils
+uuid = { version = "1.0", features = ["v4"] }
+tempfile = "3.14"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.58", features = [
+    "Win32_System_JobObjects",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_Threading",
+] }
+
+[dev-dependencies]
+tokio = { version = "1.42", features = ["full", "test-util"] }
+
+[lints]
+workspace = true

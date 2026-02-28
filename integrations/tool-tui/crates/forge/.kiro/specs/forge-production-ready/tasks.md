@@ -1,0 +1,198 @@
+
+# Implementation Plan: DX Forge Production-Ready Transformation
+
+## Overview
+
+This implementation plan transforms DX Forge from prototype to production-ready by eliminating global state, completing stub implementations, hardening error handling, and achieving meaningful test coverage. Tasks are ordered to build incrementally with early validation.
+
+## Tasks
+
+- Eliminate Global State Architecture
+- 1.1 Extract BranchingEngine from global state-Move `BRANCHING_STATE` into a struct owned by Forge
+- Add `ApplicationRecord` for revert support with file backups
+- Implement `revert_most_recent()` with actual file restoration
+- Requirements: 1.1, 1.2, 2.9
+- 1.2 Extract EventBus from global state-Create `EventBus` struct with subscriber management
+- Move event publishing/subscribing to instance methods
+- Requirements: 1.1, 1.2
+- 1.3 Refactor Forge to own all state-Add `BranchingEngine`, `EventBus`, `ToolRegistry` as owned fields
+- Remove `FORGE_INSTANCE`, `TOOL_REGISTRY`, `CURRENT_CONTEXT` globals
+- Update constructor to initialize all components
+- Requirements: 1.1, 1.2, 1.4, 1.6
+- 1.4 Write property test for instance isolation-Property 1: Instance Isolation
+- Validates: Requirements 1.2, 1.3, 1.5
+- 1.5 Add backward-compatible deprecated wrappers-Create deprecated `initialize_forge()`, `shutdown_forge()` wrappers
+- Log deprecation warnings when used
+- Requirements: 1.4
+- Checkpoint
+- Verify global state elimination
+- Ensure all tests pass, ask the user if questions arise.
+- Run `cargo test` to verify no regressions
+- Verify multiple Forge instances can be created
+- Complete Stub Implementations
+- Branching & Revert
+- 3.1 Implement actual file revert functionality-Store file backups before applying changes
+- Implement `revert_most_recent_application()` to restore backups
+- Handle edge cases (file deleted, permissions)
+- Requirements: 2.9
+- 3.2 Write property test for revert round-trip-Property 4: Revert Round-Trip
+- Validates: Requirements 2.9
+- Complete Stub Implementations
+- Event Timing
+- 4.1 Implement debounced event triggering-Add actual debounce logic with configurable delay
+- Use tokio timers for async debouncing
+- Requirements: 2.6
+- 4.2 Write property test for debounce timing-Property 2: Debounce Timing Correctness
+- Validates: Requirements 2.6
+- 4.3 Implement idle detection and scheduling-Track last activity timestamp
+- Trigger idle events after threshold
+- Implement `schedule_task_for_idle_time()`
+- Requirements: 2.7, 2.8
+- 4.4 Write property test for idle detection-Property 3: Idle Detection Correctness
+- Validates: Requirements 2.7, 2.8
+- Checkpoint
+- Verify event timing implementations
+- Ensure all tests pass, ask the user if questions arise.
+- Eliminate Panic-Prone Code Patterns
+- 6.1 Audit and fix unwrap/expect calls in core modules-Scan `src/core/`, `src/api/`, `src/orchestrator.rs`
+- Replace `.unwrap()` with `.ok_or_else()` or `?`
+- Replace `.expect()` with `.context()`
+- Requirements: 3.1, 3.2, 3.5
+- 6.2 Audit and fix unwrap/expect calls in remaining modules-Scan remaining `src/` modules
+- Apply same fixes
+- Requirements: 3.1, 3.2, 3.5
+- 6.3 Add context to all error returns-Use `.context()` on all `?` operations
+- Ensure error messages describe the operation
+- Requirements: 9.2, 9.3
+- 6.4 Write property test for graceful error handling-Property 5: Graceful Error Handling
+- Validates: Requirements 3.3, 3.6, 9.2
+- Checkpoint
+- Verify panic elimination
+- Ensure all tests pass, ask the user if questions arise.
+- Run `cargo clippy` to check for remaining issues
+- Remove Dead and Unused Code
+- 8.1 Remove empty watcher directory and consolidate watchers-Delete empty `src/watcher/` directory if exists
+- Decide: keep `watcher_legacy` or remove it
+- Add `#[deprecated]` to legacy module if keeping
+- Requirements: 4.3, 4.4, 4.5
+- 8.2 Remove unused struct fields and dead code-Run `cargo build` and fix all `dead_code` warnings
+- Remove fields prefixed with `_` that are never read
+- Add `#[allow(dead_code)]` with comments for intentional reserves
+- Requirements: 4.1, 4.2, 4.7
+- 8.3 Remove commented-out code blocks-Search for large commented code blocks
+- Delete or move to documentation
+- Requirements: 4.6
+- Clean Repository Hygiene
+- 9.1 Update.gitignore and remove committed artifacts-Add patterns for logs, node_modules, build artifacts
+- Remove committed `logs/`, `proptest-regressions/`
+- Remove any `.vsix` files
+- Requirements: 7.1, 7.2, 7.3, 7.4, 7.5
+- Checkpoint
+- Verify clean build
+- Ensure all tests pass, ask the user if questions arise.
+- Run `cargo build` with zero warnings
+- Verify `cargo clippy` passes
+- Dependency Rationalization
+- 11.1 Audit and document dependencies-Review each dependency in Cargo.toml
+- Document purpose of each major dependency
+- Identify candidates for removal or feature-gating
+- Requirements: 8.1, 8.2, 8.4
+- 11.2 Feature-gate heavy dependencies-Make `automerge`, `yrs`, `git2` optional features
+- Make `axum`, `tower` optional (for daemon feature)
+- Update code to use `#[cfg(feature = "...")]`
+- Requirements: 8.3, 8.5
+- 11.3 Remove duplicate/unused dependencies-Remove unused hashing libraries if any
+- Consolidate where possible
+- Target 20% reduction in dependency count
+- Requirements: 8.6
+- Platform I/O Backend Verification
+- 12.1 Implement graceful backend fallback-Catch native backend initialization errors
+- Fall back to portable backend with warning
+- Requirements: 11.4
+- 12.2 Write property test for backend fallback-Property 6: Backend Fallback
+- Validates: Requirements 11.4
+- 12.3 Write integration tests for platform I/O-Test io_uring on Linux (if available)
+- Test kqueue on macOS (if available)
+- Test IOCP on Windows (if available)
+- Requirements: 11.1, 11.2, 11.3, 11.5
+- Checkpoint
+- Verify platform I/O
+- Ensure all tests pass, ask the user if questions arise.
+- API Design Cleanup
+- 14.1 Resolve duplicate type exports-Fix `ToolStatus` vs `SovereignToolStatus` naming
+- Fix `ToolRegistry` vs `DxToolRegistry` naming
+- Use consistent naming or remove duplicates
+- Requirements: 10.1, 10.5
+- 14.2 Add deprecation attributes to legacy exports-Add `#[deprecated]` to `ForgeWatcher` alias
+- Add deprecation notices to any other legacy items
+- Requirements: 10.2
+- 14.3 Organize lib.rs exports with clear sections-Add section comments explaining each export group
+- Remove internal implementation details from public API
+- Requirements: 10.4, 10.6
+- Honest Documentation
+- 15.1 Update README with accurate status-Change status from "production-ready" to "alpha" or "experimental"
+- Add implementation status table (implemented vs stub)
+- Remove "132/132 functions implemented" claim
+- Requirements: 6.1, 6.2, 6.3, 6.7
+- 15.2 Mark stub functions in API docs-Add doc comments noting "Not yet implemented" for stubs
+- Update function docs to reflect actual behavior
+- Requirements: 6.4
+- 15.3 Fix doc examples-Run `cargo test
+- doc`
+- Fix any failing doc examples
+- Requirements: 6.5
+- 15.4 Update CHANGELOG and version-Add entry for current version
+- Ensure version is 0.x.y (not 1.0)
+- Sync version across Cargo.toml, README, CHANGELOG
+- Requirements: 6.6, 12.1, 12.2, 12.5
+- Checkpoint
+- Verify documentation
+- Ensure all tests pass, ask the user if questions arise.
+- Run `cargo doc` to verify documentation builds
+- Run `cargo test
+- doc` to verify examples
+- Achieve Test Coverage Targets
+- 17.1 Add unit tests for Forge core-Test constructor, configuration, basic operations
+- Test error conditions
+- Target 80% coverage on `core/forge.rs`
+- Requirements: 5.1, 5.3
+- 17.2 Add unit tests for BranchingEngine-Test vote submission, color prediction
+- Test apply and revert operations
+- Target 80% coverage
+- Requirements: 5.1, 5.3
+- 17.3 Add unit tests for EventBus-Test publish/subscribe
+- Test multiple subscribers
+- Target 75% coverage
+- Requirements: 5.1, 5.3
+- 17.4 Add integration tests for storage-Test SQLite storage operations
+- Test R2 sync (with mock or real credentials)
+- Requirements: 5.2, 2.2, 2.3
+- Final Checkpoint
+- Full Test Suite
+- Ensure all tests pass, ask the user if questions arise.
+- Run `cargo test`
+- all tests must pass
+- Run `cargo clippy`
+- no warnings
+- Run `cargo build
+- release`
+- successful build
+- Verify coverage meets 70% target
+- Final Cleanup
+- [-] 19.1 Run final audit-Verify all requirements addressed
+- Check for any remaining TODOs in code
+- Ensure consistent code style
+- Requirements: All
+- [~] 19.2 Prepare for publication-Verify `cargo publish
+- dry-run` succeeds
+- Update keywords and categories if needed
+- Requirements: 12.4
+
+## Notes
+
+- All tasks are required for comprehensive production-ready transformation
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
+- The implementation order prioritizes eliminating global state first, as it's the foundation for all other improvements

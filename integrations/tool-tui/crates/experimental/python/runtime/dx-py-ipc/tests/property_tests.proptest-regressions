@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 8ab34a34cc314e4f3d7266894ac2eee9742f0200047e0c987e33b4803e92a239 # shrinks to arena_name = "a", offset = 0, dtype = 0, shape_len = 3, shape_vals = [1]

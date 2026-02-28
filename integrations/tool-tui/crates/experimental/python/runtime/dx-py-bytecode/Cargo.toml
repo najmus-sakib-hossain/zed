@@ -1,0 +1,19 @@
+[package]
+name = "dx-py-bytecode"
+description = "Binary Python Bytecode (DPB) - Zero Parse Format for DX-Py-Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+memmap2.workspace = true
+blake3.workspace = true
+thiserror.workspace = true
+bitflags.workspace = true
+tempfile = "3.9"
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true
+tempfile.workspace = true

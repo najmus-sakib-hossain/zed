@@ -1,0 +1,37 @@
+{
+  "rules_per_language": {
+    "cpp": 14,
+    "go": 7,
+    "ts": 5,
+    "yaml": 3,
+    "kt": 15,
+    "css": 7,
+    "md": 38,
+    "json": 6,
+    "toml": 4,
+    "php": 7,
+    "py": 42,
+    "rs": 16,
+    "js": 64,
+    "html": 3
+  },
+  "rules_per_source": {
+    "ktlint": 15,
+    "taplo": 4,
+    "gofmt.rs": 7,
+    "dx-check": 67,
+    "rumdl": 38,
+    "biome": 21,
+    "mago": 7,
+    "ruff": 42,
+    "rustfmt": 16,
+    "cpp-linter-rs": 14
+  },
+  "fixable_count": 35,
+  "non_fixable_count": 196,
+  "recommended_count": 180,
+  "format_rule_count": 5,
+  "lint_rule_count": 226,
+  "binary_size_bytes": 12445,
+  "compiled_at": "2025-12-27T14:39:12.650904300+00:00"
+}

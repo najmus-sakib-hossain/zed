@@ -1,0 +1,13 @@
+[package]
+name = "dx-py-parser"
+version = "0.1.0"
+edition = "2021"
+description = "Python source parser for DX-Py runtime"
+license = "MIT"
+
+[dependencies]
+thiserror = "1.0"
+unicode-xid = "0.2"
+
+[dev-dependencies]
+proptest = "1.0"

@@ -1,0 +1,19 @@
+# Forge Repository Configuration
+[repository]
+name = "forge-demo"
+version = "1.0.0"
+created_at = "2025-11-10T00:00:00Z"
+
+[storage]
+backend = "cloudflare-r2"
+compression = "lz4"
+content_addressing = "sha256"
+
+[sync]
+protocol = "crdt"
+conflict_resolution = "last-write-wins"
+
+[features]
+traffic_branches = true
+lsp_detection = true
+auto_sync = true

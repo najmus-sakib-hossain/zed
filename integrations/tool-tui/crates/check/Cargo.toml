@@ -1,0 +1,147 @@
+[package]
+name = "dx-check"
+version = "0.1.0"
+edition = "2024"
+authors = ["dx-www Runtime Team <team@dx-www.dev>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dx-www/dx-www-runtime"
+description = "Binary-first code linter and formatter - 10x faster than Biome"
+keywords = ["linter", "formatter", "typescript", "javascript", "wasm"]
+categories = ["development-tools", "command-line-utilities"]
+
+[[bin]]
+name = "dx-check"
+path = "src/main.rs"
+
+[lib]
+name = "dx_check"
+path = "src/lib.rs"
+
+[dependencies]
+# Parser - using oxc for JavaScript/TypeScript parsing (fastest parser)
+oxc_parser = "0.52"
+oxc_ast = "0.52"
+oxc_span = "0.52"
+oxc_allocator = "0.52"
+oxc_diagnostics = "0.52"
+oxc_syntax = "0.52"
+
+# Parallelism
+rayon = "1.10"
+crossbeam-deque = "0.8"
+crossbeam-channel = "0.5"
+parking_lot = "0.12"
+
+# Memory
+memmap2 = "0.9"
+bumpalo = "3.16"
+bytemuck = { version = "1.21", features = ["derive"] }
+
+# Hashing
+blake3 = "1.5"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+crc32fast = "1.4"
+
+# Regex
+regex-automata = "0.4"
+regex = "1.11"
+
+# Serialization
+bincode = "2.0.0-rc.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# TOML formatting and linting
+taplo = "0.13"
+
+# Markdown linting and formatting
+rumdl = "0.1"
+
+# Compression
+lz4_flex = { version = "0.11", optional = true }
+
+# DX Serializer - for rule loading
+serializer = { path = "../serializer", package = "dx-serializer" }
+
+# CLI
+clap = { version = "4.5", features = ["derive", "env"] }
+colored = "2.1"
+
+# File system
+walkdir = "2.5"
+ignore = "0.4"
+glob = "0.3"
+notify = "6.1"
+
+# CPU detection
+num_cpus = "1.16"
+
+# Async (for watch mode and LSP)
+tokio = { version = "1.42", features = ["full"] }
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+miette = { version = "7.4", features = ["fancy"] }
+
+# Python support
+rustpython-parser = "0.4"
+
+# Timestamps
+chrono = { version = "0.4", features = ["serde"] }
+
+# Directory paths
+dirs = "5.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Signal handling for graceful shutdown
+ctrlc = "3.4"
+
+# HTTP client for tool downloads
+ureq = "2.10"
+
+# LSP (Language Server Protocol)
+tower-lsp = { version = "0.20", optional = true }
+lsp-types = { version = "0.95", optional = true }
+
+# Plugin system
+libloading = { version = "0.8", optional = true }
+wasmtime = { version = "27", optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+insta = "1.41"
+tempfile = "3.14"
+proptest = "1.4"
+
+[[bench]]
+name = "lint_benchmark"
+harness = false
+
+[[bench]]
+name = "regression_benchmark"
+harness = false
+
+[features]
+default = ["simd", "compression"]
+simd = []
+lsp = ["tower-lsp", "lsp-types"]
+compression = ["lz4_flex"]
+native-plugins = ["libloading"]
+wasm-plugins = ["wasmtime"]
+plugin-api = []
+
+[lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+
+[lints.clippy]
+undocumented_unsafe_blocks = "warn"
+unwrap_used = "warn"
+expect_used = "warn"
+correctness = { level = "deny", priority = -1 }
+perf = { level = "warn", priority = -1 }

@@ -1,0 +1,12 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 615096afcc466eed63120b4084ae0901e5d4a5436137cfa2f3721dd189b618c7 # shrinks to arr = [Num(3.752628643948572e143)]
+cc cc12e3d6b2dc03e1bfcfbac6d83b06576a8e1cbb16f26261e83d265c805c9765 # shrinks to obj = {"a": Num(-1.527077667057949e64)}
+cc 7a26663a9e9051731f5061298ba95e4a19d6c6f29d07d9f6a35d9cd813980afa # shrinks to section = DxSection { schema: ["id", "endpoint"], rows: [[Num(0.0), Str("/api/aaa")], [Num(1.0), Str("/api/aaa")], [Num(2.0), Str("/api/aaa")]] }
+cc 73309a92f42d5b7c1e457ffdb902104b23e2b3ca282eede03d6cf00bfb7d6bd3 # shrinks to obj = {"a": Num(-7.809199907640144e115)}
+cc 48ae114a7cdc217884609e9faff1232eda6927d000096ecaa6fd0e96487fc373 # shrinks to doc = DxDocument { context: {}, refs: {}, sections: {'a': DxSection { schema: ["a", "a___"], rows: [[Null, Str("a_kwZ")], [Num(9.371244471853544e-93), Num(-1.6232746758095203e148)]] }} }
+cc 21929899384dccd2cd4e8aa427b37277543a718d0823d381ccd3125679a13372 # shrinks to section = DxSection { schema: ["a", "au4i_"], rows: [[Null, Null], [Null, Null], [Null, Null]] }

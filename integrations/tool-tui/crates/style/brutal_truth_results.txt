@@ -1,0 +1,8 @@
+   Compiling dx-style v0.1.0 (F:\Code\dx\crates\style)
+    Finished `bench` profile [optimized] target(s) in 13.56s
+     Running benches\brutal_truth_benchmark.rs (F:\Code\dx\target\release\deps\brutal_truth_benchmark-6a2e5efdbc1333db.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

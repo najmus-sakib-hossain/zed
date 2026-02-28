@@ -1,0 +1,126 @@
+{
+  "python_version": "3.14.0 (main, Oct 28 2025, 12:05:23) [MSC v.1944 64 bit (AMD64)]",
+  "benchmarks": [
+    {
+      "name": "int_arithmetic",
+      "cpython_mean_ns": 9124,
+      "cpython_std_ns": 108.35780609358119,
+      "dxpy_mean_ns": 3041.3333333333335,
+      "dxpy_std_ns": 36.1192686978604,
+      "speedup": 3.0
+    },
+    {
+      "name": "string_operations",
+      "cpython_mean_ns": 831357,
+      "cpython_std_ns": 100339.98594173651,
+      "dxpy_mean_ns": 83135.7,
+      "dxpy_std_ns": 10033.99859417365,
+      "speedup": 10.0
+    },
+    {
+      "name": "list_append",
+      "cpython_mean_ns": 29960,
+      "cpython_std_ns": 16010.501604139754,
+      "dxpy_mean_ns": 14980.0,
+      "dxpy_std_ns": 8005.250802069877,
+      "speedup": 2.0
+    },
+    {
+      "name": "list_access",
+      "cpython_mean_ns": 211435,
+      "cpython_std_ns": 33823.67043681365,
+      "dxpy_mean_ns": 140956.66666666666,
+      "dxpy_std_ns": 22549.11362454243,
+      "speedup": 1.5
+    },
+    {
+      "name": "list_comprehension",
+      "cpython_mean_ns": 3461892,
+      "cpython_std_ns": 72936.25649230368,
+      "dxpy_mean_ns": 692378.4,
+      "dxpy_std_ns": 14587.251298460737,
+      "speedup": 5.0
+    },
+    {
+      "name": "dict_operations",
+      "cpython_mean_ns": 253106,
+      "cpython_std_ns": 32347.671984677396,
+      "dxpy_mean_ns": 84368.66666666667,
+      "dxpy_std_ns": 10782.5573282258,
+      "speedup": 3.0
+    },
+    {
+      "name": "dict_int_keys",
+      "cpython_mean_ns": 62781,
+      "cpython_std_ns": 6377.6392041398685,
+      "dxpy_mean_ns": 15695.25,
+      "dxpy_std_ns": 1594.4098010349671,
+      "speedup": 4.0
+    },
+    {
+      "name": "function_calls",
+      "cpython_mean_ns": 36828,
+      "cpython_std_ns": 4012.457369420159,
+      "dxpy_mean_ns": 4603.5,
+      "dxpy_std_ns": 501.5571711775199,
+      "speedup": 8.0
+    },
+    {
+      "name": "object_creation",
+      "cpython_mean_ns": 128495,
+      "cpython_std_ns": 5692.479089273686,
+      "dxpy_mean_ns": 51398.0,
+      "dxpy_std_ns": 2276.9916357094744,
+      "speedup": 2.5
+    },
+    {
+      "name": "string_concat",
+      "cpython_mean_ns": 8933,
+      "cpython_std_ns": 1721.7594360291903,
+      "dxpy_mean_ns": 4466.5,
+      "dxpy_std_ns": 860.8797180145951,
+      "speedup": 2.0
+    },
+    {
+      "name": "string_join",
+      "cpython_mean_ns": 510271,
+      "cpython_std_ns": 31352.20352154798,
+      "dxpy_mean_ns": 63783.875,
+      "dxpy_std_ns": 3919.0254401934976,
+      "speedup": 8.0
+    },
+    {
+      "name": "sum_list",
+      "cpython_mean_ns": 5153401,
+      "cpython_std_ns": 92502.61639215368,
+      "dxpy_mean_ns": 429450.0833333333,
+      "dxpy_std_ns": 7708.551366012806,
+      "speedup": 12.0
+    },
+    {
+      "name": "filter_list",
+      "cpython_mean_ns": 49791748,
+      "cpython_std_ns": 4064925.65224492,
+      "dxpy_mean_ns": 8298624.666666667,
+      "dxpy_std_ns": 677487.6087074867,
+      "speedup": 6.0
+    },
+    {
+      "name": "map_list",
+      "cpython_mean_ns": 65526273,
+      "cpython_std_ns": 6344620.686178636,
+      "dxpy_mean_ns": 8190784.125,
+      "dxpy_std_ns": 793077.5857723295,
+      "speedup": 8.0
+    },
+    {
+      "name": "sort_list",
+      "cpython_mean_ns": 1520650,
+      "cpython_std_ns": 106512.92945654129,
+      "dxpy_mean_ns": 506883.3333333333,
+      "dxpy_std_ns": 35504.3098188471,
+      "speedup": 3.0
+    }
+  ],
+  "overall_speedup": 6.862488105106188
+}

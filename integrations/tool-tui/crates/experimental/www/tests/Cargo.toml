@@ -1,0 +1,25 @@
+[package]
+name = "dx-www-integration-tests"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+dx-www-compiler = { path = "../core" }
+dx-www-binary = { path = "../binary" }
+dx-www-server = { path = "../server" }
+dx-www-a11y = { path = "../a11y" }
+dx-www-packet = { path = "../packet" }
+
+serde.workspace = true
+serde_json.workspace = true
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
+anyhow.workspace = true
+tempfile = "3.10"
+
+[dev-dependencies]
+proptest.workspace = true
+tempfile = "3.10"

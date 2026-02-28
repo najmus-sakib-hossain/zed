@@ -1,0 +1,10 @@
+[package]
+name = "vision-compress"
+version.workspace = true
+edition.workspace = true
+description = "Image token compression — 70-96% savings via downscale + low detail"
+
+[dependencies]
+dx-core = { workspace = true }
+image = { workspace = true }
+async-trait = { workspace = true }

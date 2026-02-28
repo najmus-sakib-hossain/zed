@@ -1,0 +1,277 @@
+[package]
+name = "dx"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "The Binary-First Development Experience CLI"
+license.workspace = true
+repository.workspace = true
+keywords = ["cli", "build-tool", "bundler", "runtime", "webassembly"]
+categories = ["command-line-utilities", "development-tools", "wasm"]
+default-run = "dx"
+
+[[bin]]
+name = "dx"
+path = "src/main.rs"
+
+[dependencies]
+# CLI Framework
+clap = { version = "4.5", features = ["derive", "env", "string", "wrap_help"] }
+clap_complete = "4.5"
+
+# Terminal UI
+console = "0.15"
+indicatif = { version = "0.17", features = ["rayon", "tokio"] }
+dialoguer = { version = "0.11", features = ["fuzzy-select"] }
+owo-colors = { version = "4.0", features = ["supports-colors"] }
+rayon = "1.10"
+cli-clipboard = "0.4"
+
+# CLI Animations (Clack-style prompts and effects)
+ratatui = "0.29"
+crossterm = "0.28"
+tachyonfx = "0.7"
+colorgrad = "0.7"
+ratatui-splash-screen = "0.1"
+
+# Animated notifications and text effects
+ratatui-notifications = "0.1"
+snailshell = "0.2"
+
+# Cliclack dependencies
+strsim = "0.11.1"
+textwrap = "0.16"
+
+# ASCII Art & Effects
+artem = "3.0"
+viuer = "0.8"
+
+# Image processing with SIMD
+image = { version = "0.25", features = ["jpeg", "png", "webp", "avif"] }
+fast_image_resize = "4.2"  # SIMD-accelerated resizing
+
+# SVG rendering
+resvg = "0.44"
+usvg = "0.44"
+tiny-skia = "0.11"
+
+# Syntax highlighting and diffs
+syntect = "5.2"
+similar = { version = "2.6", features = ["inline"] }
+bat = { version = "0.24", default-features = false, features = ["regex-onig"] }
+
+# GPU acceleration
+wgpu = "22.1"  # GPU compute for video processing
+pollster = "0.3"  # Async executor for GPU
+
+# Video decoding (optional - requires FFmpeg dev libraries)
+ffmpeg-next = { version = "7.1", optional = true }
+ffmpeg-sys-next = { version = "7.1", optional = true }
+
+# Performance optimizations
+memmap2 = "0.9"
+bytemuck = "1.14"
+parking_lot = "0.12"  # Faster mutexes
+crossbeam = "0.8"  # Lock-free data structures
+dashmap = "6.0"  # Concurrent hashmap for command registry
+
+# Sound effects
+rodio = "0.19"
+
+# Audio recording and speech-to-text
+cpal = "0.15"  # Cross-platform audio I/O
+hound = "3.5"  # WAV encoding
+candle-core = "0.8"  # Pure Rust ML framework
+candle-nn = "0.8"  # Neural network layers
+candle-transformers = "0.8"  # Transformer models
+candle-examples = "0.8"  # Example implementations
+tokenizers = "0.20"  # Tokenizer support
+mel_spec = "0.2"  # Whisper-compatible mel spectrograms
+ndarray = "0.16"  # N-dimensional arrays
+num-complex = "0.4"  # Complex numbers
+
+# HTTP downloads
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+ureq = "2.12"
+base64 = "0.22"
+
+# OAuth2 for Google authentication
+oauth2 = "4.4"
+webbrowser = "1.0"
+
+# Async Runtime
+tokio = { version = "1.40", features = ["full", "parking_lot"] }
+tokio-cron-scheduler = "0.13"
+
+# LLM Inference
+hf-hub = "0.3"
+ollama-rs = "0.2"
+async-trait = "0.1"
+dirs = "5.0"
+futures = "0.3"
+
+# Markdown rendering for chat
+termimad = "0.30"
+
+# DX Crates
+markdown = { path = "../markdown" }
+serializer = { package = "dx-serializer", path = "../serializer" }
+dx-font = { path = "../media/font" }
+dx-forge = { package = "dx-forge", path = "../forge" }
+dx-agent-hooks = { workspace = true }
+
+# Configuration
+toml = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+schemars = { version = "0.8", features = ["chrono"] }
+
+# File System
+walkdir = "2.5"
+notify = { version = "6.1", default-features = false, features = [
+    "macos_kqueue",
+] }
+ignore = "0.4"
+glob = "0.3"
+regex = "1.10"
+
+# Code Analysis
+tokei = { path = "src/commands/tree", default-features = false, features = [] }  # Vendored tokei without warnings
+
+# Cryptography
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+rand = "0.8"
+sha2 = "0.10"
+hmac = "0.12"
+uuid = { version = "1.10", features = ["v4"] }
+flate2 = "1.0"
+hex = "0.4"
+crc32fast = "1.4"
+bincode = "1.3"
+urlencoding = "2.1"
+
+# Sandboxing & Isolation
+bollard = "0.17"  # Docker API client
+oci-spec = "0.7"  # OCI specification types
+wasmtime = "26.0"  # WASM runtime for safe code execution
+wasi-common = "26.0"  # WASI support
+fs_extra = "1.3"  # Extended filesystem operations
+sysinfo = "0.31"  # Cross-platform system info
+rlimit = "0.10"  # Resource limits
+tar = "0.4"  # TAR archive support
+
+# WhatsApp Integration
+# Note: Personal WhatsApp requires either:
+# 1. WhatsApp Business API (official, requires business account)
+# 2. WhatsApp Web API (unofficial, requires running a gateway service)
+whatsapp-business-rs = "0.2"  # Official Business API
+# For personal accounts, users can run: https://github.com/chrishubert/whatsapp-api
+
+# Utilities
+anyhow = "1.0"
+thiserror = "2.0"
+chrono = { version = "0.4", features = ["serde"] }
+human_bytes = "0.4"
+humantime = "2.1"
+ctrlc = "3.4"
+which = "7.0"
+home = "0.5"
+term_size = "0.3"
+open = "5.3"
+url = "2.5"
+zeroize = { version = "1.8", features = ["derive"] }
+once_cell = "1.20"
+fuzzy-matcher = "0.3"
+atty = "0.2"
+md5 = "0.7"
+hostname = "0.4"
+whoami = "1.5"
+num_cpus = "1.16"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+onefetch-ascii = "2.26.1"
+
+# Security & Encryption
+aes-gcm = "0.10"
+argon2 = "0.5"
+
+# Native plugins
+libloading = "0.8"
+
+# Random number generation
+getrandom = "0.2"
+
+# WebSocket
+tokio-tungstenite = "0.24"
+futures-util = "0.3"
+
+# HTTP Server (Gateway API) - Actix Web (production) + Axum (lightweight)
+actix-web = { version = "4.9", features = ["compress-gzip", "compress-zstd"] }
+actix-cors = "0.7"
+actix-files = "0.6"
+actix-ws = "0.3"
+actix-rt = "2.10"
+axum = { version = "0.7", features = ["tokio", "http1", "http2", "json"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "trace", "timeout"] }
+hyper = { version = "1.4", features = ["full"] }
+hyper-util = { version = "0.1", features = ["tokio", "server-auto"] }
+
+# mDNS Discovery (optional - for zero-config networking)
+mdns-sd = { version = "0.12", optional = true }
+
+# Async streams
+tokio-stream = { version = "0.1", features = ["io-util"] }
+
+[build-dependencies]
+serializer = { package = "dx-serializer", path = "../serializer" }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+nix = { version = "0.29", features = ["process", "mount", "user", "sched"] }
+caps = "0.5"  # Linux capabilities
+landlock = "0.4"  # Modern Linux sandboxing (kernel 5.13+)
+
+[target.'cfg(windows)'.dependencies]
+libc = "0.2"
+winapi = { version = "0.3", features = [
+    "fileapi",
+    "minwinbase",
+    "winerror",
+    "handleapi",
+    "winbase",
+    "processthreadsapi",
+    "jobapi2",
+    "winnt",
+] }
+windows = { version = "0.58", features = [
+    "Win32_Security",
+    "Win32_System_JobObjects",
+    "Win32_System_Threading",
+    "Win32_Foundation",
+] }
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.1"
+tempfile = "3.12"
+proptest = "1.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "cli_benchmarks"
+harness = false
+
+[[bench]]
+name = "session_memory_benchmarks"
+harness = false
+
+[features]
+default = []
+self-update = [] # For future self-update functionality
+video-hw-decode = ["ffmpeg-next", "ffmpeg-sys-next"] # Hardware video decoding
+mdns = ["mdns-sd"] # mDNS/Bonjour service discovery for gateway
+actix-gateway = [] # Use Actix Web for gateway (default: Axum)

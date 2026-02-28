@@ -1,0 +1,31 @@
+[package]
+name = "dx-agent-browser"
+version.workspace = true
+edition.workspace = true
+description = "Browser control via Chrome DevTools Protocol for DX Agent"
+license.workspace = true
+
+[features]
+default = []
+webdriver = ["dep:fantoccini"]
+
+[dependencies]
+dx-agent-protocol = { path = "../protocol" }
+
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = "0.1"
+chrono = { workspace = true }
+uuid = { version = "1", features = ["v4", "serde"] }
+base64 = { workspace = true }
+
+# CDP - Chrome DevTools Protocol
+chromiumoxide = { version = "0.7", features = ["tokio-runtime"], default-features = false }
+futures-util = "0.3"
+fantoccini = { version = "0.22", optional = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

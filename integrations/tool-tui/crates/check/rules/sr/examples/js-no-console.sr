@@ -1,0 +1,4 @@
+rule:7[language              = js category=suspicious severity=warn fixable=true recommended=true description=Disallow the use of console statements. Console statements are often used for debugging and should be removed before production deployment. docs url=https://dx.dev/rules/no-console]
+pattern:4[match              = console.$method\($args...\) where=$method in [log error warn info debug trace dir table] message=Unexpected console statement suggestion=Remove or replace with proper logging]
+fix:3[replace                = position=full preserve=comments]
+examples:2[incorrect         = console.log\('debug'\); console.error\('error'\); console.warn\('warning'\); console.info\('info'\); correct=logger.info\('production log'\); logger.error\('error message'\); logger.warn\('warning message'\);]

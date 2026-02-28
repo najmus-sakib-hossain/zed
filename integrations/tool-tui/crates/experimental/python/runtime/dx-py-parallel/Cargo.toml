@@ -1,0 +1,20 @@
+[package]
+name = "dx-py-parallel"
+description = "Thread-Per-Core Parallel Executor for DX-Py-Runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+crossbeam.workspace = true
+rayon.workspace = true
+parking_lot.workspace = true
+core_affinity.workspace = true
+thiserror.workspace = true
+num_cpus.workspace = true
+dx-py-gc = { path = "../dx-py-gc" }
+
+[dev-dependencies]
+proptest.workspace = true
+criterion.workspace = true

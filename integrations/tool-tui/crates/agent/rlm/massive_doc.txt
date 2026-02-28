@@ -1,0 +1,15 @@
+MASSIVE TECHNICAL DOCUMENTATION - ENTERPRISE SYSTEM ARCHITECTURE
+
+This document represents a large-scale enterprise system with extensive documentation.
+In real-world scenarios, this could be:
+- Complete API documentation (1000+ endpoints)
+- Large codebase analysis (100K+ lines)
+- Legal contracts and compliance documents
+- Medical research papers and clinical trials
+- Financial reports and audit trails
+- Scientific datasets and research findings
+
+The key demonstration: Traditional prompting FAILS on documents this large,
+but RLM handles them effortlessly through recursive processing.
+
+[Content continues for many pages...]

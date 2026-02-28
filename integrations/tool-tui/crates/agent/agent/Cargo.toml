@@ -1,0 +1,68 @@
+[package]
+name = "dx-agent"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "AGI-like AI Agent for DX - connects to any app, creates its own integrations"
+
+[dependencies]
+# Workspace dependencies
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+reqwest.workspace = true
+clap.workspace = true
+
+# Internal crates
+dx-core = { path = "../core" }
+dx-serializer = { path = "../serializer" }
+dx-integrations = { path = "../integrations" }
+dx-wasm = { path = "../wasm" }
+
+# WASM runtime for dynamic plugin execution
+wasmtime = "40.0"
+wasmtime-wasi = "40.0"
+
+# Async channels for daemon communication
+async-channel = "2.5"
+futures = "0.3"
+
+# File watching for hot-reload
+notify = "9.0.0-rc.1"
+
+# Git operations for auto-PR
+gix = { version = "0.77", default-features = false, features = ["blocking-network-client"] }
+
+# Cron scheduling
+tokio-cron-scheduler = "0.15"
+
+# HTTP client for OAuth flows
+oauth2 = "5"
+
+# Secure storage for tokens
+keyring = "3"
+
+# UUID for unique identifiers
+uuid = { version = "1", features = ["v4"] }
+
+# Chrono for timestamps
+chrono = { version = "0.4", features = ["serde"] }
+
+# Async traits
+async-trait = "0.1"
+
+# URL encoding
+urlencoding = "2"
+
+# System daemon (Unix only)
+[target.'cfg(unix)'.dependencies]
+daemonize = "0.5"
+
+[dev-dependencies]
+mockall.workspace = true
+tempfile = "3"

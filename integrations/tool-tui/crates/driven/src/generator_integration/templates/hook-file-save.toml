@@ -1,0 +1,12 @@
+[hook]
+name = "{{hook_name}}"
+description = "{{description}}"
+enabled = true
+
+[trigger]
+type = "file-save"
+pattern = "{{file_pattern}}"
+
+[action]
+type = "shell"
+command = "{{command}}"

@@ -1,0 +1,31 @@
+[package]
+name = "dx-py-cli"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "dx-py"
+path = "src/main.rs"
+
+[dependencies]
+dx-py-core = { path = "../dx-py-core" }
+dx-py-discovery = { path = "../dx-py-discovery" }
+dx-py-protocol = { path = "../dx-py-protocol" }
+dx-py-daemon = { path = "../dx-py-daemon" }
+dx-py-graph = { path = "../dx-py-graph" }
+dx-py-executor = { path = "../dx-py-executor" }
+dx-py-fixture = { path = "../dx-py-fixture" }
+dx-py-snapshot = { path = "../dx-py-snapshot" }
+clap = { workspace = true }
+colored = { workspace = true }
+tokio = { workspace = true }
+notify = { workspace = true }
+glob = { workspace = true }
+quick-xml = { workspace = true }
+thiserror = { workspace = true }
+regex = { workspace = true }
+num_cpus = "1.17"
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = "3.9"

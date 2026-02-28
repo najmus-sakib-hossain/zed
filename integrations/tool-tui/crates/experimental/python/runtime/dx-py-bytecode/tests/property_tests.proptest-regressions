@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 575ae047e410988ce18225123583987fabaf5844f76b161a3ac1afd20f5fe4ba # shrinks to code = CodeObject { name: "A", qualname: "A", filename: "<test>", firstlineno: 1, argcount: 0, posonlyargcount: 0, kwonlyargcount: 0, nlocals: 0, stacksize: 10, flags: CodeFlags(OPTIMIZED), code: [21], constants: [], names: ["_", "_"], varnames: [], freevars: [], cellvars: [] }

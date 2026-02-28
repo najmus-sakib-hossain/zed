@@ -1,0 +1,13 @@
+[package]
+name = "patch-prefer"
+version.workspace = true
+edition.workspace = true
+description = "Prefer diffs over full file rewrites — 90-98% savings on file edits"
+
+[dependencies]
+dx-core = { workspace = true }
+similar = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

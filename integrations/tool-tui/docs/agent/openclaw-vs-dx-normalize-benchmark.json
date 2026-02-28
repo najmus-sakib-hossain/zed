@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-02-14T09:14:10.914Z",
+  "corpusSize": 19,
+  "parityMismatches": [],
+  "results": {
+    "dx": {
+      "name": "dx",
+      "iterations": 200000,
+      "totalNs": 55272100,
+      "avgNs": 276.3605,
+      "sink": 1778999,
+      "mismatches": 0
+    },
+    "openclaw": {
+      "name": "openclaw",
+      "iterations": 200000,
+      "totalNs": 54194200,
+      "avgNs": 270.971,
+      "sink": 1778999,
+      "mismatches": 0
+    }
+  },
+  "summary": {
+    "faster": "openclaw",
+    "speedup": 0.9804982984181893
+  }
+}

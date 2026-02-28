@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vite Guide — almostnode docs</title>
+  <meta name="description" content="Set up a Vite dev server in the browser with React, hot module replacement, and TypeScript support.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://almostnode.dev/docs/vite-guide.html">
+  <meta property="og:title" content="Vite Guide — almostnode docs">
+  <meta property="og:description" content="Set up a Vite dev server in the browser with React, hot module replacement, and TypeScript support.">
+  <meta property="og:image" content="https://almostnode.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vite Guide — almostnode docs">
+  <meta name="twitter:description" content="Set up a Vite dev server in the browser with React, hot module replacement, and TypeScript support.">
+  <meta name="twitter:image" content="https://almostnode.dev/og-image.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <label class="menu-toggle" for="sidebar-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </label>
+  <a href="../" class="topbar-logo"><span>almostnode</span></a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-section">Docs</span>
+  <ul class="topbar-links">
+    <li><a href="https://github.com/macaly/almostnode">GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/almostnode">npm</a></li>
+  </ul>
+</div>
+
+<input type="checkbox" id="sidebar-check">
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-label">Guide</div>
+      <a href="./">Getting Started</a>
+      <a href="./core-concepts.html">Core Concepts</a>
+      <a href="./security.html">Security</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Frameworks</div>
+      <a href="./nextjs-guide.html">Next.js</a>
+      <a href="./vite-guide.html" class="active">Vite</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Tutorials</div>
+      <a href="./tutorial-editor.html">Editor + Preview</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Reference</div>
+      <a href="./api-reference.html">API Reference</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Vite Guide</h1>
+    <p class="lead">Run a Vite dev server in the browser with React, JSX/TSX support, npm packages, and hot module replacement.</p>
+
+    <h2>Setup</h2>
+    <p>The Vite dev server works like the Next.js server — VirtualFS for files, ViteDevServer for request processing, and ServerBridge for serving.</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS<span class="op">,</span> <span class="fn">getServerBridge</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+<span class="kw">import</span> <span class="op">{</span> ViteDevServer <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/vite'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+<span class="kw">const</span> server <span class="op">=</span> <span class="kw">new</span> <span class="fn">ViteDevServer</span><span class="op">(</span>vfs<span class="op">);</span>
+<span class="kw">const</span> bridge <span class="op">=</span> <span class="fn">getServerBridge</span><span class="op">();</span>
+
+<span class="kw">await</span> bridge<span class="op">.</span><span class="fn">initServiceWorker</span><span class="op">();</span>
+bridge<span class="op">.</span><span class="fn">registerServer</span><span class="op">(</span>server<span class="op">,</span> <span class="num">5173</span><span class="op">);</span></code></pre>
+
+    <h2>React App</h2>
+    <p>Create a basic React app with Vite. You need an <code>index.html</code> entry point and a root component:</p>
+
+    <pre><code><span class="cm">// Entry HTML</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/index.html'</span><span class="op">,</span> <span class="str">`
+  &lt;!DOCTYPE html&gt;
+  &lt;html&gt;
+    &lt;body&gt;
+      &lt;div id="root"&gt;&lt;/div&gt;
+      &lt;script type="module" src="/src/main.tsx"&gt;&lt;/script&gt;
+    &lt;/body&gt;
+  &lt;/html&gt;
+`</span><span class="op">);</span>
+
+<span class="cm">// Main entry point</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/src/main.tsx'</span><span class="op">,</span> <span class="str">`
+  import React from 'react';
+  import ReactDOM from 'react-dom/client';
+  import App from './App';
+
+  ReactDOM.createRoot(
+    document.getElementById('root')
+  ).render(&lt;App /&gt;);
+`</span><span class="op">);</span>
+
+<span class="cm">// App component</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/src/App.tsx'</span><span class="op">,</span> <span class="str">`
+  import { useState } from 'react';
+
+  export default function App() {
+    const [count, setCount] = useState(0);
+    return (
+      &lt;div&gt;
+        &lt;h1&gt;Vite + React&lt;/h1&gt;
+        &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;
+          Count: {count}
+        &lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+`</span><span class="op">);</span></code></pre>
+
+    <h2>npm Packages</h2>
+    <p>Install npm packages and use them in your Vite app. The dev server resolves bare imports from <code>node_modules/</code>:</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS<span class="op">,</span> PackageManager <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+<span class="kw">const</span> npm <span class="op">=</span> <span class="kw">new</span> <span class="fn">PackageManager</span><span class="op">(</span>vfs<span class="op">);</span>
+
+<span class="cm">// Install React</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'react'</span><span class="op">);</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'react-dom'</span><span class="op">);</span>
+
+<span class="cm">// Now your Vite app can import them</span>
+<span class="cm">// import React from 'react';</span></code></pre>
+
+    <h2>Hot Module Replacement</h2>
+    <p>The Vite dev server supports HMR with React Refresh. When you update a component in the VFS, only that component re-renders — state is preserved:</p>
+
+    <pre><code><span class="cm">// Update a component — HMR kicks in</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/src/App.tsx'</span><span class="op">,</span> <span class="str">`
+  import { useState } from 'react';
+
+  export default function App() {
+    const [count, setCount] = useState(0);
+    return (
+      &lt;div&gt;
+        &lt;h1&gt;Updated App!&lt;/h1&gt;
+        &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;
+          Clicked {count} times
+        &lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+`</span><span class="op">);</span>
+<span class="cm">// The heading updates but the count state is preserved</span></code></pre>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>React Refresh preserves state for function components. If you change the component's structure significantly (like adding or removing hooks), a full remount may occur.</p>
+    </div>
+
+    <div class="page-nav">
+      <a href="./nextjs-guide.html">
+        <div class="label">Previous</div>
+        <div class="title">Next.js Guide</div>
+      </a>
+      <a href="./api-reference.html" class="next">
+        <div class="label">Next</div>
+        <div class="title">API Reference</div>
+      </a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

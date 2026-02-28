@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 08a911af041fdb4edd470d0716287a9bf21d5da31f44c52aad2fc3d93fbfd35f # shrinks to context_type = "IndexError", context_msg = "", exc_type = "IndexError", exc_msg = ""
+cc b6cbe29471cc45029b0cd1731b9cd30a497702fef62cb6d7ccc19a7d772fc39e # shrinks to context_type = "ValueError", context_msg = "?", exc_type = "ValueError", exc_msg = "0?"

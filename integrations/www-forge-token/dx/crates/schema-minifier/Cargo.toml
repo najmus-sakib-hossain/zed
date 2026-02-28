@@ -1,0 +1,14 @@
+[package]
+name = "schema-minifier"
+version.workspace = true
+edition.workspace = true
+description = "Tool schema minification — 40-70% savings on schema tokens"
+
+[dependencies]
+dx-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

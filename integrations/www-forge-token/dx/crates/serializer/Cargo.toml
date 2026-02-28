@@ -1,0 +1,11 @@
+[package]
+name = "serializer"
+version.workspace = true
+edition.workspace = true
+description = "Compact serializer — 14% more token-efficient than TOON format"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }

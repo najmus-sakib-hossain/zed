@@ -1,0 +1,38 @@
+[package]
+name = "dx-www-form"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Binary validation engine - compile-time schema validation with zero runtime overhead"
+keywords = ["wasm", "web", "validation", "dx", "form"]
+categories = ["wasm", "web-programming"]
+
+[lib]
+name = "dx_www_form"
+path = "src/lib.rs"
+
+[dependencies]
+# Regex with automata for pre-compiled validators
+regex-automata = "0.4"
+
+# Bitflags for error masks
+bitflags = "2.4"
+
+# Binary serialization
+serde = { version = "1.0", features = ["derive"] }
+
+# Lazy static validators
+once_cell = "1.19"
+
+# Internal dependencies
+dx-www-packet = { workspace = true, features = ["std"], optional = true }
+
+[features]
+default = ["std"]
+std = ["dx-www-packet"]
+no_std = []
+
+[dev-dependencies]
+criterion = "0.5"

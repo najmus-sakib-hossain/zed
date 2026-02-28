@@ -1,0 +1,265 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "DX Serializer",
+  "scopeName": "source.dx-serializer",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#llm-tabular-header" },
+    { "include": "#llm-tabular-close" },
+    { "include": "#llm-inline-object" },
+    { "include": "#llm-root-scalar" },
+    { "include": "#human-indexed-section-headers" },
+    { "include": "#human-section-headers" },
+    { "include": "#human-table-comment" },
+    { "include": "#human-tabular-row" },
+    { "include": "#human-list-header" },
+    { "include": "#human-list-item" },
+    { "include": "#human-key-value-line" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        { "name": "comment.line.double-slash.dx", "match": "//.*$" },
+        { "name": "comment.line.number-sign.dx", "match": "^#(?!\\s*(columns|suffix):).*$" }
+      ]
+    },
+
+    "llm-inline-object": {
+      "comment": "NEW LLM format: section(key=value key2=value2)",
+      "match": "^([a-zA-Z_][a-zA-Z0-9_.]*)(\\()(.+)(\\))\\s*$",
+      "captures": {
+        "1": { "name": "entity.name.section.dx" },
+        "2": { "name": "punctuation.bracket.round.begin.dx" },
+        "3": { "patterns": [{ "include": "#llm-inline-content" }] },
+        "4": { "name": "punctuation.bracket.round.end.dx" }
+      }
+    },
+
+    "llm-tabular-header": {
+      "comment": "NEW LLM format: section[col1 col2 col3](",
+      "match": "^([a-zA-Z_][a-zA-Z0-9_.]*)(\\[)([^\\]]+)(\\])(\\()\\s*$",
+      "captures": {
+        "1": { "name": "entity.name.section.dx" },
+        "2": { "name": "punctuation.bracket.square.begin.dx" },
+        "3": { "name": "variable.parameter.schema.dx" },
+        "4": { "name": "punctuation.bracket.square.end.dx" },
+        "5": { "name": "punctuation.bracket.round.begin.dx" }
+      }
+    },
+
+    "llm-tabular-row": {
+      "comment": "NEW LLM format: table row data",
+      "match": "^\\s*([^)]+)\\s*$",
+      "captures": {
+        "1": { "patterns": [{ "include": "#value-content" }] }
+      }
+    },
+
+    "llm-tabular-close": {
+      "comment": "NEW LLM format: closing ) for table",
+      "match": "^(\\))\\s*$",
+      "captures": {
+        "1": { "name": "punctuation.bracket.round.end.dx" }
+      }
+    },
+
+    "llm-root-scalar": {
+      "comment": "LLM format: key=value (no spaces around =)",
+      "match": "^([a-zA-Z_][a-zA-Z0-9_]*)(=)(.+)$",
+      "captures": {
+        "1": { "name": "support.type.property-name.dx" },
+        "2": { "name": "keyword.operator.assignment.dx" },
+        "3": { "patterns": [{ "include": "#value-content" }] }
+      }
+    },
+
+    "llm-inline-content": {
+      "patterns": [
+        { "include": "#llm-inline-array" },
+        { "include": "#llm-inline-kv" },
+        { "include": "#value-content" }
+      ]
+    },
+
+    "llm-inline-array": {
+      "comment": "NEW format: key=[item1 item2 item3]",
+      "match": "([a-zA-Z_][a-zA-Z0-9_-]*)(=)(\\[)([^\\]]+)(\\])",
+      "captures": {
+        "1": { "name": "variable.parameter.dx" },
+        "2": { "name": "keyword.operator.assignment.dx" },
+        "3": { "name": "punctuation.bracket.square.begin.dx" },
+        "4": { "patterns": [{ "include": "#value-content" }] },
+        "5": { "name": "punctuation.bracket.square.end.dx" }
+      }
+    },
+
+    "llm-inline-kv": {
+      "comment": "key=value inside inline object",
+      "match": "([a-zA-Z_][a-zA-Z0-9_-]*)(=)([^\\s\\[\\)]+)",
+      "captures": {
+        "1": { "name": "variable.parameter.dx" },
+        "2": { "name": "keyword.operator.assignment.dx" },
+        "3": { "patterns": [{ "include": "#value-content" }] }
+      }
+    },
+
+    "human-section-headers": {
+      "comment": "Human format: [section] or [section.subsection] or [Section With Spaces]",
+      "match": "^(\\[)([a-zA-Z_][a-zA-Z0-9_. -]*)(\\])\\s*$",
+      "captures": {
+        "1": { "name": "punctuation.definition.section.begin.dx" },
+        "2": { "name": "entity.name.section.dx" },
+        "3": { "name": "punctuation.definition.section.end.dx" }
+      }
+    },
+
+    "human-indexed-section-headers": {
+      "comment": "Human format indexed section: [section:index]",
+      "match": "^(\\[)([a-zA-Z_][a-zA-Z0-9_.]*)([:])([0-9]+)(\\])\\s*$",
+      "captures": {
+        "1": { "name": "punctuation.definition.section.begin.dx" },
+        "2": { "name": "entity.name.section.dx" },
+        "3": { "name": "punctuation.separator.colon.dx" },
+        "4": { "name": "constant.numeric.index.dx" },
+        "5": { "name": "punctuation.definition.section.end.dx" }
+      }
+    },
+
+    "human-list-header": {
+      "comment": "Human format: key:",
+      "match": "^([a-zA-Z_][a-zA-Z0-9_-]*)(:)\\s*$",
+      "captures": {
+        "1": { "name": "support.type.property-name.dx" },
+        "2": { "name": "punctuation.separator.colon.dx" }
+      }
+    },
+
+    "human-list-item": {
+      "comment": "Human format: - item",
+      "match": "^(-)\\s+(.*)$",
+      "captures": {
+        "1": { "name": "punctuation.definition.list.dx" },
+        "2": { "patterns": [{ "include": "#value-content" }] }
+      }
+    },
+
+    "human-key-value-line": {
+      "comment": "Human format: key = value (with spaces)",
+      "match": "^([a-zA-Z_][a-zA-Z0-9_-]*)\\s+(=)\\s+(.*)$",
+      "captures": {
+        "1": { "name": "support.type.property-name.dx" },
+        "2": { "name": "keyword.operator.assignment.dx" },
+        "3": { "patterns": [{ "include": "#value-content" }] }
+      }
+    },
+
+    "human-tabular-row": {
+      "comment": "Human format tabular row: col=val  col=val  col=val",
+      "match": "^\\s*((?:[a-zA-Z_][a-zA-Z0-9_-]*=[^\\s]+\\s*)+)$",
+      "captures": {
+        "1": { "patterns": [{ "include": "#tabular-cell" }] }
+      }
+    },
+
+    "tabular-cell": {
+      "comment": "Single cell in tabular row: key=value",
+      "match": "([a-zA-Z_][a-zA-Z0-9_-]*)(=)([^\\s]+)",
+      "captures": {
+        "1": { "name": "variable.parameter.column.dx" },
+        "2": { "name": "keyword.operator.assignment.dx" },
+        "3": { "patterns": [{ "include": "#value-content" }] }
+      }
+    },
+
+    "human-table-comment": {
+      "comment": "Table metadata comments: # columns: or # suffix:",
+      "match": "^(#)\\s*(columns|suffix)(:)\\s*(.*)$",
+      "captures": {
+        "1": { "name": "comment.line.number-sign.dx" },
+        "2": { "name": "keyword.other.table-meta.dx" },
+        "3": { "name": "punctuation.separator.colon.dx" },
+        "4": { "name": "variable.parameter.schema.dx" }
+      }
+    },
+
+    "value-content": {
+      "patterns": [
+        { "include": "#strings" },
+        { "include": "#paths" },
+        { "include": "#urls" },
+        { "include": "#references" },
+        { "include": "#versions" },
+        { "include": "#booleans" },
+        { "include": "#null-values" },
+        { "include": "#numbers" },
+        { "include": "#identifiers" }
+      ]
+    },
+
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.dx",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [{ "name": "constant.character.escape.dx", "match": "\\\\." }]
+        },
+        {
+          "name": "string.quoted.single.dx",
+          "begin": "'",
+          "end": "'",
+          "patterns": [{ "name": "constant.character.escape.dx", "match": "\\\\." }]
+        }
+      ]
+    },
+
+    "paths": {
+      "patterns": [
+        { "name": "string.other.link.dx", "match": "@/[a-zA-Z0-9_/.-]+" }
+      ]
+    },
+
+    "urls": {
+      "patterns": [
+        { "name": "markup.underline.link.dx", "match": "https?://[^\\s;\\]|,]+" }
+      ]
+    },
+
+    "references": {
+      "patterns": [
+        { "name": "variable.other.reference.dx", "match": "\\^[a-zA-Z0-9_]+" }
+      ]
+    },
+
+    "versions": {
+      "patterns": [
+        { "name": "constant.numeric.version.dx", "match": "\\b[0-9]+\\.[0-9]+\\.[0-9]+\\b" },
+        { "name": "constant.numeric.version.dx", "match": "\\b[0-9]+\\.[0-9]+\\b" }
+      ]
+    },
+
+    "booleans": {
+      "patterns": [
+        { "name": "constant.language.boolean.dx", "match": "\\b(true|false|yes|no)\\b" }
+      ]
+    },
+
+    "null-values": {
+      "patterns": [
+        { "name": "constant.language.null.dx", "match": "\\b(null|none|all|latest|default)\\b" }
+      ]
+    },
+
+    "numbers": {
+      "patterns": [
+        { "name": "constant.numeric.dx", "match": "\\b[0-9]+\\b" }
+      ]
+    },
+
+    "identifiers": {
+      "patterns": [
+        { "name": "string.unquoted.dx", "match": "[a-zA-Z_][a-zA-Z0-9_-]*" }
+      ]
+    }
+  }
+}

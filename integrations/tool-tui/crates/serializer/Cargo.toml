@@ -1,0 +1,214 @@
+[package]
+name = "dx-serializer"
+version = "0.1.0"
+edition.workspace = true
+rust-version = "1.85"
+authors.workspace = true
+description = "A token-efficient serialization format for LLM context windows with high-performance binary encoding"
+repository.workspace = true
+documentation = "https://docs.rs/dx-serializer"
+keywords = ["serialization", "parser", "format", "performance", "zero-copy"]
+categories = ["encoding", "parser-implementations", "asynchronous"]
+readme = "README.md"
+license.workspace = true
+
+[lints]
+workspace = true
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[lib]
+name = "serializer"
+path = "src/lib.rs"
+crate-type = ["rlib"]
+
+[dependencies]
+dx-serializer-derive = { path = "derive", optional = true }
+bytemuck = { version = "1.18", features = ["derive"] }
+bytes = "1.5"
+rustc-hash = "1.1"
+memchr = "2.7"
+thiserror = "2.0"
+indexmap = "2.7"
+serde = { version = "1.0", optional = true, features = ["derive"] }
+serde_json = { version = "1.0", optional = true }
+serde_yaml = { version = "0.9", optional = true }
+toml = { version = "0.8", optional = true }
+rkyv = { version = "0.8", features = ["bytecheck"] }
+bincode = { version = "1.3", optional = true }
+
+# LZ4 compression
+lz4_flex = { version = "0.11", optional = true }
+
+# Zstd compression
+zstd = { version = "0.13", optional = true }
+
+# Parallel processing
+rayon = { version = "1.10", optional = true }
+
+# Memory-mapped files
+memmap2 = { version = "0.9", optional = true }
+
+# Token counting for LLM models
+tiktoken-rs = { version = "0.6", optional = true }
+tokenizers = { version = "0.21", optional = true }
+
+# File watching
+notify = { version = "6.1", optional = true }
+
+# WASM bindings
+wasm-bindgen = { version = "=0.2.106", optional = true }
+console_error_panic_hook = { version = "0.1", optional = true }
+
+# Platform-specific async I/O (Linux io_uring)
+[target.'cfg(target_os = "linux")'.dependencies]
+io-uring = { version = "0.7", optional = true }
+libc = "0.2"
+
+# Platform-specific async I/O (Windows IOCP)
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "0.59", features = [
+    "Win32_System_IO",
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+], optional = true }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+rkyv = { version = "0.8", features = ["bytecheck"] }
+rkyv_derive = "0.8"
+proptest = "1.4"
+tempfile = "3.14"
+bincode = "1.3"
+postcard = { version = "1.0", features = ["alloc"] }
+hex = "0.4"
+ctor = "0.2"
+
+[features]
+default = ["converters", "compression"]
+converters = ["serde", "serde_json", "serde_yaml", "toml", "bincode"]
+wasm = ["wasm-bindgen", "console_error_panic_hook", "converters", "compression"]
+compression = ["compression-lz4", "compression-zstd"]
+compression-lz4 = ["lz4_flex"]
+compression-zstd = ["zstd"]
+watch = ["notify"]
+parallel = ["rayon"]
+tiktoken = ["tiktoken-rs"]
+tokenizers-hf = ["tokenizers"]
+token-counting = ["tiktoken", "tokenizers-hf"]
+derive = ["dx-serializer-derive"]
+
+# TODO: Implement these advanced features
+# async-io = ["io-uring", "windows-sys"]
+# mmap = ["memmap2"]
+# arena = []
+# quantum = []
+# simd = []
+# machine-ultra = ["mmap", "arena", "quantum", "simd", "parallel", "compression"]
+
+full = ["converters", "compression", "watch", "token-counting", "derive", "parallel"]
+
+[[bench]]
+name = "dx_vs_rkyv_final"
+harness = false
+
+[[bench]]
+name = "dx_batch_vs_rkyv"
+harness = false
+
+[[bench]]
+name = "dx_vs_rkyv_optimized"
+harness = false
+
+[[bench]]
+name = "dx_adaptive_vs_rkyv"
+harness = false
+
+[[bench]]
+name = "adaptive_optimization"
+harness = false
+
+[[bench]]
+name = "optimized_rkyv_complete"
+harness = false
+
+[[bench]]
+name = "optimized_rkyv_test"
+harness = false
+
+[[bench]]
+name = "dx_machine_complete"
+harness = false
+
+[[bench]]
+name = "arena_vs_rkyv"
+harness = false
+
+[[bench]]
+name = "dx_vs_rkyv"
+harness = false
+
+[[bench]]
+name = "dx_vs_rkyv_real"
+harness = false
+
+[[bench]]
+name = "dx_vs_toon"
+harness = false
+
+[[bench]]
+name = "comprehensive"
+harness = false
+
+[[bench]]
+name = "dx_machine_vs_rkyv"
+harness = false
+
+[[bench]]
+name = "dx_machine_standalone"
+harness = false
+
+[[bench]]
+name = "machine_vs_rkyv"
+harness = false
+
+[[bench]]
+name = "zerocopy_vs_rkyv"
+harness = false
+
+[[bench]]
+name = "brutal_truth"
+harness = false
+
+[[bench]]
+name = "quick_comparison"
+harness = false
+
+[[bench]]
+name = "mmap_benchmark"
+harness = false
+
+[[bench]]
+name = "arena_benchmark"
+harness = false
+
+[[bin]]
+name = "dx-serialize"
+path = "src/bin/serialize.rs"
+
+[[bench]]
+name = "theme_compression_test"
+harness = false
+
+[[bench]]
+name = "machine_format_perf"
+harness = false
+
+[[bench]]
+name = "machine_format_compression_comparison"
+harness = false
+
+[[bench]]
+name = "compression_vs_pure_rkyv"
+harness = false

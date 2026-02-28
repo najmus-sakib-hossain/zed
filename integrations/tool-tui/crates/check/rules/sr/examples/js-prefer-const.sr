@@ -1,0 +1,3 @@
+rule:7[language              = js category=style severity=warn fixable=true recommended=true description=Require const declarations for variables that are never reassigned. Using const makes code more predictable and easier to understand. It also helps prevent accidental reassignment bugs. docs url=https://dx.dev/rules/prefer-const]
+pattern:4[match              = let $name = $init where=$name is not reassigned message=Use const instead of let for variable '$name' suggestion=Change let to const]
+fix:3[replace                = const $name = $init position=full preserve=both]

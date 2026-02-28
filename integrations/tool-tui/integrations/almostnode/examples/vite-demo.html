@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite Demo — almostnode agent runtime</title>
+    <link rel="stylesheet" href="./shared-styles.css" />
+    <style>
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1px;
+        background: var(--border);
+        height: calc(100vh - 44px);
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-topbar">
+      <a href="../index.html" class="back">← demos</a>
+      <span class="sep">/</span>
+      <a href="../index.html" class="logo">almostnode</a>
+      <span class="sep">/</span>
+      <span class="title">Vite Dev Server</span>
+      <span class="tag">vite · react · hmr</span>
+    </div>
+
+    <div class="hmr-indicator" id="hmr-indicator">HMR Update</div>
+
+    <div class="layout">
+      <!-- Editor -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Editor</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="status-dot" id="status-dot"></div>
+            <span class="panel-label" id="status-text">Initializing...</span>
+          </div>
+        </div>
+
+        <div class="file-tabs" id="file-tabs">
+          <button class="file-tab active" data-file="/src/App.jsx"><span class="dot"></span>App.jsx</button>
+          <button class="file-tab" data-file="/src/Counter.jsx"><span class="dot"></span>Counter.jsx</button>
+          <button class="file-tab" data-file="/src/main.jsx"><span class="dot"></span>main.jsx</button>
+          <button class="file-tab" data-file="/src/style.css"><span class="dot"></span>style.css</button>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <textarea id="editor" placeholder="Loading..."></textarea>
+        </div>
+
+        <div class="toolbar">
+          <button id="save-btn" class="btn btn-primary" disabled>Save</button>
+          <button id="install-btn" class="btn btn-secondary" disabled>Install Vite</button>
+          <button id="run-btn" class="btn btn-secondary" disabled>Start Preview</button>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Live Preview</span>
+          <button id="refresh-btn" class="btn btn-secondary" style="padding:4px 10px;">Refresh</button>
+        </div>
+        <div class="preview-placeholder" id="preview-placeholder">
+          Click Start Preview to launch the dev server
+        </div>
+        <iframe id="preview-frame" class="preview-frame" style="display:none;"></iframe>
+      </div>
+
+      <!-- Console -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Console</span>
+          <button id="clear-btn" class="btn btn-secondary" style="padding:4px 10px;">Clear</button>
+        </div>
+        <div class="terminal" id="output"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initViteDemo, installVite, startDevServer, VirtualFS, Runtime, PackageManager } from '../src/vite-demo.ts';
+
+      const outputEl = document.getElementById('output');
+      const editorEl = document.getElementById('editor');
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      const saveBtn = document.getElementById('save-btn');
+      const clearBtn = document.getElementById('clear-btn');
+      const installBtn = document.getElementById('install-btn');
+      const runBtn = document.getElementById('run-btn');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const fileTabsEl = document.getElementById('file-tabs');
+      const previewFrame = document.getElementById('preview-frame');
+      const previewPlaceholder = document.getElementById('preview-placeholder');
+      const hmrIndicator = document.getElementById('hmr-indicator');
+
+      let vfs = null;
+      let runtime = null;
+      let npm = null;
+      let devServer = null;
+      let devServerUrl = null;
+      let currentFile = '/src/App.jsx';
+      let previewActive = false;
+
+      function log(message, className = '') {
+        const line = document.createElement('div');
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        if (className) line.className = className;
+        outputEl.appendChild(line);
+        outputEl.scrollTop = outputEl.scrollHeight;
+      }
+
+      function setStatus(status, text) {
+        statusDot.className = 'status-dot ' + status;
+        statusText.textContent = text;
+      }
+
+      function showHmrIndicator() {
+        hmrIndicator.classList.add('show');
+        setTimeout(() => hmrIndicator.classList.remove('show'), 2000);
+      }
+
+      function loadFile(path) {
+        if (!vfs) return;
+        try {
+          const content = vfs.readFileSync(path, 'utf8');
+          editorEl.value = content;
+          currentFile = path;
+          document.querySelectorAll('.file-tab').forEach((tab) => {
+            tab.classList.toggle('active', tab.dataset.file === path);
+          });
+        } catch (e) {
+          log(`Error loading ${path}: ${e.message}`, 'error');
+        }
+      }
+
+      function saveFile() {
+        if (!vfs || !currentFile) return;
+        try {
+          vfs.writeFileSync(currentFile, editorEl.value);
+          log(`Saved: ${currentFile}`);
+          if (previewActive && !devServer) updatePreview();
+        } catch (e) {
+          log(`Error saving ${currentFile}: ${e.message}`, 'error');
+        }
+      }
+
+      function updatePreview() {
+        if (!previewActive || !devServerUrl) return;
+        previewFrame.onload = () => {
+          if (devServer && previewFrame.contentWindow) {
+            devServer.setHMRTarget(previewFrame.contentWindow);
+          }
+        };
+        previewFrame.src = devServerUrl + '?t=' + Date.now();
+      }
+
+      async function startPreview() {
+        previewPlaceholder.style.display = 'none';
+        previewFrame.style.display = 'block';
+        previewActive = true;
+        if (devServerUrl) {
+          previewFrame.onload = () => {
+            if (devServer && previewFrame.contentWindow) {
+              devServer.setHMRTarget(previewFrame.contentWindow);
+              log('HMR target connected', 'hmr');
+            }
+          };
+          previewFrame.src = devServerUrl;
+        }
+        log('Preview started');
+        log('Edit a file and save to trigger HMR', 'hmr');
+      }
+
+      async function init() {
+        try {
+          setStatus('', 'Initializing...');
+          const result = await initViteDemo(outputEl, null);
+          vfs = result.vfs;
+          runtime = result.runtime;
+          npm = result.npm;
+
+          vfs.watch('/src', { recursive: true }, (eventType, filename) => {
+            if (eventType === 'change' && previewActive) {
+              log(`File ${eventType}: ${filename}`);
+            }
+          });
+
+          saveBtn.disabled = false;
+          installBtn.disabled = false;
+          runBtn.disabled = false;
+          loadFile(currentFile);
+          setStatus('running', 'Ready');
+          log('Demo ready. Click Start Preview to launch.');
+        } catch (e) {
+          setStatus('error', 'Error');
+          log(`Init error: ${e.message}`, 'error');
+          console.error(e);
+        }
+      }
+
+      async function doInstallVite() {
+        try {
+          installBtn.disabled = true;
+          setStatus('', 'Installing Vite...');
+          await installVite(npm, log);
+          runBtn.disabled = false;
+          setStatus('running', 'Vite installed');
+          log('Vite installed. Click Start Preview.');
+        } catch (e) {
+          setStatus('error', 'Install failed');
+          log(`Install error: ${e.message}`, 'error');
+          console.error(e);
+          installBtn.disabled = false;
+        }
+      }
+
+      async function doStartPreview() {
+        try {
+          runBtn.disabled = true;
+          setStatus('', 'Starting dev server...');
+          const result = await startDevServer(vfs, { port: 3000, log });
+          devServer = result.server;
+          devServerUrl = result.url;
+          log(`Dev server URL: ${devServerUrl}`);
+          devServer.on('hmr-update', (update) => {
+            log(`HMR: ${update.path}`, 'hmr');
+            showHmrIndicator();
+          });
+          await startPreview();
+          setStatus('running', 'Dev server running');
+        } catch (e) {
+          setStatus('error', 'Preview failed');
+          log(`Preview error: ${e.message}`, 'error');
+          console.error(e);
+          runBtn.disabled = false;
+        }
+      }
+
+      saveBtn.addEventListener('click', saveFile);
+      clearBtn.addEventListener('click', () => { outputEl.innerHTML = ''; });
+      refreshBtn.addEventListener('click', () => { if (previewActive) { log('Refreshing...'); updatePreview(); } });
+      installBtn.addEventListener('click', doInstallVite);
+      runBtn.addEventListener('click', doStartPreview);
+      fileTabsEl.addEventListener('click', (e) => {
+        if (e.target.closest('.file-tab')) loadFile(e.target.closest('.file-tab').dataset.file);
+      });
+      editorEl.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+      });
+
+      init();
+    </script>
+  </body>
+</html>

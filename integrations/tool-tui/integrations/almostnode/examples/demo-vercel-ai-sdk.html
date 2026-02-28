@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vercel AI SDK Demo — almostnode agent runtime</title>
+    <link rel="stylesheet" href="./shared-styles.css" />
+    <style>
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+        height: calc(100vh - 44px);
+      }
+      .bottom-panel {
+        border-top: 1px solid var(--border);
+        max-height: 200px;
+        display: flex;
+        flex-direction: column;
+      }
+      .bottom-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 16px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(0,0,0,0.2);
+      }
+      .bottom-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .bottom-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .api-key-input {
+        padding: 6px 10px;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        border: 1px solid var(--border);
+        background: var(--black);
+        color: var(--text);
+        width: 260px;
+      }
+      .api-key-input::placeholder { color: var(--text-dim); }
+      .api-key-input.connected {
+        width: 180px;
+        border-color: var(--accent-border);
+        color: var(--text-dim);
+      }
+      .connection-status {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        padding: 2px 10px;
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        color: var(--accent-dim);
+      }
+      .setup-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+      .setup-overlay.hidden { display: none; }
+      .setup-dialog {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 32px;
+        max-width: 420px;
+        width: 90%;
+      }
+      .setup-dialog h2 {
+        font-family: var(--mono);
+        font-size: 0.9rem;
+        color: var(--text-bright);
+        margin-bottom: 8px;
+      }
+      .setup-dialog p {
+        font-size: 0.8rem;
+        color: var(--text-dim);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+      .setup-dialog .privacy-note {
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        color: var(--accent-dim);
+        background: var(--accent-bg);
+        border: 1px solid var(--accent-border);
+        padding: 8px 12px;
+        margin-bottom: 16px;
+        line-height: 1.5;
+      }
+      .setup-dialog input {
+        width: 100%;
+        padding: 10px 12px;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        border: 1px solid var(--border);
+        background: var(--black);
+        color: var(--text);
+        margin-bottom: 12px;
+      }
+      .setup-dialog input::placeholder { color: var(--text-dim); }
+      .setup-dialog button {
+        width: 100%;
+        padding: 10px;
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        font-weight: 600;
+        background: var(--accent);
+        color: var(--black);
+        border: none;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .setup-dialog button:hover { background: #00ffaa; }
+      .setup-dialog button:disabled { opacity: 0.4; cursor: not-allowed; }
+      .loading-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        color: var(--text-dim);
+      }
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--border);
+        border-top-color: var(--accent);
+        animation: spin 1s linear infinite;
+        margin-bottom: 12px;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+  </head>
+  <body>
+    <div class="demo-topbar">
+      <a href="../index.html" class="back">← demos</a>
+      <span class="sep">/</span>
+      <a href="../index.html" class="logo">almostnode</a>
+      <span class="sep">/</span>
+      <span class="title">Vercel AI SDK</span>
+      <span class="tag">next.js · ai sdk · openai · streaming</span>
+    </div>
+
+    <div class="layout">
+      <!-- Preview -->
+      <div class="panel" style="overflow:hidden;position:relative;">
+        <div class="panel-header">
+          <span class="panel-label">Preview</span>
+          <div style="display:flex;gap:6px;">
+            <button id="refreshBtn" class="btn btn-secondary" style="padding:4px 10px;" disabled>Refresh</button>
+            <button id="openBtn" class="btn btn-secondary" style="padding:4px 10px;" disabled>Open Tab</button>
+          </div>
+        </div>
+        <div id="previewContainer" style="flex:1;display:flex;flex-direction:column;">
+          <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Starting dev server...</p>
+          </div>
+        </div>
+        <div class="setup-overlay" id="setupOverlay">
+          <div class="setup-dialog">
+            <h2>OpenAI API Key Required</h2>
+            <p>This demo uses the Vercel AI SDK to stream responses from OpenAI. Enter your API key to get started.</p>
+            <div class="privacy-note">Your key stays in your browser. It is never sent to our servers — API calls go directly from your browser to OpenAI via a CORS proxy.</div>
+            <input type="password" id="setupKeyInput" placeholder="sk-..." />
+            <button id="setupKeyBtn" disabled>Connect</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom -->
+      <div class="bottom-panel">
+        <div class="bottom-header">
+          <div class="bottom-left">
+            <span class="panel-label">Console</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <div class="status-dot" id="statusDot"></div>
+              <span class="panel-label" id="statusText">Initializing...</span>
+            </div>
+          </div>
+          <div class="bottom-right">
+            <div id="connectionStatus" class="connection-status">
+              <div class="status-dot running"></div>
+              <span id="connectionStatusText">Connected</span>
+            </div>
+            <input type="password" class="api-key-input" id="apiKey" placeholder="OpenAI API key (sk-...)" />
+            <button id="connectBtn" class="btn btn-secondary" disabled>Connect</button>
+          </div>
+        </div>
+        <div class="terminal" id="logs"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/vercel-ai-sdk-demo-entry.ts"></script>
+  </body>
+</html>

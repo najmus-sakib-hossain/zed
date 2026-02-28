@@ -1,0 +1,14 @@
+{
+  "name": "@dx/telegram",
+  "version": "2026.2.4",
+  "description": "Dx Telegram channel plugin",
+  "type": "module",
+  "devDependencies": {
+    "dx": "workspace:*"
+  },
+  "dx": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}

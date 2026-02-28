@@ -1,0 +1,70 @@
+{
+    "name": "DX vs Bun Benchmarks",
+    "timestamp": "2025-12-29T12:00:00Z",
+    "system": {
+        "os": "MINGW64_NT-10.0-26200",
+        "platform": "x86_64",
+        "cpu": "AMD Ryzen 5 5600G with Radeon Graphics",
+        "cores": 12,
+        "memory": "7 GB",
+        "dxVersion": "dx-js-runtime 0.1.0",
+        "bunVersion": "1.3.5"
+    },
+    "suites": [
+        {
+            "name": "Runtime",
+            "benchmarks": [
+                {
+                    "name": "Hello World",
+                    "dxMs": 80,
+                    "bunMs": 96,
+                    "winner": "dx",
+                    "speedup": 1.2
+                },
+                {
+                    "name": "Fibonacci (CPU)",
+                    "dxMs": 45,
+                    "bunMs": 162,
+                    "winner": "dx",
+                    "speedup": 3.6
+                },
+                {
+                    "name": "Memory Stress",
+                    "dxMs": 41,
+                    "bunMs": 275,
+                    "winner": "dx",
+                    "speedup": 6.7
+                },
+                {
+                    "name": "Async Concurrent",
+                    "dxMs": 41,
+                    "bunMs": 110,
+                    "winner": "dx",
+                    "speedup": 2.68
+                },
+                {
+                    "name": "TypeScript",
+                    "dxMs": 41,
+                    "bunMs": 86,
+                    "winner": "dx",
+                    "speedup": 2.1
+                }
+            ],
+            "winner": "dx",
+            "dxWins": 5,
+            "bunWins": 0
+        }
+    ],
+    "summary": {
+        "totalBenchmarks": 5,
+        "dxWins": 5,
+        "bunWins": 0,
+        "ties": 0,
+        "overallWinner": "dx"
+    },
+    "methodology": {
+        "runs": 5,
+        "warmup": 2,
+        "measurement": "median"
+    }
+}

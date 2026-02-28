@@ -1,0 +1,13 @@
+[package]
+name = "video-scene-segment"
+version.workspace = true
+edition.workspace = true
+description = "Scene boundary detection for intelligent video budget allocation"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+image = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

@@ -1,0 +1,17 @@
+[package]
+name = "dx-bundle-parallel"
+description = "Speculative parallel processing for DX Bundler v2"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+dx-bundle-core = { path = "../dx-bundle-core" }
+dx-bundle-scanner = { path = "../dx-bundle-scanner" }
+dx-bundle-pipeline = { path = "../dx-bundle-pipeline" }
+dx-bundle-cache = { path = "../dx-bundle-cache" }
+rayon.workspace = true
+crossbeam-channel.workspace = true
+dashmap.workspace = true
+parking_lot.workspace = true
+num_cpus.workspace = true

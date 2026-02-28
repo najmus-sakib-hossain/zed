@@ -1,0 +1,39 @@
+{
+  "name": "@midday/jobs",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "trigger dev",
+    "deploy": "trigger deploy",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "bun test --exit src",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "./schema": "./src/schema.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "catalog:",
+    "@fast-csv/format": "catalog:",
+    "@midday/db": "workspace:*",
+    "@midday/email": "workspace:*",
+    "@midday/encryption": "workspace:*",
+    "@midday/notifications": "workspace:*",
+    "@midday/supabase": "workspace:*",
+    "@midday/trpc": "workspace:*",
+    "@sindresorhus/slugify": "catalog:",
+    "@zip.js/zip.js": "^2.8.10",
+    "ai": "catalog:",
+    "camelcase-keys": "catalog:",
+    "heic-convert": "catalog:",
+    "node-xlsx": "catalog:",
+    "sharp": "catalog:",
+    "trigger.dev": "4.1.2",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/heic-convert": "1.2.3"
+  }
+}

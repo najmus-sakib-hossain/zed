@@ -1,0 +1,13 @@
+timestamp="2026-02-11T21:45:57.454515300+00:00"
+total_score=476
+files_analyzed=1
+rank=SS
+categories(formatting=100 linting=76 security=100 design_patterns=100 structure_and_docs=100)
+violations[category severity file line column message points](
+  linting Medium test_suite/test.js 0 3 "Unexpected var, use let or const instead" 2
+  linting Medium test_suite/test.js 32 51 "Unexpected console.log statement" 2
+  linting High test_suite/test.js 53 62 "Unexpected debugger statement" 5
+  linting High test_suite/test.js 63 80 "eval() is a security risk and should not be used" 5
+  linting High test_suite/test.js 86 90 "Unexpected constant condition" 5
+  linting High test_suite/test.js 92 95 "Empty block statement" 5
+)

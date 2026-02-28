@@ -1,0 +1,5 @@
+rule:7[language              = js category=style severity=warn fixable=true recommended=true description=Require let or const instead of var. var has function scope which can lead to bugs. Use let or const for block-scoped variables. docs url=https://dx.dev/rules/no-var]
+pattern:3[match              = var $name = $init message=Use 'let' or 'const' instead of 'var' suggestion=Replace var with let or const]
+Replace_with_let let_$name_  = $init full both null
+Replace_with_const_\(if_never_reassigned\) const_$name_  = $init full both $name is not reassigned
+examples:2[incorrect         = var x = 1; var name = "John"; for \(var i = 0; i < 10; i++\) { var temp = i * 2; } correct=let x = 1; const name = "John"; for \(let i = 0; i < 10; i++\) { const temp = i * 2; }]

@@ -1,0 +1,15 @@
+LARGE TECHNICAL DOCUMENTATION - SYSTEM ARCHITECTURE
+
+This document contains extensive technical details about our system architecture.
+In a real-world scenario, this could be:
+- A large codebase documentation
+- API specifications
+- Research papers
+- Legal documents
+- Medical records
+- Financial reports
+
+The key point is that traditional prompting would fail to process this entire document
+in a single API call due to token limits, but RLM can handle it efficiently.
+
+[This file serves as a placeholder - the demo generates content dynamically]

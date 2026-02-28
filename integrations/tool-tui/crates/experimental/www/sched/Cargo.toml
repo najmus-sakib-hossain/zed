@@ -1,0 +1,24 @@
+[package]
+name = "dx-www-sched"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Priority-based task scheduler for WASM runtime"
+keywords = ["wasm", "web", "scheduler", "dx", "async"]
+categories = ["wasm", "web-programming", "asynchronous"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+web-sys = { workspace = true, features = ["Performance", "Window"] }
+dx-www-core.workspace = true
+dx-www-dom.workspace = true
+dx-www-morph.workspace = true
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+console_error_panic_hook.workspace = true

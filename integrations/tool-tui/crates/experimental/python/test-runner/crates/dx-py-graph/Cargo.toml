@@ -1,0 +1,19 @@
+[package]
+name = "dx-py-graph"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+dx-py-core = { path = "../dx-py-core" }
+tree-sitter = { workspace = true }
+tree-sitter-python = { workspace = true }
+petgraph = { workspace = true }
+blake3 = { workspace = true }
+walkdir = { workspace = true }
+serde = { workspace = true }
+bincode = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = "3.9"

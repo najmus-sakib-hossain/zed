@@ -1,0 +1,16 @@
+[package]
+name = "dx-www-rtl"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "RTL detection and CSS flipping"
+keywords = ["wasm", "web", "rtl", "dx", "i18n"]
+categories = ["wasm", "web-programming", "internationalization"]
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+unic-langid = "0.9"

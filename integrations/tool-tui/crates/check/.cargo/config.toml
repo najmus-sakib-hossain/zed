@@ -1,0 +1,22 @@
+# Cargo configuration for dx-check
+#
+# **Validates: Requirement 10.5 - Set up code coverage reporting**
+
+[alias]
+# Run tests with coverage using cargo-llvm-cov
+coverage = "llvm-cov --html --output-dir coverage"
+coverage-json = "llvm-cov --json --output-path coverage.json"
+coverage-lcov = "llvm-cov --lcov --output-path lcov.info"
+
+# Run tests with tarpaulin (alternative coverage tool)
+tarpaulin = "tarpaulin --out Html --output-dir coverage"
+
+[build]
+# Enable debug info for better coverage reports
+# rustflags = ["-C", "instrument-coverage"]
+
+[env]
+# Environment variables for coverage
+CARGO_INCREMENTAL = "0"
+RUSTFLAGS = "-Cinstrument-coverage"
+LLVM_PROFILE_FILE = "dx-check-%p-%m.profraw"

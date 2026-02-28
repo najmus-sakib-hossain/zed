@@ -1,0 +1,12 @@
+[package]
+name = "retrieval-budget"
+version.workspace = true
+edition.workspace = true
+description = "Retrieval context budgeting — 60-90% savings on RAG context overflow"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

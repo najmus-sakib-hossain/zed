@@ -1,0 +1,52 @@
+# DX WWW Framework Configuration
+# Official DX Website - dx-option
+
+[project]
+name = "dx-option"
+version = "0.1.0"
+description = "Official DX Binary Dawn Website - The Future of Web Development"
+
+[build]
+output_dir = ".dx/build"
+cache_dir = ".dx/cache"
+optimization = "aggressive"      # Binary optimization level
+tree_shake = true                # Remove unused code
+source_maps = true               # Generate source maps for debugging
+
+[routing]
+base_path = "/"
+trailing_slash = false
+case_sensitive = false
+
+[server]
+host = "0.0.0.0"
+port = 3000
+hot_reload = true
+
+[database]
+provider = "turso"
+url = "libsql://dx-option-{YOUR_ORG}.turso.io"
+auth_token = "${TURSO_AUTH_TOKEN}"
+sync_interval = 60               # Sync interval in seconds for embedded replicas
+
+[style]
+atomic = true                    # Enable atomic CSS compilation
+binary_css = true                # Compile CSS to binary format
+purge_unused = true              # Purge unused styles in production
+
+[features]
+binary_dawn = true               # Enable Binary Dawn animations
+three_d = true                   # Enable 3D WebGL support
+forms = true                     # Enable Binary Forms
+realtime = true                  # Enable realtime sync
+offline = true                   # Enable offline support
+
+[i18n]
+default_locale = "en"
+locales = ["en", "es", "zh", "ja", "de", "fr"]
+
+[seo]
+generate_sitemap = true
+generate_robots = true
+default_title = "DX - Binary-First Web Framework"
+default_description = "Replace React/Next.js with Binary Protocol. 20x faster animations, 10x faster forms, zero-parse rendering."

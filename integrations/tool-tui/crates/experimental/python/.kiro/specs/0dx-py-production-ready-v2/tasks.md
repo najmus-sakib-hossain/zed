@@ -1,0 +1,304 @@
+Implementation Plan: DX-Py Production Ready
+
+## Overview
+
+This implementation plan transforms DX-Py from a prototype into a production-ready Python toolchain. The work is organized into phases: core type methods, language features, tooling fixes, and validation.
+
+## Tasks
+
+- Implement String Methods
+- 1.1 Create string methods module with upper(), lower(), strip()
+- Create `runtime/dx-py-core/src/pystr_methods.rs`
+- Implement `upper()` using Rust's `to_uppercase()`
+- Implement `lower()` using Rust's `to_lowercase()`
+- Implement `strip()`, `lstrip()`, `rstrip()`
+- Requirements: 1.1, 1.2, 1.7
+- 1.2 Implement split() and join() methods
+- Implement `split()` with optional separator
+- Implement `split(sep)` with custom separator
+- Implement `join(iterable)` for string concatenation
+- Handle edge cases (empty strings, no matches)
+- Requirements: 1.3, 1.4, 1.6
+- 1.3 Implement replace(), find(), startswith(), endswith()
+- Implement `replace(old, new)` with optional count
+- Implement `find(sub)` returning index or
+- 1
+- Implement `startswith(prefix)` and `endswith(suffix)`
+- Requirements: 1.5, 1.8, 1.9, 1.10
+- 1.4 Wire string methods to interpreter's LOAD_ATTR
+- Modify `dispatcher.rs` to handle string attribute access
+- Create `BoundMethod::String` variant for method binding
+- Implement method call dispatch for string methods
+- Requirements: 1.1-1.10
+- 1.5 Write property tests for string methods
+- Property 1: String Method Round-Trip Consistency
+- Property 2: String Case Conversion Idempotence
+- Property 3: String Search Consistency
+- Validates: Requirements 1.1-1.10
+- -Implement List Methods
+- 2.1 Implement append(), extend(), insert() on PyList
+- Add `append(&self, item: PyValue)` method
+- Add `extend(&self, items: &[PyValue])` method
+- Add `insert(&self, index: i64, item: PyValue)` method
+- Ensure thread-safety with interior mutability
+- Requirements: 2.1, 2.2, 2.3
+- 2.2 Implement remove(), pop(), clear() on PyList
+- Add `remove(&self, item: &PyValue)
+- > RuntimeResult<()>`
+- Add `pop(&self, index: Option<i64>)
+- > RuntimeResult<PyValue>`
+- Add `clear(&self)` method
+- Handle IndexError for empty list pop
+- Requirements: 2.4, 2.5, 2.6, 2.11
+- 2.3 Implement sort(), reverse(), index(), count()
+- Add `sort(&self)
+- > RuntimeResult<()>` with comparison
+- Add `reverse(&self)` for in-place reversal
+- Add `index_of(&self, item: &PyValue)
+- > RuntimeResult<i64>`
+- Add `count(&self, item: &PyValue)
+- > i64`
+- Requirements: 2.7, 2.8, 2.9, 2.10
+- 2.4 Wire list methods to interpreter's LOAD_ATTR
+- Modify `dispatcher.rs` to handle list attribute access
+- Create `BoundMethod::List` variant for method binding
+- Implement method call dispatch for list methods
+- Requirements: 2.1-2.11
+- 2.5 Write property tests for list methods
+- Property 4: List Append Invariant
+- Property 5: List Sort Ordering
+- Property 6: List Reverse Round-Trip
+- Property 7: List Pop Consistency
+- Validates: Requirements 2.1-2.11
+- -Implement Dict Methods
+- 3.1 Implement keys(), values(), items() on PyDict
+- Add `keys_list(&self)
+- > PyValue` returning list of keys
+- Add `values_list(&self)
+- > PyValue` returning list of values
+- Add `items_list(&self)
+- > PyValue` returning list of tuples
+- Requirements: 3.1, 3.2, 3.3
+- 3.2 Implement get(), pop(), update(), clear()
+- Add `get_with_default(&self, key, default)
+- > PyValue`
+- Add `pop(&self, key, default?)
+- > RuntimeResult<PyValue>`
+- Add `update(&self, other: &PyDict)`
+- Add `clear(&self)`
+- Handle KeyError for missing keys
+- Requirements: 3.4, 3.5, 3.6, 3.7, 3.8, 3.9
+- 3.3 Wire dict methods to interpreter's LOAD_ATTR
+- Modify `dispatcher.rs` to handle dict attribute access
+- Create `BoundMethod::Dict` variant for method binding
+- Implement method call dispatch for dict methods
+- Requirements: 3.1-3.9
+- 3.4 Write property tests for dict methods
+- Property 8: Dict Keys-Values-Items Consistency
+- Property 9: Dict Get Consistency
+- Property 10: Dict Update Merge
+- Validates: Requirements 3.1-3.9
+- -Checkpoint
+- Core Type Methods
+- Ensure all tests pass, ask the user if questions arise.
+- Verify string, list, dict methods work via manual testing
+- -Fix List Comprehensions
+- 5.1 Fix comprehension bytecode generation in compiler
+- Review `compile_list_comp` in `runtime/dx-py-compiler/src/compiler.rs`
+- Ensure BUILD_LIST creates empty list on stack
+- Ensure LIST_APPEND adds to correct list
+- Fix loop variable scoping
+- Requirements: 4.1, 4.2, 4.3
+- 5.2 Fix comprehension execution in interpreter
+- Review FOR_ITER and LIST_APPEND opcode handlers
+- Ensure proper stack management during iteration
+- Fix return value (list, not None)
+- Requirements: 4.1, 4.5
+- 5.3 Add support for filtered and nested comprehensions
+- Implement conditional filtering with POP_JUMP_IF_FALSE
+- Implement nested loops for multiple generators
+- Test variable capture from enclosing scope
+- Requirements: 4.2, 4.3, 4.4
+- 5.4 Write property tests for list comprehensions
+- Property 11: List Comprehension Length
+- Property 12: List Comprehension Filter
+- Validates: Requirements 4.1-4.5
+- -Fix Exception Handling
+- 6.1 Implement exception handler stack in interpreter
+- Create `ExceptionHandler` struct with try block tracking
+- Implement `push_try()` and `pop_try()` for block management
+- Track stack depth for proper unwinding
+- Requirements: 5.1, 5.5
+- 6.2 Implement exception matching and binding
+- Implement type-based exception matching
+- Support `except ExceptionType as e` binding
+- Implement exception hierarchy for subclass matching
+- Requirements: 5.2, 5.3
+- 6.3 Implement finally block execution
+- Ensure finally runs on normal completion
+- Ensure finally runs on exception
+- Ensure finally runs on return/break/continue
+- Requirements: 5.4
+- 6.4 Implement raise statement
+- Support `raise ExceptionType(message)`
+- Support bare `raise` for re-raising
+- Implement exception chaining
+- Requirements: 5.6, 5.7
+- 6.5 Write property tests for exception handling
+- Property 13: Exception Finally Guarantee
+- Property 14: Exception Type Matching
+- Validates: Requirements 5.1-5.7
+- -Fix Class System
+- 7.1 Fix class definition and type creation
+- Review CLASS_DEF opcode handler
+- Ensure PyType is created with proper dict
+- Store methods as PyFunction in class dict
+- Requirements: 6.1
+- 7.2 Fix class instantiation and init calling
+- Implement CALL opcode for type objects
+- Create PyInstance with class reference
+- Call init with instance as first argument
+- Requirements: 6.2, 6.3
+- 7.3 Fix attribute access and method binding
+- Implement proper MRO lookup in getattr
+- Create BoundMethod for instance method access
+- Pass self correctly when calling bound methods
+- Requirements: 6.4, 6.5
+- 7.4 Implement inheritance and super()
+- Implement MRO calculation (C3 linearization)
+- Implement super() builtin
+- Support method override and parent method access
+- Requirements: 6.6, 6.7, 6.8
+- 7.5 Write property tests for class system
+- Property 15: Class Instance Attribute Access
+- Property 16: Class Inheritance
+- Validates: Requirements 6.1-6.8
+- -Checkpoint
+- Language Features
+- Ensure all tests pass, ask the user if questions arise.
+- Verify comprehensions, exceptions, classes work via manual testing
+- -Implement JSON Module
+- 9.1 Implement json.dumps() serialization
+- Create `runtime/dx-py-core/src/stdlib/json.rs`
+- Implement recursive serialization for all JSON types
+- Handle string escaping properly
+- Return error for non-serializable types
+- Requirements: 7.5
+- 9.2 Implement json.loads() parsing
+- Implement JSON parser (recursive descent)
+- Parse null, bool, number, string, array, object
+- Return proper Python types
+- Handle parse errors gracefully
+- Requirements: 7.6
+- 9.3 Register json module in module system
+- Add json to builtin_modules list in VM
+- Create module with dumps and loads functions
+- Ensure import json works
+- Requirements: 7.1, 7.4
+- 9.4 Write property tests for JSON module
+- Property 17: JSON Round-Trip
+- Validates: Requirements 7.5, 7.6
+- -Fix Module Import Caching
+- 10.1 Ensure module caching works correctly
+- Verify modules dict is checked before loading
+- Ensure same object returned for repeated imports
+- Test with multiple import statements
+- Requirements: 7.7, 7.8
+- 10.2 Write property test for module caching
+- Property 18: Module Import Caching
+- Validates: Requirements 7.7
+- -Fix Test Runner Worker Process
+- 11.1 Fix worker process communication
+- Review `test-runner/dx-py-executor/src/worker.rs`
+- Implement JSON-over-stdio protocol
+- Add proper error handling for pipe errors
+- Implement timeout for unresponsive workers
+- Requirements: 8.5, 8.6
+- 11.2 Fix test execution and result reporting
+- Ensure worker can execute test functions
+- Capture assertion errors with messages
+- Capture other exceptions with tracebacks
+- Report results back to main process
+- Requirements: 8.1, 8.2, 8.3, 8.4
+- 11.3 Handle worker crashes gracefully
+- Detect worker process termination
+- Report crash as error, not hang
+- Continue with remaining tests
+- Requirements: 8.7
+- 11.4 Write integration tests for test runner
+- Test passing test execution
+- Test failing test reporting
+- Test error handling
+- Validates: Requirements 8.1-8.7
+- -Fix Package Manager Add Command
+- 12.1 Fix pyproject.toml modification
+- Review `package-manager/dx-py-cli/src/commands/add.rs`
+- Use toml_edit for preserving formatting
+- write changes to file
+- Handle missing dependencies section
+- Requirements: 9.1, 9.4
+- 12.2 Support version constraints and dev dependencies
+- Parse version specifiers (==, >=, etc.)
+- Support
+- -dev flag for dev dependencies
+- Validate package names
+- Requirements: 9.2, 9.3, 9.6
+- 12.3 Add confirmation output
+- Print success message after adding
+- Print error message on failure
+- Requirements: 9.5
+- 12.4 Write integration tests for add command
+- Test adding package to dependencies
+- Test adding with version constraint
+- Test adding dev dependency
+- Validates: Requirements 9.1-9.6
+- -Checkpoint
+- Tooling Fixes
+- Ensure all tests pass, ask the user if questions arise.
+- Verify test runner and package manager work via manual testing
+- -Fix Benchmark Validation
+- 14.1 Add output validation to benchmarks
+- Modify benchmark runner to capture output
+- Compare DX-Py output with CPython output
+- Skip benchmarks where outputs differ
+- Requirements: 10.1, 10.2
+- 14.2 Update benchmark reporting
+- Only report speedups for successful benchmarks
+- Add "not supported" status for failed benchmarks
+- Add feature coverage metric
+- Requirements: 10.3, 10.4, 10.5
+- 14.3 Update benchmark documentation
+- Update CURRENT_BENCHMARK.md with honest results
+- Document which features are tested
+- Remove misleading claims
+- Requirements: 10.1-10.5
+- -Final Validation
+- 15.1 Run full test suite
+- Run all runtime tests
+- Run all package manager tests
+- Run all test runner tests
+- Verify no regressions
+- 15.2 Manual integration testing
+- Test string methods: `"hello".upper()`, `"a,b,c".split(",")`
+- Test list methods: `[1,2,3].append(4)`, `[3,1,2].sort()`
+- Test dict methods: `{"a":1}.keys()`, `{"a":1}.get("b", 0)`
+- Test comprehensions: `[x*2 for x in range(5)]`
+- Test exceptions: `try: 1/0 except: print("caught")`
+- Test classes: `class Foo: def bar(self): return 1`
+- Test JSON: `json.dumps({"a": 1})`, `json.loads('{"a": 1}')`
+- 15.3 Update documentation
+- Update PROBLEMS.md with current status
+- Update README.md with accurate feature list
+- Update PRODUCTION_READINESS.md
+- -Final Checkpoint
+- Ensure all tests pass, ask the user if questions arise.
+- Verify all requirements are met
+
+## Notes
+
+- All tasks are required for comprehensive validation
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
+- Integration tests verify end-to-end behavior

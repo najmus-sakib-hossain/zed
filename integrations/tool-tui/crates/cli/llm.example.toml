@@ -1,0 +1,67 @@
+# DX CLI Local LLM Configuration Example
+# Copy this to ~/.config/dx/llm.toml and customize
+
+# Default backend: "ollama" or "khroma"
+default_backend = "ollama"
+
+# Model cache directory
+cache_dir = "~/.cache/dx/models"
+
+[huggingface]
+# HuggingFace token for private models (optional)
+# token = "hf_..."
+
+# Default model to use with Candle backend
+default_model = "Qwen/Qwen2.5-Coder-3B-Instruct"
+
+# Model revision/branch
+revision = "main"
+
+[ollama]
+# Ollama server URL
+url = "http://localhost:11434"
+
+# Default Ollama model (local)
+default_model = "qwen2.5-coder:3b"
+
+# Local models directory (optional - uses OLLAMA_MODELS env var if not set)
+models_dir = "F:/ollama/models"
+
+# Remote models directory (optional - for network/shared models)
+# models_remote_dir = "/mnt/shared/ollama/models"
+
+# Enable Ollama Remote AI (access to GPT-4, Claude, etc.)
+enable_remote = false
+
+# Ollama Remote API key (get from ollama.com/remote)
+# remote_api_key = "your-api-key-here"
+
+# Remote model to use when enable_remote = true
+# Options: "gpt-4", "gpt-4-turbo", "claude-3-opus", "claude-3-sonnet", etc.
+# remote_model = "gpt-4-turbo"
+
+[khroma]
+# Khroma API endpoint
+endpoint = "http://localhost:8080"
+
+# API key (optional)
+# api_key = "your-key-here"
+
+[inference]
+# Maximum context length
+max_context = 8192
+
+# Temperature for sampling (0.0 = deterministic, 1.0 = creative)
+temperature = 0.7
+
+# Top-p sampling (nucleus sampling)
+top_p = 0.9
+
+# Top-k sampling
+top_k = 50
+
+# Repetition penalty
+repetition_penalty = 1.1
+
+# Maximum tokens to generate
+max_tokens = 2048

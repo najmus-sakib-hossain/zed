@@ -1,0 +1,58 @@
+[gateway]
+enabled                      = true
+host                         = 0.0.0.0
+port                         = 31337
+service_name                 = DX Gateway
+
+[gateway.security]
+require_auth                 = true
+session_timeout              = 3600
+max_connections              = 10
+
+[gateway.discovery]
+enabled                      = true
+
+[gateway.discovery.txt_records]
+protocol                     = dx-gateway-v1
+capabilities                 = voice,canvas,commands
+
+[gateway.pairing]
+code_expiry                  = 300
+alphanumeric                 = false
+code_length                  = 6
+max_attempts                 = 3
+lockout_duration             = 300
+
+[gateway.platforms.ios]
+voice_wake                   = true
+canvas                       = true
+camera                       = true
+
+[gateway.platforms.android]
+voice_wake                   = true
+canvas                       = true
+camera                       = true
+sms_gateway                  = false
+
+[gateway.platforms.macos]
+voice_wake                   = true
+canvas                       = true
+menu_bar                     = true
+shortcuts                    = true
+
+[gateway.logging]
+level                        = info
+file                         = 
+connections                  = true
+commands                     = true
+
+[gateway.advanced]
+ping_interval                = 30
+pong_timeout                 = 10
+queue_size                   = 100
+compression                  = true
+
+[gateway.tls]
+enabled                      = false
+cert_file                    = 
+key_file                     = 

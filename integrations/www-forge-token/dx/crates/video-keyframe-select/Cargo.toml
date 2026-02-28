@@ -1,0 +1,12 @@
+[package]
+name = "video-keyframe-select"
+version.workspace = true
+edition.workspace = true
+description = "Video keyframe selection — retain only semantically distinct frames"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

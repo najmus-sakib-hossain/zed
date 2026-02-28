@@ -1,0 +1,67 @@
+[package]
+name = "dx-www-cache"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "The Eternal Binary Cache Engine - 0ms second-visit LCP"
+repository.workspace = true
+keywords = ["cache", "indexeddb", "wasm", "performance", "eternal"]
+categories = ["wasm", "caching"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+
+# Web APIs
+web-sys = { version = "0.3", features = [
+    "Window",
+    "Navigator",
+    "Storage",
+    "CacheStorage",
+    "Cache",
+    "Request",
+    "Response",
+    "Headers",
+    "RequestInit",
+    "ResponseInit",
+    "ServiceWorkerContainer",
+    "ServiceWorkerRegistration",
+    "IdbDatabase",
+    "IdbOpenDbRequest",
+    "IdbVersionChangeEvent",
+    "IdbTransaction",
+    "IdbTransactionMode",
+    "IdbObjectStore",
+    "IdbRequest",
+    "Event",
+    "EventTarget",
+    "DomException",
+    "console",
+] }
+
+# IndexedDB (async wrapper)
+indexed_db_futures = "0.5"
+
+# Cryptographic verification
+ed25519-dalek = { version = "2.1.0", features = ["serde"] }
+getrandom = { version = "0.2", features = ["js"] }
+blake3 = "1.8"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde-wasm-bindgen = "0.6"
+
+# Internal dependencies
+dx-www-binary = { path = "../binary" }
+
+# Error handling
+console_error_panic_hook = "0.1"
+
+[dev-dependencies]
+rand = "0.8"

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Next.js Demo — almostnode agent runtime</title>
+    <link rel="stylesheet" href="./shared-styles.css" />
+    <style>
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1px;
+        background: var(--border);
+        height: calc(100vh - 44px);
+      }
+      .editor-inner {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+      }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-topbar">
+      <a href="../index.html" class="back">← demos</a>
+      <span class="sep">/</span>
+      <a href="../index.html" class="logo">almostnode</a>
+      <span class="sep">/</span>
+      <span class="title">Next.js App</span>
+      <span class="tag">next.js · app router · hmr</span>
+    </div>
+
+    <div class="hmr-indicator" id="hmr-indicator">HMR Update</div>
+
+    <div class="layout">
+      <!-- Editor panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Editor</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="status-dot" id="status-dot"></div>
+            <span class="panel-label" id="status-text">Initializing...</span>
+          </div>
+        </div>
+
+        <div class="router-tabs">
+          <button id="pages-router-btn" class="router-tab active">Pages Router</button>
+          <button id="app-router-btn" class="router-tab">App Router</button>
+        </div>
+
+        <div class="file-tabs" id="file-tabs">
+          <button class="file-tab active" data-file="/pages/index.jsx"><span class="dot"></span>index.jsx</button>
+          <button class="file-tab" data-file="/pages/about.jsx"><span class="dot"></span>about.jsx</button>
+          <button class="file-tab" data-file="/pages/users/[id].jsx"><span class="dot"></span>[id].jsx</button>
+          <button class="file-tab" data-file="/pages/api/hello.js"><span class="dot"></span>api/hello.js</button>
+          <button class="file-tab" data-file="/styles/globals.css"><span class="dot"></span>globals.css</button>
+        </div>
+
+        <!-- Package install -->
+        <div class="inline-section">
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+            <input type="text" id="package-input" placeholder="Package (e.g., lodash, date-fns@3)" style="flex:1;" />
+            <button id="install-btn" class="btn btn-secondary">Install</button>
+          </div>
+          <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text-dim);">
+            Installed: <span id="installed-list">react, react-dom</span>
+          </div>
+        </div>
+
+        <!-- CORS proxy -->
+        <div class="inline-section">
+          <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
+            <input type="text" id="proxy-input" placeholder="CORS Proxy URL" style="flex:1;" />
+            <button id="set-proxy-btn" class="btn btn-secondary">Set</button>
+            <button id="clear-proxy-btn" class="btn btn-secondary">Clear</button>
+          </div>
+          <div style="font-family:var(--mono);font-size:0.6rem;color:var(--text-dim);">
+            Proxy: <span id="proxy-status">Not configured</span>
+          </div>
+        </div>
+
+        <div class="editor-inner">
+          <textarea id="editor" placeholder="Loading..."></textarea>
+        </div>
+
+        <div class="toolbar">
+          <button id="save-btn" class="btn btn-primary" disabled>Save</button>
+          <button id="run-btn" class="btn btn-secondary" disabled>Start Preview</button>
+          <label class="toggle-row" style="margin-left:auto;">
+            <input type="checkbox" id="worker-toggle" />
+            <span>Worker</span>
+            <span id="worker-status" class="toggle-badge">Off</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Preview panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Live Preview</span>
+          <button id="refresh-btn" class="btn btn-secondary" style="padding:4px 10px;">Refresh</button>
+        </div>
+        <div class="url-bar">
+          <input type="text" id="url-input" value="/" />
+          <button id="url-go-btn" class="btn btn-secondary">Go</button>
+        </div>
+        <div class="preview-placeholder" id="preview-placeholder">
+          Click Start Preview to launch the Next.js dev server
+        </div>
+        <iframe id="preview-frame" class="preview-frame" style="display:none;"></iframe>
+      </div>
+
+      <!-- Console panel -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Console</span>
+          <button id="clear-btn" class="btn btn-secondary" style="padding:4px 10px;">Clear</button>
+        </div>
+        <div class="terminal" id="output"></div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initNextDemo, initNextAppRouterDemo, startNextDevServer, VirtualFS, Runtime, PackageManager, createRuntime } from '../src/next-demo.ts';
+
+      // CORS Proxy helpers
+      function setCorsProxy(url) {
+        if (url) localStorage.setItem('__corsProxyUrl', url);
+        else localStorage.removeItem('__corsProxyUrl');
+      }
+      function getCorsProxy() {
+        return localStorage.getItem('__corsProxyUrl') || null;
+      }
+
+      const outputEl = document.getElementById('output');
+      const editorEl = document.getElementById('editor');
+      const statusDot = document.getElementById('status-dot');
+      const statusText = document.getElementById('status-text');
+      const saveBtn = document.getElementById('save-btn');
+      const clearBtn = document.getElementById('clear-btn');
+      const runBtn = document.getElementById('run-btn');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const fileTabsEl = document.getElementById('file-tabs');
+      const previewFrame = document.getElementById('preview-frame');
+      const previewPlaceholder = document.getElementById('preview-placeholder');
+      const hmrIndicator = document.getElementById('hmr-indicator');
+      const pagesRouterBtn = document.getElementById('pages-router-btn');
+      const appRouterBtn = document.getElementById('app-router-btn');
+      const urlInput = document.getElementById('url-input');
+      const urlGoBtn = document.getElementById('url-go-btn');
+      const packageInput = document.getElementById('package-input');
+      const installBtn = document.getElementById('install-btn');
+      const installedList = document.getElementById('installed-list');
+      const proxyInput = document.getElementById('proxy-input');
+      const setProxyBtn = document.getElementById('set-proxy-btn');
+      const clearProxyBtn = document.getElementById('clear-proxy-btn');
+      const proxyStatus = document.getElementById('proxy-status');
+      const workerToggle = document.getElementById('worker-toggle');
+      const workerStatus = document.getElementById('worker-status');
+
+      let vfs = null;
+      let runtime = null;
+      let devServer = null;
+      let devServerUrl = null;
+      let currentFile = '/pages/index.jsx';
+      let previewActive = false;
+      let useAppRouter = false;
+      let useWorker = false;
+      let packageManager = null;
+      let installedPackages = new Set(['react', 'react-dom']);
+
+      function updateWorkerStatus() {
+        if (useWorker) {
+          workerStatus.textContent = 'On';
+          workerStatus.classList.add('on');
+        } else {
+          workerStatus.textContent = 'Off';
+          workerStatus.classList.remove('on');
+        }
+      }
+
+      const pagesRouterTabs = [
+        { file: '/pages/index.jsx', label: 'index.jsx' },
+        { file: '/pages/about.jsx', label: 'about.jsx' },
+        { file: '/pages/users/[id].jsx', label: '[id].jsx' },
+        { file: '/pages/typescript/index.tsx', label: 'typescript.tsx' },
+        { file: '/pages/external-api.jsx', label: 'external-api.jsx' },
+        { file: '/pages/api/hello.js', label: 'api/hello.js' },
+        { file: '/styles/globals.css', label: 'globals.css' },
+      ];
+
+      const appRouterTabs = [
+        { file: '/app/page.jsx', label: 'page.jsx' },
+        { file: '/app/layout.jsx', label: 'layout.jsx' },
+        { file: '/app/about/page.jsx', label: 'about/page.jsx' },
+        { file: '/app/typescript/page.tsx', label: 'typescript.tsx' },
+        { file: '/app/dashboard/page.jsx', label: 'dashboard/page.jsx' },
+        { file: '/app/users/[id]/page.jsx', label: 'users/[id].jsx' },
+        { file: '/app/globals.css', label: 'globals.css' },
+      ];
+
+      function log(message, className = '') {
+        const line = document.createElement('div');
+        line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+        if (className) line.className = className;
+        outputEl.appendChild(line);
+        outputEl.scrollTop = outputEl.scrollHeight;
+      }
+
+      function setStatus(status, text) {
+        statusDot.className = 'status-dot ' + status;
+        statusText.textContent = text;
+      }
+
+      function showHmrIndicator() {
+        hmrIndicator.classList.add('show');
+        setTimeout(() => hmrIndicator.classList.remove('show'), 2000);
+      }
+
+      function updateInstalledList() {
+        installedList.textContent = Array.from(installedPackages).join(', ') || 'none';
+      }
+
+      function createPackageDemoPage(packageName) {
+        const safeName = packageName.replace(/[^a-zA-Z0-9-]/g, '');
+        const jsName = packageName.replace(/[^a-zA-Z0-9]/g, '');
+        const pagePath = useAppRouter
+          ? `/app/${safeName}-demo/page.jsx`
+          : `/pages/${safeName}-demo.jsx`;
+
+        if (useAppRouter) {
+          vfs.mkdirSync(`/app/${safeName}-demo`, { recursive: true });
+        }
+
+        let demoContent = '';
+        if (packageName === 'lodash' || packageName.startsWith('lodash')) {
+          demoContent = `'use client';
+import React, { useState } from 'react';
+import _ from 'https://esm.sh/lodash@4?dev';
+
+export default function LodashDemo() {
+  const [items] = useState(['apple', 'banana', 'cherry', 'date', 'elderberry']);
+  const [shuffled, setShuffled] = useState(items);
+  return (
+    <div style={{padding:'2rem',maxWidth:'600px',margin:'0 auto'}}>
+      <h1>Lodash Demo</h1>
+      <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginBottom:'16px'}}>
+        {shuffled.map((item, i) => <span key={i} style={{padding:'4px 12px',background:'#1a1a1a',border:'1px solid #2a2a2a'}}>{item}</span>)}
+      </div>
+      <button onClick={() => setShuffled(_.shuffle([...items]))}>Shuffle with _.shuffle()</button>
+      <div style={{marginTop:'16px'}}>
+        <p>_.uniq([1,1,2,3]) = [{_.uniq([1,1,2,3]).join(', ')}]</p>
+        <p>_.capitalize('hello') = "{_.capitalize('hello')}"</p>
+        <p>_.random(1, 100) = {_.random(1, 100)}</p>
+      </div>
+    </div>
+  );
+}`;
+        } else if (packageName === 'date-fns' || packageName.startsWith('date-fns')) {
+          demoContent = `'use client';
+import React from 'react';
+import { format, formatDistance, subDays, addDays } from 'https://esm.sh/date-fns@3?dev';
+
+export default function DateFnsDemo() {
+  const now = new Date();
+  return (
+    <div style={{padding:'2rem',maxWidth:'600px',margin:'0 auto'}}>
+      <h1>date-fns Demo</h1>
+      <p>Full: {format(now, 'PPPP')}</p>
+      <p>Short: {format(now, 'PP')}</p>
+      <p>Time: {format(now, 'pp')}</p>
+      <p>5 days ago: {formatDistance(subDays(now, 5), now, { addSuffix: true })}</p>
+      <p>In 10 days: {formatDistance(addDays(now, 10), now, { addSuffix: true })}</p>
+    </div>
+  );
+}`;
+        } else if (packageName === 'dayjs') {
+          demoContent = `'use client';
+import React from 'react';
+import dayjs from 'https://esm.sh/dayjs@1?dev';
+import relativeTime from 'https://esm.sh/dayjs@1/plugin/relativeTime?dev';
+dayjs.extend(relativeTime);
+
+export default function DayjsDemo() {
+  const now = dayjs();
+  return (
+    <div style={{padding:'2rem',maxWidth:'600px',margin:'0 auto'}}>
+      <h1>Day.js Demo</h1>
+      <p>Full: {now.format('dddd, MMMM D, YYYY')}</p>
+      <p>Short: {now.format('MM/DD/YYYY')}</p>
+      <p>Time: {now.format('h:mm A')}</p>
+      <p>5 days ago: {now.subtract(5, 'day').fromNow()}</p>
+      <p>In 2 weeks: {now.add(2, 'week').fromNow()}</p>
+    </div>
+  );
+}`;
+        } else {
+          demoContent = `'use client';
+import React from 'react';
+// import ${jsName} from 'https://esm.sh/${packageName}?dev';
+
+export default function ${jsName.charAt(0).toUpperCase() + jsName.slice(1)}Demo() {
+  return (
+    <div style={{padding:'2rem',maxWidth:'600px',margin:'0 auto'}}>
+      <h1>${packageName} Demo</h1>
+      <p>The <code>${packageName}</code> package has been installed.</p>
+      <p>Import via esm.sh:</p>
+      <code>import ${jsName} from 'https://esm.sh/${packageName}?dev';</code>
+    </div>
+  );
+}`;
+        }
+
+        vfs.writeFileSync(pagePath, demoContent);
+        return { pagePath, routePath: `/${safeName}-demo` };
+      }
+
+      async function installPackage(packageSpec) {
+        if (!vfs || !packageManager) {
+          log('VFS or PackageManager not initialized', 'error');
+          return;
+        }
+        const packageName = packageSpec.split('@')[0];
+        installBtn.disabled = true;
+        installBtn.textContent = 'Installing...';
+        try {
+          log(`Installing ${packageSpec}...`);
+          const result = await packageManager.install(packageSpec, {
+            onProgress: (message) => log(message),
+          });
+          for (const name of result.added) installedPackages.add(name);
+          updateInstalledList();
+          const { pagePath, routePath } = createPackageDemoPage(packageName);
+          log(`Created demo: ${pagePath}`, 'hmr');
+          const tabs = useAppRouter ? appRouterTabs : pagesRouterTabs;
+          if (!tabs.find(t => t.file === pagePath)) {
+            tabs.push({ file: pagePath, label: `${packageName}-demo.jsx` });
+            updateFileTabs();
+          }
+          loadFile(pagePath);
+          log(`Installed ${packageSpec}`, 'hmr');
+          log(`Navigate to ${routePath} to see the demo.`);
+        } catch (error) {
+          log(`Failed: ${error.message}`, 'error');
+          console.error(error);
+        } finally {
+          installBtn.disabled = false;
+          installBtn.textContent = 'Install';
+        }
+      }
+
+      function updateFileTabs() {
+        const tabs = useAppRouter ? appRouterTabs : pagesRouterTabs;
+        fileTabsEl.innerHTML = tabs.map((tab, i) =>
+          `<button class="file-tab${i === 0 ? ' active' : ''}" data-file="${tab.file}"><span class="dot"></span>${tab.label}</button>`
+        ).join('');
+        currentFile = tabs[0].file;
+        loadFile(currentFile);
+      }
+
+      function loadFile(path) {
+        if (!vfs) return;
+        try {
+          editorEl.value = vfs.readFileSync(path, 'utf8');
+          currentFile = path;
+          document.querySelectorAll('.file-tab').forEach((tab) => {
+            tab.classList.toggle('active', tab.dataset.file === path);
+          });
+        } catch (e) {
+          log(`Error loading ${path}: ${e.message}`, 'error');
+        }
+      }
+
+      function saveFile() {
+        if (!vfs || !currentFile) return;
+        try {
+          vfs.writeFileSync(currentFile, editorEl.value);
+          log(`Saved: ${currentFile}`);
+        } catch (e) {
+          log(`Error saving: ${e.message}`, 'error');
+        }
+      }
+
+      function updatePreview() {
+        if (!previewActive || !devServerUrl) return;
+        previewFrame.onload = () => {
+          if (devServer && previewFrame.contentWindow) devServer.setHMRTarget(previewFrame.contentWindow);
+        };
+        previewFrame.src = devServerUrl + '?t=' + Date.now();
+      }
+
+      function navigateToPath(path) {
+        if (!previewActive || !devServerUrl) {
+          log('Preview not running.', 'error');
+          return;
+        }
+        if (!path.startsWith('/')) path = '/' + path;
+        const fullUrl = devServerUrl + path.substring(1);
+        previewFrame.onload = () => {
+          if (devServer && previewFrame.contentWindow) devServer.setHMRTarget(previewFrame.contentWindow);
+        };
+        log(`Navigating to: ${path}`);
+        previewFrame.src = fullUrl;
+        urlInput.value = path;
+      }
+
+      async function startPreview() {
+        previewPlaceholder.style.display = 'none';
+        previewFrame.style.display = 'block';
+        previewActive = true;
+        if (devServerUrl) {
+          previewFrame.onload = () => {
+            if (devServer && previewFrame.contentWindow) {
+              devServer.setHMRTarget(previewFrame.contentWindow);
+              log('HMR target connected', 'hmr');
+            }
+          };
+          previewFrame.src = devServerUrl;
+          urlInput.value = '/';
+        }
+        log('Preview started');
+        log('Edit and save to trigger HMR', 'hmr');
+      }
+
+      async function init() {
+        try {
+          setStatus('', 'Initializing...');
+          if (devServer) { devServer.stop(); devServer = null; devServerUrl = null; }
+          previewActive = false;
+          previewPlaceholder.style.display = 'flex';
+          previewFrame.style.display = 'none';
+          runBtn.disabled = false;
+          outputEl.innerHTML = '';
+          urlInput.value = '/';
+
+          const result = useAppRouter
+            ? await initNextAppRouterDemo(outputEl, { useWorker })
+            : await initNextDemo(outputEl, { useWorker });
+
+          vfs = result.vfs;
+          runtime = result.runtime;
+          packageManager = new PackageManager(vfs, { cwd: '/' });
+          installedPackages = new Set(['react', 'react-dom']);
+          updateInstalledList();
+
+          const watchDir = useAppRouter ? '/app' : '/pages';
+          vfs.watch(watchDir, { recursive: true }, (eventType, filename) => {
+            if (eventType === 'change' && previewActive) log(`File ${eventType}: ${filename}`);
+          });
+
+          saveBtn.disabled = false;
+          runBtn.disabled = false;
+          updateFileTabs();
+          setStatus('running', 'Ready');
+          log(`Ready (${useAppRouter ? 'App Router' : 'Pages Router'})`);
+          log('Click Start Preview to launch.');
+        } catch (e) {
+          setStatus('error', 'Error');
+          log(`Init error: ${e.message}`, 'error');
+          console.error(e);
+        }
+      }
+
+      async function doStartPreview() {
+        try {
+          runBtn.disabled = true;
+          setStatus('', 'Starting dev server...');
+          const result = await startNextDevServer(vfs, { port: 3001, log });
+          devServer = result.server;
+          devServerUrl = result.url;
+          log(`Dev server: ${devServerUrl}`);
+          devServer.on('hmr-update', (update) => {
+            log(`HMR: ${update.path}`, 'hmr');
+            showHmrIndicator();
+          });
+          await startPreview();
+          setStatus('running', 'Dev server running');
+        } catch (e) {
+          setStatus('error', 'Preview failed');
+          log(`Error: ${e.message}`, 'error');
+          console.error(e);
+          runBtn.disabled = false;
+        }
+      }
+
+      // Event listeners
+      saveBtn.addEventListener('click', saveFile);
+      clearBtn.addEventListener('click', () => { outputEl.innerHTML = ''; });
+      refreshBtn.addEventListener('click', () => { if (previewActive) { log('Refreshing...'); updatePreview(); } });
+      runBtn.addEventListener('click', doStartPreview);
+      fileTabsEl.addEventListener('click', (e) => {
+        const tab = e.target.closest('.file-tab');
+        if (tab) loadFile(tab.dataset.file);
+      });
+      editorEl.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveFile(); }
+      });
+      urlGoBtn.addEventListener('click', () => navigateToPath(urlInput.value));
+      urlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') navigateToPath(urlInput.value); });
+
+      installBtn.addEventListener('click', () => {
+        const s = packageInput.value.trim();
+        if (s) { installPackage(s); packageInput.value = ''; }
+      });
+      packageInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const s = packageInput.value.trim();
+          if (s) { installPackage(s); packageInput.value = ''; }
+        }
+      });
+
+      function updateProxyStatus() {
+        const proxy = getCorsProxy();
+        proxyStatus.textContent = proxy || 'Not configured';
+        proxyStatus.style.color = proxy ? 'var(--accent)' : 'var(--text-dim)';
+      }
+      setProxyBtn.addEventListener('click', () => {
+        const u = proxyInput.value.trim();
+        if (u) { setCorsProxy(u); updateProxyStatus(); log(`Proxy set: ${u}`, 'hmr'); }
+      });
+      clearProxyBtn.addEventListener('click', () => {
+        setCorsProxy(null); proxyInput.value = ''; updateProxyStatus(); log('Proxy cleared', 'hmr');
+      });
+      proxyInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          const u = proxyInput.value.trim();
+          if (u) { setCorsProxy(u); updateProxyStatus(); log(`Proxy set: ${u}`, 'hmr'); }
+        }
+      });
+
+      pagesRouterBtn.addEventListener('click', async () => {
+        if (!useAppRouter) return;
+        useAppRouter = false;
+        pagesRouterBtn.classList.add('active');
+        appRouterBtn.classList.remove('active');
+        log('Switching to Pages Router...');
+        await init();
+      });
+      appRouterBtn.addEventListener('click', async () => {
+        if (useAppRouter) return;
+        useAppRouter = true;
+        appRouterBtn.classList.add('active');
+        pagesRouterBtn.classList.remove('active');
+        log('Switching to App Router...');
+        await init();
+      });
+
+      workerToggle.addEventListener('change', async () => {
+        useWorker = workerToggle.checked;
+        updateWorkerStatus();
+        log(`Worker mode: ${useWorker ? 'ON' : 'OFF'}`, useWorker ? 'hmr' : '');
+        await init();
+      });
+
+      init();
+    </script>
+  </body>
+</html>

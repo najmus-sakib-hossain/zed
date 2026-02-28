@@ -1,0 +1,19 @@
+[package]
+name = "dx-bundle-pipeline"
+description = "Unified single-pass transformation pipeline for DX Bundler v2"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+dx-bundle-core = { path = "../dx-bundle-core" }
+dx-bundle-scanner = { path = "../dx-bundle-scanner" }
+thiserror.workspace = true
+oxc_allocator.workspace = true
+oxc_parser.workspace = true
+oxc_span.workspace = true
+oxc_ast.workspace = true
+regex-lite = "0.1"
+
+[dev-dependencies]
+proptest.workspace = true

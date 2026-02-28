@@ -1,0 +1,49 @@
+[package]
+name = "dx"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX CLI - AGI-like AI Agent that connects to any app and creates its own integrations"
+
+[[bin]]
+name = "dx"
+path = "src/main.rs"
+
+[dependencies]
+# Internal crates
+dx-core = { path = "../core" }
+dx-agent = { path = "../agent" }
+dx-serializer = { path = "../serializer" }
+dx-integrations = { path = "../integrations" }
+dx-wasm = { path = "../wasm" }
+
+# Workspace dependencies
+clap.workspace = true
+anyhow.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# HTTP client for Google AI Studio API
+reqwest = { version = "0.12", features = ["json", "stream"] }
+serde = { version = "1.0", features = ["derive"] }
+futures-util = "0.3"
+
+# Rich terminal output
+colored = "2"
+indicatif = "0.17"
+
+# Config file parsing
+toml = "0.8"
+
+# Interactive prompts
+console = "0.15"
+owo-colors = "4"
+once_cell = "1"
+zeroize = "1"
+chrono = "0.4"
+
+# For measuring display width of Unicode strings (emoji, wide chars)
+unicode-width = "0.1"

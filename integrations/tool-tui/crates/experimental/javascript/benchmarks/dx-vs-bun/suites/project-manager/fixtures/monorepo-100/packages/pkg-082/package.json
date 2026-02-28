@@ -1,0 +1,15 @@
+{
+  "name": "pkg-082",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "echo Building pkg-082",
+    "test": "echo Testing pkg-082",
+    "lint": "echo Linting pkg-082"
+  },
+  "dependencies": {
+    "pkg-081": "1.0.0",
+    "pkg-080": "1.0.0",
+    "pkg-079": "1.0.0"
+  }
+}

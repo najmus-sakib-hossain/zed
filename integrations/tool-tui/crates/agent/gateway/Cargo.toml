@@ -1,0 +1,52 @@
+[package]
+name = "dx-agent-gateway"
+version.workspace = true
+edition.workspace = true
+description = "WebSocket gateway server for DX Agent"
+license.workspace = true
+
+[dependencies]
+dx-agent-protocol = { path = "../protocol" }
+
+# Async runtime
+tokio = { workspace = true }
+tokio-tungstenite = { workspace = true }
+
+# Web framework
+axum = { version = "0.8", features = ["ws"] }
+axum-extra = { version = "0.10", features = ["typed-header"] }
+tower = { version = "0.5", features = ["full"] }
+tower-http = { version = "0.6", features = ["cors", "trace", "compression-gzip"] }
+
+# Serialization
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Database
+rusqlite = { version = "0.37", features = ["bundled"] }
+
+# Auth
+jsonwebtoken = "9"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+
+# Utils
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+chrono = { workspace = true }
+uuid = { version = "1", features = ["v4", "serde"] }
+dashmap = { workspace = true }
+bytes = { workspace = true }
+futures-util = "0.3"
+parking_lot = { workspace = true }
+
+# Config
+toml = "0.8"
+
+[dev-dependencies]
+tokio-tungstenite = { workspace = true }
+reqwest = { version = "0.12", features = ["json"] }
+tempfile = "3"

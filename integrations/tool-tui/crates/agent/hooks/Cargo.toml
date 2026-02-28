@@ -1,0 +1,37 @@
+[package]
+name = "dx-agent-hooks"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX Agent hooks - Lua scripting engine for automation hooks and plugins"
+
+[dependencies]
+# Lua embedding
+mlua = { version = "0.10", features = ["lua54", "async", "serialize", "vendored"] }
+
+# Async
+tokio = { version = "1.42", features = ["full"] }
+async-trait = "0.1"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "2.0"
+
+# Utils
+tracing = "0.1"
+dashmap = "6.1"
+uuid = { version = "1.0", features = ["v4"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# File watching
+notify = "7"
+
+[dev-dependencies]
+tokio = { version = "1.42", features = ["full", "test-util"] }
+
+[lints]
+workspace = true

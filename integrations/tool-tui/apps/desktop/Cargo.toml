@@ -1,0 +1,106 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[workspace]
+members = [
+	"crates/gpui-component-macros",
+	"crates/gpui-component-ui",
+	"crates/gpui-wry",
+	"crates/zed_vendor/collections",
+	"crates/zed_vendor/component",
+	"crates/zed_vendor/fuzzy",
+	"crates/zed_vendor/icons",
+	"crates/zed_vendor/menu",
+	"crates/zed_vendor/picker",
+	"crates/zed_vendor/settings",
+	"crates/zed_vendor/theme",
+	"crates/zed_vendor/ui",
+	"crates/zed_vendor/ui_input",
+	"crates/zed_vendor/ui_macros",
+	"crates/zed_vendor/util",
+]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+publish = false
+license = "GPL-3.0-or-later"
+
+[workspace.dependencies]
+anyhow = "1"
+gpui = { git = "https://github.com/zed-industries/zed" }
+gpui-component-macros = { path = "crates/gpui-component-macros", version = "0.5.1" }
+gpui-macros = "0.2.2"
+collections = { path = "crates/zed_vendor/collections" }
+component = { path = "crates/zed_vendor/component" }
+fuzzy = { path = "crates/zed_vendor/fuzzy" }
+icons = { path = "crates/zed_vendor/icons" }
+menu = { path = "crates/zed_vendor/menu" }
+picker = { path = "crates/zed_vendor/picker" }
+settings = { path = "crates/zed_vendor/settings" }
+theme = { path = "crates/zed_vendor/theme" }
+ui = { path = "crates/zed_vendor/ui" }
+ui_input = { path = "crates/zed_vendor/ui_input" }
+ui_macros = { path = "crates/zed_vendor/ui_macros" }
+util = { path = "crates/zed_vendor/util" }
+indexmap = "2"
+rustc-hash = "2"
+log = "0.4"
+itertools = "0.14"
+smallvec = "1"
+strum = { version = "0.27", features = ["derive"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1"
+notify = "7.0.0"
+ropey = { version = "=2.0.0-beta.1", features = ["metric_lines_lf", "metric_utf16"] }
+rust-i18n = "3"
+schemars = "1"
+serde_repr = "0.1"
+smol = "2"
+sum-tree = { version = "0.2.0", package = "zed-sum-tree" }
+tracing = "0.1.41"
+lsp-types = { version = "0.97.0", features = ["proposed"] }
+
+[workspace.lints.clippy]
+almost_complete_range = "allow"
+arc_with_non_send_sync = "allow"
+borrowed_box = "allow"
+dbg_macro = "deny"
+let_underscore_future = "allow"
+manual_is_multiple_of = "allow"
+map_entry = "allow"
+module_inception = "allow"
+non_canonical_partial_ord_impl = "allow"
+reversed_empty_ranges = "allow"
+single_range_in_vec_init = "allow"
+style = { level = "allow", priority = -1 }
+todo = "deny"
+type_complexity = "allow"
+
+[dependencies]
+gpui = { git = "https://github.com/zed-industries/zed" }
+gpui-component = { path = "crates/gpui-component-ui" }
+gpui-wry = { path = "crates/gpui-wry" }
+dx-icons = { path = "../../crates/media/icon", default-features = false, features = ["rayon"] }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+walkdir = "2.5"
+rust-embed = "8.5"
+resvg = "0.45"
+tiny-skia = "0.11"
+usvg = "0.45"
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls", "stream"] }
+futures = "0.3"
+dirs = "5.0"
+chrono = { version = "0.4", features = ["serde"] }
+raw-window-handle = "0.6"
+wry = { version = "0.53.3", package = "lb-wry" }
+
+[build-dependencies]
+embed-resource = "3.0"
+image = { version = "0.25", default-features = true, features = ["ico", "png"] }

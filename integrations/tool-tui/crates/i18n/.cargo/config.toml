@@ -1,0 +1,8 @@
+[build]
+rustflags = ["-C", "target-cpu=native"]
+
+[env]
+WHISPER_NO_AVX = "OFF"
+WHISPER_NO_AVX2 = "OFF"
+WHISPER_NO_FMA = "OFF"
+WHISPER_NO_F16C = "OFF"

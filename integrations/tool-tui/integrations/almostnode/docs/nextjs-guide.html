@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Next.js Guide — almostnode docs</title>
+  <meta name="description" content="Run a full Next.js dev server in the browser with App Router, file-based routing, HMR, and CSS Modules.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://almostnode.dev/docs/nextjs-guide.html">
+  <meta property="og:title" content="Next.js Guide — almostnode docs">
+  <meta property="og:description" content="Run a full Next.js dev server in the browser with App Router, file-based routing, HMR, and CSS Modules.">
+  <meta property="og:image" content="https://almostnode.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Next.js Guide — almostnode docs">
+  <meta name="twitter:description" content="Run a full Next.js dev server in the browser with App Router, file-based routing, HMR, and CSS Modules.">
+  <meta name="twitter:image" content="https://almostnode.dev/og-image.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <label class="menu-toggle" for="sidebar-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </label>
+  <a href="../" class="topbar-logo"><span>almostnode</span></a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-section">Docs</span>
+  <ul class="topbar-links">
+    <li><a href="https://github.com/macaly/almostnode">GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/almostnode">npm</a></li>
+  </ul>
+</div>
+
+<input type="checkbox" id="sidebar-check">
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-label">Guide</div>
+      <a href="./">Getting Started</a>
+      <a href="./core-concepts.html">Core Concepts</a>
+      <a href="./security.html">Security</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Frameworks</div>
+      <a href="./nextjs-guide.html" class="active">Next.js</a>
+      <a href="./vite-guide.html">Vite</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Tutorials</div>
+      <a href="./tutorial-editor.html">Editor + Preview</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Reference</div>
+      <a href="./api-reference.html">API Reference</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Next.js Guide</h1>
+    <p class="lead">Run a full Next.js development server in the browser with App Router, Pages Router, HMR, CSS Modules, and API routes.</p>
+
+    <h2>Setup</h2>
+    <p>The Next.js dev server needs three things: a VirtualFS to store your files, a NextDevServer to process requests, and a ServerBridge to serve them in an iframe.</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+<span class="kw">import</span> <span class="op">{</span> NextDevServer <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode/next'</span><span class="op">;</span>
+<span class="kw">import</span> <span class="op">{</span> <span class="fn">getServerBridge</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+<span class="kw">const</span> server <span class="op">=</span> <span class="kw">new</span> <span class="fn">NextDevServer</span><span class="op">(</span>vfs<span class="op">);</span>
+<span class="kw">const</span> bridge <span class="op">=</span> <span class="fn">getServerBridge</span><span class="op">();</span>
+
+<span class="cm">// Initialize the service worker</span>
+<span class="kw">await</span> bridge<span class="op">.</span><span class="fn">initServiceWorker</span><span class="op">();</span>
+
+<span class="cm">// Register the server on a port</span>
+bridge<span class="op">.</span><span class="fn">registerServer</span><span class="op">(</span>server<span class="op">,</span> <span class="num">3000</span><span class="op">);</span>
+
+<span class="cm">// Point an iframe to the dev server</span>
+iframe<span class="op">.</span>src <span class="op">=</span> bridge<span class="op">.</span><span class="fn">getServerUrl</span><span class="op">(</span><span class="num">3000</span><span class="op">);</span></code></pre>
+
+    <h2>App Router</h2>
+    <p>The App Router uses file-based routing with <code>/app</code> directory conventions. Each directory can contain <code>page.tsx</code>, <code>layout.tsx</code>, <code>loading.tsx</code>, and <code>error.tsx</code>.</p>
+
+    <h3>Basic Page</h3>
+    <pre><code><span class="cm">// Create a root layout</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/layout.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function RootLayout({ children }) {
+    return (
+      &lt;html&gt;
+        &lt;body&gt;{children}&lt;/body&gt;
+      &lt;/html&gt;
+    );
+  }
+`</span><span class="op">);</span>
+
+<span class="cm">// Create the home page</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/page.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function Home() {
+    return &lt;h1&gt;Welcome!&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span>
+
+<span class="cm">// Create a nested route: /about</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/about/page.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function About() {
+    return &lt;h1&gt;About us&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span></code></pre>
+
+    <h3>Dynamic Routes</h3>
+    <p>Use bracket notation for dynamic segments:</p>
+    <pre><code><span class="cm">// /app/posts/[id]/page.tsx → matches /posts/123</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/posts/[id]/page.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function Post({ params }) {
+    return &lt;h1&gt;Post {params.id}&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span></code></pre>
+
+    <h3>Route Groups</h3>
+    <p>Route groups use <code>(groupName)</code> directories. They're transparent in the URL — useful for organizing code without affecting the path:</p>
+    <pre><code><span class="cm">// /app/(marketing)/pricing/page.tsx → /pricing</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/(marketing)/pricing/page.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function Pricing() {
+    return &lt;h1&gt;Plans&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span></code></pre>
+
+    <h2>Pages Router</h2>
+    <p>The Pages Router uses the <code>/pages</code> directory. Each file becomes a route:</p>
+    <pre><code><span class="cm">// /pages/index.jsx → /</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/pages/index.jsx'</span><span class="op">,</span> <span class="str">`
+  export default function Home() {
+    return &lt;h1&gt;Pages Router home&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span>
+
+<span class="cm">// /pages/about.jsx → /about</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/pages/about.jsx'</span><span class="op">,</span> <span class="str">`
+  export default function About() {
+    return &lt;h1&gt;About&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span></code></pre>
+
+    <h3>API Routes</h3>
+    <p>Files in <code>/pages/api/</code> (Pages Router) or <code>/app/api/.../route.ts</code> (App Router) create API endpoints:</p>
+    <pre><code><span class="cm">// Pages Router API route</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/pages/api/hello.js'</span><span class="op">,</span> <span class="str">`
+  export default function handler(req, res) {
+    res.status(200).json({ message: 'Hello!' });
+  }
+`</span><span class="op">);</span>
+
+<span class="cm">// App Router route handler</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/api/hello/route.ts'</span><span class="op">,</span> <span class="str">`
+  export async function GET(request) {
+    return Response.json({ message: 'Hello!' });
+  }
+`</span><span class="op">);</span></code></pre>
+
+    <h2>CSS Modules</h2>
+    <p>Import <code>.module.css</code> files to get scoped class names:</p>
+    <pre><code>vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/styles.module.css'</span><span class="op">,</span> <span class="str">`
+  .title {
+    color: blue;
+    font-size: 2rem;
+  }
+  .subtitle {
+    color: gray;
+  }
+`</span><span class="op">);</span>
+
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/page.tsx'</span><span class="op">,</span> <span class="str">`
+  import styles from './styles.module.css';
+
+  export default function Home() {
+    return (
+      &lt;div&gt;
+        &lt;h1 className={styles.title}&gt;Hello&lt;/h1&gt;
+        &lt;p className={styles.subtitle}&gt;World&lt;/p&gt;
+      &lt;/div&gt;
+    );
+  }
+`</span><span class="op">);</span></code></pre>
+    <p>Classes are scoped with a hash to prevent collisions between components.</p>
+
+    <h2>Hot Module Replacement</h2>
+    <p>The dev server supports HMR through React Refresh. Two things are required for HMR to work:</p>
+    <ol>
+      <li>Call <code>devServer.start()</code> — this enables file watching on the VFS</li>
+      <li>Call <code>devServer.setHMRTarget(iframe.contentWindow)</code> — this tells the server where to send updates via <code>postMessage</code></li>
+    </ol>
+    <p>Once both are set up, writing to the VFS triggers HMR automatically:</p>
+    <pre><code><span class="kw">const</span> devServer <span class="op">=</span> <span class="kw">new</span> <span class="fn">NextDevServer</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span> port<span class="op">:</span> <span class="num">3000</span><span class="op">,</span> root<span class="op">:</span> <span class="str">'/'</span> <span class="op">});</span>
+devServer<span class="op">.</span><span class="fn">start</span><span class="op">();</span> <span class="cm">// Required: enables file watching for HMR</span>
+
+<span class="cm">// After bridge setup and iframe load:</span>
+devServer<span class="op">.</span><span class="fn">setHMRTarget</span><span class="op">(</span>iframe<span class="op">.</span>contentWindow<span class="op">);</span> <span class="cm">// Required: HMR delivery target</span>
+
+<span class="cm">// Now updating a file triggers HMR automatically</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app/page.tsx'</span><span class="op">,</span> <span class="str">`
+  export default function Home() {
+    return &lt;h1&gt;Version 2&lt;/h1&gt;;
+  }
+`</span><span class="op">);</span></code></pre>
+    <div class="callout">
+      <div class="callout-title">Important</div>
+      <p>Without <code>devServer.start()</code>, the server won't watch the VFS for changes and HMR updates won't fire. This is the most common cause of HMR not working.</p>
+    </div>
+
+    <h2>Configuration</h2>
+    <p>You can provide a <code>next.config.js</code> for path aliases and other options:</p>
+    <pre><code>vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/next.config.js'</span><span class="op">,</span> <span class="str">`
+  module.exports = {
+    experimental: {
+      paths: {
+        '@/*': ['./src/*'],
+        '@components/*': ['./src/components/*']
+      }
+    }
+  };
+`</span><span class="op">);</span></code></pre>
+
+    <div class="page-nav">
+      <a href="./core-concepts.html">
+        <div class="label">Previous</div>
+        <div class="title">Core Concepts</div>
+      </a>
+      <a href="./vite-guide.html" class="next">
+        <div class="label">Next</div>
+        <div class="title">Vite Guide</div>
+      </a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+[package]
+name = "dx-pkg-registry-index"
+version = "0.3.0"
+edition = "2024"
+authors = ["DX Team"]
+description = "Compressed Package Registry Index (CPRI) - Local binary npm registry for instant resolution"
+
+[dependencies]
+# Core
+tokio = { version = "1.35", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Binary format
+bytemuck = { version = "1.14", features = ["derive"] }
+memmap2 = "0.9"
+
+# Hashing
+xxhash-rust = { version = "0.8", features = ["xxh64"] }
+
+# Compression
+zstd = "0.13"
+
+# Network
+reqwest = { version = "0.11", default-features = false, features = ["stream", "json", "rustls-tls"] }
+futures = "0.3"
+
+# Semver
+semver = "1.0"
+
+# Filesystem
+dirs = "5.0"
+walkdir = "2"
+
+# Error handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+
+[dev-dependencies]
+tokio-test = "0.4"
+tempfile = "3"

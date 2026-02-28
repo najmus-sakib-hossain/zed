@@ -1,0 +1,64 @@
+[package]
+name = "dx-option"
+version = "0.1.0"
+edition = "2024"
+description = "Official DX Binary Dawn Website"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/nicksrandall/dx"
+keywords = ["web", "binary", "wasm", "framework"]
+
+[dependencies]
+# DX WWW Framework Core
+dx-www = { path = "../dx-www" }
+dx-www-core = { path = "../core" }
+dx-www-binary = { path = "../binary" }
+dx-www-state = { path = "../state" }
+dx-www-query = { path = "../query" }
+dx-www-db = { path = "../db" }
+dx-www-form = { path = "../form" }
+dx-www-auth = { path = "../auth" }
+dx-www-server = { path = "../server" }
+dx-www-client = { path = "../client" }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+bincode = "2.0.0-rc.3"
+bytemuck = { version = "1.14", features = ["derive"] }
+
+# Async Runtime
+tokio = { version = "1.37", features = ["full"] }
+
+# Database - Turso (LibSQL)
+libsql = "0.6"
+
+# HTTP/Server
+axum = { version = "0.7", features = ["macros"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "compression-br", "compression-gzip"] }
+
+# 3D/WebGL (compiled to WASM)
+glam = "0.27"              # Fast math for 3D
+wgpu = { version = "0.19", optional = true }
+
+# Error Handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[features]
+default = ["binary-dawn", "turso", "forms"]
+binary-dawn = []
+turso = ["libsql"]
+forms = []
+webgl = ["wgpu"]
+ssr = []
+
+[dev-dependencies]
+criterion = "0.5"
+
+[[bin]]
+name = "dx-option-server"
+path = "src/main.rs"

@@ -1,0 +1,10 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 066922b47208a20ead9a98c12fa07669e9e92e2b4df961bc864086994dc49aa5 # shrinks to session_id = "AAa000aA", ttl_seconds = 1
+cc d4430f6084a89f4745614acd90a44d979911e46568464171629cc60d06a748b3 # shrinks to num_requests = 8, processing_times = [10], timeout_buffer_ms = 500
+cc f5eced961025b631dc64bd15fbb8dd8b60e96335186e7e5b3a50bb352ba9f5fa # shrinks to timeout_ms = 105, completing_connections = 3, non_completing_connections = 4
+cc d3db892344039787dfcc6cb21db840a63ac764c4167c7f9b695568931b2d6e21 # shrinks to timeout_ms = 217, completing_connections = 3, non_completing_connections = 3

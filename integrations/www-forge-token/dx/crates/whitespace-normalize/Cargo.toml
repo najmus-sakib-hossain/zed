@@ -1,0 +1,13 @@
+[package]
+name = "whitespace-normalize"
+version.workspace = true
+edition.workspace = true
+description = "Whitespace normalization — 5-15% savings on formatting waste"
+
+[dependencies]
+dx-core = { workspace = true }
+regex-lite = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

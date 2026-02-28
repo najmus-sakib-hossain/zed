@@ -1,0 +1,34 @@
+{
+  "name": "@dx/nostr",
+  "version": "2026.2.4",
+  "description": "Dx Nostr channel plugin for NIP-04 encrypted DMs",
+  "type": "module",
+  "dependencies": {
+    "nostr-tools": "^2.23.0",
+    "dx": "workspace:*",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "dx": "workspace:*"
+  },
+  "dx": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "channel": {
+      "id": "nostr",
+      "label": "Nostr",
+      "selectionLabel": "Nostr (NIP-04 DMs)",
+      "docsPath": "/channels/nostr",
+      "docsLabel": "nostr",
+      "blurb": "Decentralized protocol; encrypted DMs via NIP-04.",
+      "order": 55,
+      "quickstartAllowFrom": true
+    },
+    "install": {
+      "npmSpec": "@dx/nostr",
+      "localPath": "extensions/nostr",
+      "defaultChoice": "npm"
+    }
+  }
+}

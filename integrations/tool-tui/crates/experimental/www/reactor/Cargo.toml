@@ -1,0 +1,65 @@
+[package]
+name = "dx-www-reactor"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Binary Dawn - Cross-platform I/O reactor with thread-per-core architecture"
+repository.workspace = true
+keywords = ["reactor", "io_uring", "kqueue", "iocp", "async"]
+categories = ["asynchronous", "network-programming"]
+
+[lints]
+workspace = true
+
+[lib]
+name = "dx_reactor"
+crate-type = ["rlib"]
+
+[dependencies]
+# Core
+bitflags = "2.6"
+num_cpus = "1.16"
+parking_lot = "0.12"
+crossbeam-deque = "0.8"
+
+# Async
+futures = "0.3"
+
+# Error handling
+thiserror = "2.0"
+
+# Security
+dx-security = { path = "../security" }
+
+# Logging
+tracing = "0.1"
+
+# Property testing
+proptest = { version = "1.4", optional = true }
+
+# Platform-specific dependencies
+[target.'cfg(target_os = "linux")'.dependencies]
+io-uring = { version = "0.6", optional = true }
+libc = "0.2"
+
+[target.'cfg(any(target_os = "macos", target_os = "freebsd", target_os = "openbsd"))'.dependencies]
+libc = "0.2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "0.52", features = [
+    "Win32_Foundation",
+    "Win32_System_IO",
+    "Win32_Networking_WinSock",
+    "Win32_System_Threading",
+    "Win32_Storage_FileSystem",
+] }
+
+[features]
+default = ["auto"]
+auto = []
+io_uring = ["io-uring"]
+testing = ["proptest"]
+
+[dev-dependencies]
+proptest = "1.4"

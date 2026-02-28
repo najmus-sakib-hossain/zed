@@ -1,0 +1,47 @@
+{
+  "name": "dx-js",
+  "version": "0.0.1",
+  "description": "DX JavaScript Runtime - A fast, modern JavaScript/TypeScript runtime",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "runtime",
+    "dx",
+    "fast",
+    "jit"
+  ],
+  "homepage": "https://github.com/nicholasgrose/dx-js",
+  "bugs": {
+    "url": "https://github.com/nicholasgrose/dx-js/issues"
+  },
+  "license": "MIT",
+  "author": "DX Team",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicholasgrose/dx-js.git"
+  },
+  "bin": {
+    "dx-js": "bin/dx-js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install.js"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
+  "files": [
+    "bin/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ]
+}

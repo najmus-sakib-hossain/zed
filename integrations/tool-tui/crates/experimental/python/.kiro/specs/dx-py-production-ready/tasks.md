@@ -1,0 +1,381 @@
+
+# Implementation Plan: DX-Py Production Ready
+
+## Overview
+
+This implementation plan transforms DX-Py from a proof-of-concept into a production-ready Python toolchain. Tasks are organized by priority: critical fixes first (class system, exceptions, comprehensions), then core functionality (generators, JIT, package manager), then competitive features (async, stdlib). Each task builds incrementally on previous work. Property-based tests validate correctness properties from the design document.
+
+## Tasks
+
+### Phase 1: Critical Runtime Fixes
+
+- Fix Class System
+- 1.1 Fix method compilation in compiler
+- Modify `compile_class` in `runtime/dx-py-compiler/src/compiler.rs`
+- Compile method bodies to `CodeRef` instead of storing as strings
+- Add `MAKE_FUNCTION` opcode emission for each method
+- Requirements: 1.1
+- 1.2 Implement class instantiation in dispatcher
+- Modify `dispatch.rs` to handle `CALL_FUNCTION` on class objects
+- Create `PyInstance` with class reference
+- Call `__init__` with instance as first argument
+- Requirements: 1.2, 1.3
+- 1.3 Implement method resolution order (MRO)
+- Add C3 linearization algorithm to `PyClass`
+- Implement `get_method` that follows MRO
+- Add `super()` builtin that returns MRO proxy
+- Requirements: 1.4, 1.5
+- 1.4 Write property tests for class system
+- Property 1: Class Method Compilation Produces Valid Bytecode
+- Property 2: Class Instantiation Correctly Binds Arguments
+- Property 3: Method Resolution Order Follows C3 Linearization
+- Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5
+- -Fix Exception Handling
+- 2.1 Add exception handler opcodes
+- Add `SETUP_EXCEPT`, `POP_EXCEPT`, `RERAISE`, `SETUP_FINALLY` opcodes
+- Modify compiler to emit these opcodes for try/except/finally
+- Requirements: 2.1, 2.3
+- 2.2 Implement exception handler dispatch
+- Add `ExceptionHandler` struct to track try blocks
+- Modify main execution loop to catch exceptions
+- Implement handler matching by exception type
+- Requirements: 2.1, 2.2, 2.4
+- 2.3 Implement finally block execution
+- Ensure finally runs on normal exit, exception, and return
+- Handle nested try/finally correctly
+- Requirements: 2.3, 2.7
+- 2.4 Implement raise and exception chaining
+- Handle bare `raise` to re-raise current exception
+- Implement `raise X from Y` for exception chaining
+- Requirements: 2.5, 2.6
+- 2.5 Write property tests for exception handling
+- Property 4: Exception Handler Selection Is Correct
+- Property 5: Finally Blocks Always Execute
+- Property 6: Exception Propagation Preserves Stack Semantics
+- Validates: Requirements 2.1-2.7
+- -Fix List Comprehensions
+- 3.1 Fix comprehension bytecode generation
+- Modify `compile_list_comp` in compiler
+- Use `GET_ITER` + `FOR_ITER` instead of `CALL_FUNCTION` on iterator
+- Emit `LIST_APPEND` for result accumulation
+- Requirements: 3.1, 3.4, 3.5
+- 3.2 Implement filtered comprehensions
+- Add `POP_JUMP_IF_FALSE` for condition filtering
+- Handle multiple `if` clauses
+- Requirements: 3.2
+- 3.3 Implement nested comprehensions
+- Handle multiple `for` clauses with correct nesting
+- Ensure outer loop iterates first
+- Requirements: 3.3
+- 3.4 Write property tests for list comprehensions
+- Property 7: List Comprehension Equivalence
+- Validates: Requirements 3.1-3.5
+- -Checkpoint
+- Core Runtime Fixes
+- Ensure all tests pass for class system, exceptions, and list comprehensions
+- Run: `cargo test
+- p dx-py-compiler
+- p dx-py-interpreter`
+- Ask user if questions arise
+- -Fix JSON Module
+- 5.1 Fix module attribute access
+- Ensure `json_builtins_expanded()` functions are accessible via module dict
+- Fix import mechanism to populate module `__dict__` correctly
+- Requirements: 5.1
+- 5.2 Implement json.dumps
+- Implement `pyvalue_to_json` for all JSON-serializable types
+- Handle `indent` parameter for pretty printing
+- Escape special characters in strings
+- Requirements: 5.2, 5.3, 5.5
+- 5.3 Implement json.loads
+- Parse JSON string to PyValue
+- Raise `JSONDecodeError` for invalid JSON
+- Requirements: 5.4, 5.6
+- 5.4 Write property tests for JSON module
+- Property 10: JSON Round-Trip Consistency
+- Validates: Requirements 5.2, 5.3, 5.4
+- -Fix CLI Expression Support
+- 6.1 Implement semicolon statement separation
+- Split `-c` argument on semicolons
+- Parse and execute each statement in order
+- Share namespace between statements
+- Requirements: 15.1, 15.4
+- 6.2 Improve error reporting
+- Report syntax errors with position information
+- Show context around error location
+- Requirements: 15.3
+- 6.3 Write property tests for CLI
+- Property 29: CLI Multi-Statement Execution
+- Validates: Requirements 15.1, 15.2, 15.4
+- -Checkpoint
+- Critical Fixes Complete
+- Run full test suite: `cargo test
+- -workspace`
+- Verify: classes, exceptions, comprehensions, JSON, CLI all working
+- Ask user if questions arise
+
+### Phase 2: Core Functionality
+
+- Implement Dict and Set Comprehensions
+- 8.1 Implement dict comprehension compilation
+- Add `compile_dict_comp` similar to list comprehension
+- Use `BUILD_MAP` and `MAP_ADD` opcodes
+- Requirements: 4.1, 4.3
+- 8.2 Implement set comprehension compilation
+- Add `compile_set_comp` similar to list comprehension
+- Use `BUILD_SET` and `SET_ADD` opcodes
+- Requirements: 4.2, 4.4
+- 8.3 Write property tests for dict/set comprehensions
+- Property 8: Dict Comprehension Equivalence
+- Property 9: Set Comprehension Equivalence
+- Validates: Requirements 4.1-4.5
+- -Implement Generators
+- 9.1 Implement generator state machine
+- Create `PyGenerator` struct with frame and state
+- Implement `Created`, `Running`, `Suspended`, `Completed` states
+- Requirements: 6.1, 6.3
+- 9.2 Implement yield and next
+- Add `YIELD_VALUE` opcode handling
+- Implement `send()` method for resuming
+- Raise `StopIteration` when exhausted
+- Requirements: 6.2, 6.4
+- 9.3 Implement yield from
+- Delegate to sub-iterator
+- Propagate `send()` and `throw()` to sub-iterator
+- Requirements: 6.5
+- 9.4 Implement generator expressions
+- Compile generator expressions to generator functions
+- Return generator object instead of executing
+- Requirements: 6.1, 6.6
+- 9.5 Write property tests for generators
+- Property 11: Generator Iteration Equivalence
+- Property 12: Yield From Delegation
+- Validates: Requirements 6.1-6.6
+- -Implement JIT Compilation
+- 10.1 Implement baseline compiler
+- Add Cranelift IR generation in `baseline.rs`
+- Support `LOAD_CONST`, `BINARY_ADD/SUB/MUL/DIV`, `RETURN`
+- Requirements: 7.5, 7.6
+- 10.2 Implement function call compilation
+- Generate call instructions for function calls
+- Handle argument passing
+- Requirements: 7.7
+- 10.3 Implement hot function detection
+- Add call counter to functions
+- Trigger compilation at 100 calls
+- Requirements: 7.1
+- 10.4 Implement deoptimization
+- Add type guards for speculative optimizations
+- Fall back to interpreter on guard failure
+- Requirements: 7.3, 7.4
+- 10.5 Write property tests for JIT
+- Property 13: JIT Compilation Threshold
+- Property 14: JIT Semantic Equivalence
+- Validates: Requirements 7.1-7.7
+- -Checkpoint
+- Core Functionality Complete
+- Run: `cargo test
+- -workspace`
+- Verify: dict/set comprehensions, generators, JIT all working
+- Ask user if questions arise
+
+### Phase 3: Package Manager
+
+- Implement PyPI Downloads
+- 12.1 Implement PyPI JSON API client
+- Create `PyPiDownloader` with reqwest client
+- Query `//pypi.org/pypi/{name}/{version}/json`
+- Parse package metadata
+- Requirements: 8.1
+- 12.2 Implement wheel selection
+- Match platform tags (cp312-cp312-win_amd64, etc.)
+- Prefer wheels over sdist
+- Requirements: 8.5
+- 12.3 Implement hash verification
+- Compute SHA256 of downloaded file
+- Compare with PyPI metadata
+- Abort on mismatch
+- Requirements: 8.2
+- 12.4 Implement dependency resolution
+- Parse `Requires-Dist` from metadata
+- Recursively resolve dependencies
+- Select highest compatible versions
+- Requirements: 8.3, 8.4
+- 12.5 Write property tests for downloads
+- Property 15: Package Download Hash Verification
+- Property 16: Dependency Resolution Completeness
+- Validates: Requirements 8.1-8.6
+- -Implement Wheel Installation
+- 13.1 Implement wheel extraction
+- Extract wheel contents to site-packages
+- Create package directory structure
+- Requirements: 9.1
+- 13.2 Implement dist-info creation
+- Create `.dist-info` directory
+- Write METADATA, RECORD files
+- Requirements: 9.2, 9.6
+- 13.3 Implement entry point scripts
+- Parse entry_points.txt
+- Create executable scripts in bin directory
+- Requirements: 9.3
+- 13.4 Implement uninstall
+- Read RECORD file
+- Remove all listed files
+- Requirements: 9.5
+- 13.5 Write property tests for installation
+- Property 17: Wheel Installation Completeness
+- Property 18: Uninstall Completeness
+- Validates: Requirements 9.1-9.6
+- -Implement Virtual Environment Support
+- 14.1 Implement venv creation
+- Create directory structure (bin/Scripts, lib, include)
+- Write pyvenv.cfg
+- Requirements: 10.1, 10.4
+- 14.2 Implement activation scripts
+- Create activate.sh, activate.ps1, activate.bat
+- Set PATH and VIRTUAL_ENV environment variables
+- Requirements: 10.5
+- 14.3 Implement venv-aware package installation
+- Detect active venv from VIRTUAL_ENV
+- Install to venv's site-packages
+- Requirements: 10.2, 10.3
+- 14.4 Write property tests for venv
+- Property 19: Virtual Environment Isolation
+- Validates: Requirements 10.1-10.5
+- -Checkpoint
+- Package Manager Complete
+- Run: `cargo test
+- p dx-py-package-manager`
+- Test: `dx-py add requests` (requires network)
+- Ask user if questions arise
+
+### Phase 4: Test Runner
+
+- Implement Fixture Support
+- 16.1 Implement fixture discovery
+- Parse `@pytest.fixture` decorators
+- Extract scope, autouse, params
+- Build fixture registry
+- Requirements: 11.1
+- 16.2 Implement fixture injection
+- Match test parameters to fixture names
+- Resolve fixture dependency chains
+- Inject values as test arguments
+- Requirements: 11.1, 11.5
+- 16.3 Implement fixture scopes
+- Track scope instances (function, class, module, session)
+- Cache fixture values per scope
+- Requirements: 11.2, 11.3
+- 16.4 Implement fixture teardown
+- Handle `yield` in fixtures
+- Execute teardown after test/scope completion
+- Requirements: 11.4
+- 16.5 Implement autouse fixtures
+- Automatically inject autouse fixtures
+- Respect scope boundaries
+- Requirements: 11.6
+- 16.6 Write property tests for fixtures
+- Property 20: Fixture Injection Correctness
+- Property 21: Fixture Scope Semantics
+- Property 22: Fixture Teardown Execution
+- Validates: Requirements 11.1-11.6
+- -Implement Parametrized Tests
+- 17.1 Implement parametrize parsing
+- Parse `@pytest.mark.parametrize` decorator
+- Extract parameter names and values
+- Requirements: 12.1
+- 17.2 Implement test expansion
+- Create test case per parameter set
+- Handle cartesian product for multiple decorators
+- Requirements: 12.1, 12.2
+- 17.3 Implement test IDs
+- Generate IDs from parameter values
+- Use explicit IDs from pytest.param
+- Requirements: 12.3
+- 17.4 Implement failure reporting
+- Report which parameter set failed
+- Show parameter values in output
+- Requirements: 12.4
+- 17.5 Write property tests for parametrize
+- Property 23: Parametrize Expansion
+- Property 24: Parametrize Cartesian Product
+- Validates: Requirements 12.1-12.5
+- -Checkpoint
+- Test Runner Complete
+- Run: `cargo test
+- p dx-py-fixture
+- p dx-py-discovery`
+- Test with real pytest test files
+- Ask user if questions arise
+
+### Phase 5: Advanced Features
+
+- Implement Async/Await
+- 19.1 Implement coroutine objects
+- Create `PyCoroutine` similar to `PyGenerator`
+- Return coroutine from `async def` calls
+- Requirements: 13.1
+- 19.2 Implement await expression
+- Add `GET_AWAITABLE`, `YIELD_FROM` opcodes
+- Suspend coroutine until awaited value ready
+- Requirements: 13.2
+- 19.3 Implement asyncio.run
+- Create event loop
+- Execute coroutine to completion
+- Requirements: 13.3
+- 19.4 Implement asyncio.gather
+- Run multiple coroutines concurrently
+- Collect results in order
+- Requirements: 13.4
+- 19.5 Implement async for and async with
+- Handle `__aiter__`, `__anext__`
+- Handle `__aenter__`, `__aexit__`
+- Requirements: 13.5, 13.6
+- 19.6 Write property tests for async
+- Property 25: Async Function Returns Coroutine
+- Property 26: Asyncio.run Executes to Completion
+- Property 27: Asyncio.gather Concurrent Execution
+- Validates: Requirements 13.1-13.6
+- -Implement Standard Library Modules
+- 20.1 Implement os.path
+- join, exists, dirname, basename, isfile, isdir
+- Requirements: 14.1
+- 20.2 Implement pathlib.Path
+- Basic path operations
+- read_text, write_text, exists, mkdir
+- Requirements: 14.2
+- 20.3 Implement re module
+- match, search, findall, sub
+- Compile patterns
+- Requirements: 14.3
+- 20.4 Implement datetime module
+- datetime, date, time, timedelta
+- strftime, strptime
+- Requirements: 14.4
+- 20.5 Implement collections module
+- defaultdict, Counter, deque
+- Requirements: 14.5
+- 20.6 Implement itertools module
+- chain, zip_longest, groupby, islice
+- Requirements: 14.6
+- 20.7 Implement functools module
+- partial, reduce, lru_cache
+- Requirements: 14.7
+- 20.8 Write property tests for stdlib
+- Property 28: Standard Library Equivalence
+- Validates: Requirements 14.1-14.7
+- -Final Checkpoint
+- All Features Complete
+- Run full test suite: `cargo test
+- -workspace`
+- Run benchmarks against CPython, pytest, uv
+- Document any remaining gaps
+- Ask user for final review
+
+## Notes
+
+- All tasks including property-based tests are required for comprehensive coverage
+- Each checkpoint ensures incremental validation before proceeding
+- Property tests validate universal correctness properties from the design document
+- Unit tests (not listed separately) should be written alongside implementation
+- Network-dependent tests (PyPI downloads) require manual verification

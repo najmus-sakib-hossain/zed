@@ -1,0 +1,187 @@
+
+# Implementation Plan: DX-Py VM Integration
+
+## Overview
+
+This implementation plan wires together the existing DX-Py components into a fully functional Python runtime. The approach is incremental - each task builds on the previous, with checkpoints to verify functionality.
+
+## Tasks
+
+- Extend PyValue enum with new variants
+- Add Function, BoundMethod, Class, Instance, Module, Code, Cell variants to PyValue
+- Update type_name() and to_bool() methods for new variants
+- Update Display/Debug implementations
+- Requirements: 1.1, 3.1, 4.1
+- -Implement PyCell for closures
+- 2.1 Create PyCell struct with RefCell-Implement new(), get(), set() methods
+- Add to dx-py-core/src/lib.rs exports
+- Requirements: 2.1, 2.2, 2.3
+- 2.2 Write property test for cell value preservation-Property 2: Closure Cell Preservation
+- Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5
+- -Implement MAKE_FUNCTION opcode handler
+- 3.1 Add MAKE_FUNCTION handler to dispatch.rs-Pop Code object and qualname from stack
+- Create PyFunction with correct CodeRef
+- Handle flags for defaults (0x01), closure (0x08), annotations (0x04)
+- Push PyFunction onto stack
+- Requirements: 1.1
+- 3.2 Add MakeClosure opcode (0x74) to opcodes.rs-Similar to MAKE_FUNCTION but with closure cells
+- Requirements: 2.1
+- 3.3 Write property test for function creation-Property 1: Function Definition Round-Trip
+- Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5, 1.6
+- -Enhance CALL opcode for user-defined functions
+- 4.1 Modify CALL handler in dispatch.rs-Check if callable is PyValue::Function
+- Create new frame with bound arguments
+- Execute function bytecode recursively
+- Return result to caller's stack
+- Requirements: 1.2, 1.3, 1.4
+- 4.2 Implement argument binding logic-Handle positional arguments
+- Handle default values
+- Handle *args and **kwargs
+- Requirements: 1.4, 1.5
+- 4.3 Write unit tests for argument binding edge cases-Test missing required args
+- Test too many positional args
+- Test default value usage
+- Requirements: 1.4, 1.5
+- -Checkpoint
+- Verify basic functions work
+- Test: `def add(a, b): return a + b; print(add(1, 2))`
+- Test: `def greet(name="World"): return "Hello " + name; print(greet())`
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement closure support (LOAD_DEREF, STORE_DEREF)
+- 6.1 Add LOAD_DEREF handler-Load value from cell at specified index
+- Requirements: 2.2
+- 6.2 Add STORE_DEREF handler-Store value into cell at specified index
+- Requirements: 2.3
+- 6.3 Update frame to support cells and freevars-Add cells: Vec to PyFrame
+- Add freevars: Vec to PyFrame
+- Requirements: 2.4
+- 6.4 Write property test for closure behavior-Property 2: Closure Cell Preservation
+- Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5
+- -Implement PyClass and PyInstance
+- 7.1 Create PyClass struct in dx-py-core/src/types.rs-Fields: name, bases, mro, namespace, metaclass
+- Implement compute_mro() with C3 linearization
+- Implement getattr() with MRO lookup
+- Requirements: 3.1, 4.4
+- 7.2 Create PyInstance struct-Fields: class, dict
+- Implement getattr() with instance → class → bases lookup
+- Implement setattr() to store in instance dict
+- Requirements: 3.2, 3.3, 3.4
+- 7.3 Implement PyBoundMethod-Fields: func, instance
+- Implement call() that prepends instance to args
+- Requirements: 3.5
+- -Implement BUILD_CLASS opcode handler
+- 8.1 Add BUILD_CLASS handler to dispatch.rs-Pop class body function, name, bases from stack
+- Execute class body to populate namespace
+- Create PyClass with computed MRO
+- Push class onto stack
+- Requirements: 3.1
+- 8.2 Implement class instantiation in CALL-When callable is PyValue::Class, create PyInstance
+- Call init if defined
+- Return instance
+- Requirements: 3.2
+- 8.3 Write property test for class MRO-Property 3: Class Instantiation and Method Resolution
+- Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5, 3.6
+- -Implement LOAD_ATTR and STORE_ATTR for instances
+- 9.1 Enhance LOAD_ATTR handler-Check if object is PyInstance
+- Use instance.getattr() for lookup
+- Create bound method for function attributes
+- Requirements: 3.3, 3.5
+- 9.2 Enhance STORE_ATTR handler-Check if object is PyInstance
+- Store in instance.dict
+- Requirements: 3.4
+- 9.3 Implement LOAD_METHOD and CALL_METHOD-Optimize method calls without bound method creation
+- Requirements: 3.6
+- -Checkpoint
+- Verify classes work
+- Test: `class Counter: def __init__(self): self.n = 0`
+- Test: `class Dog: def bark(self): return "woof"`
+- Test: Inheritance with method override
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement module import system
+- 11.1 Add IMPORT_NAME handler-Look up module name from names table
+- Use import system to locate and load module
+- Push module onto stack
+- Requirements: 4.1, 4.2
+- 11.2 Add IMPORT_FROM handler-Get attribute from module on stack
+- Push attribute value onto stack
+- Requirements: 4.4
+- 11.3 Implement module caching-Store loaded modules in VM.modules
+- Return cached module on subsequent imports
+- Requirements: 4.3
+- 11.4 Write property test for module caching-Property 4: Module Import Caching
+- Validates: Requirements 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
+- -Implement list comprehension support
+- 12.1 Verify LIST_APPEND opcode works correctly-Should append to list at specified stack depth
+- Requirements: 5.2
+- 12.2 Ensure compiler generates inline loops (not nested functions)-Check dx-py-compiler for comprehension compilation
+- Requirements: 5.1
+- 12.3 Write property test for comprehension equivalence-Property 5: List Comprehension Equivalence
+- Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5
+- -Enhance exception handling
+- 13.1 Verify SETUP_EXCEPT pushes handler block-Requirements: 6.1
+- 13.2 Implement exception matching in except clause-Bind exception to target variable if specified
+- Requirements: 6.3
+- 13.3 Ensure finally always executes-Requirements: 6.4
+- 13.4 Write property test for exception handling-Property 6: Exception Handler Unwinding
+- Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.5
+- -Implement context manager support
+- 14.1 Implement BEFORE_WITH to call enter-Requirements: 7.1
+- 14.2 Implement with block exit handling-Call exit with None on normal exit
+- Call exit with exception info on exceptional exit
+- Requirements: 7.2, 7.3
+- 14.3 Handle exception suppression-If exit returns True, suppress exception
+- Requirements: 7.4
+- 14.4 Write property test for context managers-Property 7: Context Manager Protocol
+- Validates: Requirements 7.1, 7.2, 7.3, 7.4, 7.5
+- -Checkpoint
+- Verify advanced features work
+- Test: `with open('test.txt') as f: data = f.read()`
+- Test: `try: x = 1/0 except: print("caught")`
+- Test: `[x*2 for x in range(5)]`
+- Ensure all tests pass, ask the user if questions arise.
+- -Implement decorator support
+- 16.1 Verify compiler generates decorator calls-Decorator should wrap function after MAKE_FUNCTION
+- Requirements: 8.1
+- 16.2 Test stacked decorators-Verify bottom-to-top application order
+- Requirements: 8.2
+- 16.3 Write property test for decorator ordering-Property 8: Decorator Application Order
+- Validates: Requirements 8.1, 8.2, 8.3, 8.4
+- -Add missing builtin functions
+- 17.1 Implement isinstance() and issubclass()-Requirements: 9.1
+- 17.2 Implement getattr(), setattr(), hasattr(), delattr()-Requirements: 9.2
+- 17.3 Implement super()-Requirements: 9.3
+- 17.4 Implement property(), staticmethod(), classmethod()-Requirements: 9.4, 9.5
+- 17.5 Verify enumerate(), zip(), map(), filter() work-Requirements: 9.6
+- 17.6 Verify sorted(), reversed(), min(), max(), sum() work-Requirements: 9.7
+- 17.7 Implement open() for file I/O-Requirements: 9.8
+- 17.8 Write property test for builtin correctness-Property 9: Builtin Function Correctness
+- Validates: Requirements 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8
+- -Integration testing with test-runner
+- 18.1 Create sample pytest test file-Include fixtures, assertions, parametrize
+- Requirements: 10.1, 10.2, 10.3, 10.4
+- 18.2 Run test-runner against sample tests-Verify discovery works
+- Verify execution works
+- Requirements: 10.5
+- -Integration testing with real packages
+- 19.1 Test json module-`import json; json.dumps({"a": 1})`
+- Requirements: 11.1
+- 19.2 Test os and sys modules-`import os; os.getcwd()`
+- Requirements: 11.2
+- 19.3 Test pathlib module-`from pathlib import Path; Path(".").exists()`
+- Requirements: 11.3
+- 19.4 Test collections module-`from collections import defaultdict`
+- Requirements: 11.4
+- -Final checkpoint
+- Full integration test
+- Run comprehensive test suite
+- Verify all property tests pass
+- Test real Python programs (fibonacci, factorial, etc.)
+- Ensure all tests pass, ask the user if questions arise.
+
+## Notes
+
+- All tasks are required (comprehensive testing approach)
+- Each task references specific requirements for traceability
+- Checkpoints ensure incremental validation
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases

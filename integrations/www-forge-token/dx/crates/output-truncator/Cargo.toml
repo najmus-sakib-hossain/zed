@@ -1,0 +1,12 @@
+[package]
+name = "output-truncator"
+version.workspace = true
+edition.workspace = true
+description = "Head+tail tool output truncation — 50-95% savings on large outputs"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

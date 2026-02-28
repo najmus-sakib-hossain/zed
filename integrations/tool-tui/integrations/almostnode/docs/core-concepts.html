@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Core Concepts — almostnode docs</title>
+  <meta name="description" content="Understand almostnode's architecture: VirtualFS, Runtime, PackageManager, and ServerBridge.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://almostnode.dev/docs/core-concepts.html">
+  <meta property="og:title" content="Core Concepts — almostnode docs">
+  <meta property="og:description" content="Understand almostnode's architecture: VirtualFS, Runtime, PackageManager, and ServerBridge.">
+  <meta property="og:image" content="https://almostnode.dev/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Core Concepts — almostnode docs">
+  <meta name="twitter:description" content="Understand almostnode's architecture: VirtualFS, Runtime, PackageManager, and ServerBridge.">
+  <meta name="twitter:image" content="https://almostnode.dev/og-image.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <label class="menu-toggle" for="sidebar-check">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </label>
+  <a href="../" class="topbar-logo"><span>almostnode</span></a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-section">Docs</span>
+  <ul class="topbar-links">
+    <li><a href="https://github.com/macaly/almostnode">GitHub</a></li>
+    <li><a href="https://www.npmjs.com/package/almostnode">npm</a></li>
+  </ul>
+</div>
+
+<input type="checkbox" id="sidebar-check">
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-label">Guide</div>
+      <a href="./">Getting Started</a>
+      <a href="./core-concepts.html" class="active">Core Concepts</a>
+      <a href="./security.html">Security</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Frameworks</div>
+      <a href="./nextjs-guide.html">Next.js</a>
+      <a href="./vite-guide.html">Vite</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Tutorials</div>
+      <a href="./tutorial-editor.html">Editor + Preview</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-label">Reference</div>
+      <a href="./api-reference.html">API Reference</a>
+    </div>
+  </nav>
+
+  <main class="content">
+    <h1>Core Concepts</h1>
+    <p class="lead">almostnode is built on four core primitives that work together to simulate a Node.js environment in the browser.</p>
+
+    <h2>Architecture Overview</h2>
+    <p>Every almostnode app uses these components:</p>
+    <pre><code><span class="cm">┌─────────────────────────────────────────┐</span>
+<span class="cm">│            Your Application              │</span>
+<span class="cm">├─────────────────────────────────────────┤</span>
+<span class="cm">│  Framework Dev Servers (Next.js / Vite)  │</span>
+<span class="cm">├──────────┬──────────┬───────────────────┤</span>
+<span class="cm">│  Runtime │   npm    │   ServerBridge    │</span>
+<span class="cm">├──────────┴──────────┴───────────────────┤</span>
+<span class="cm">│           VirtualFS (in-memory)          │</span>
+<span class="cm">└─────────────────────────────────────────┘</span></code></pre>
+
+    <ul>
+      <li><strong>VirtualFS</strong> — an in-memory filesystem that stores all files</li>
+      <li><strong>Runtime</strong> — executes JavaScript/TypeScript with Node.js module resolution</li>
+      <li><strong>PackageManager</strong> — installs npm packages into the virtual filesystem</li>
+      <li><strong>ServerBridge</strong> — connects virtual servers to real browser URLs via a service worker</li>
+    </ul>
+
+    <h2>VirtualFS</h2>
+    <p>VirtualFS provides a POSIX-compatible filesystem API that stores files in memory. It supports directories, binary files, file watching, and all the common <code>fs</code> operations you'd expect from Node.js.</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+
+<span class="cm">// Create directories</span>
+vfs<span class="op">.</span><span class="fn">mkdirSync</span><span class="op">(</span><span class="str">'/src'</span><span class="op">,</span> <span class="op">{</span> recursive<span class="op">:</span> <span class="kw">true</span> <span class="op">});</span>
+
+<span class="cm">// Write files</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/src/index.js'</span><span class="op">,</span> <span class="str">'console.log("hello")'</span><span class="op">);</span>
+
+<span class="cm">// Read files</span>
+<span class="kw">const</span> content <span class="op">=</span> vfs<span class="op">.</span><span class="fn">readFileSync</span><span class="op">(</span><span class="str">'/src/index.js'</span><span class="op">,</span> <span class="str">'utf8'</span><span class="op">);</span>
+
+<span class="cm">// List directory contents</span>
+<span class="kw">const</span> files <span class="op">=</span> vfs<span class="op">.</span><span class="fn">readdirSync</span><span class="op">(</span><span class="str">'/src'</span><span class="op">);</span> <span class="cm">// ['index.js']</span>
+
+<span class="cm">// Watch for changes</span>
+vfs<span class="op">.</span><span class="fn">watch</span><span class="op">(</span><span class="str">'/src'</span><span class="op">,</span> <span class="op">(</span>event<span class="op">,</span> filename<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>event<span class="op">,</span> filename<span class="op">);</span>
+<span class="op">});</span></code></pre>
+
+    <h3>Key Features</h3>
+    <ul>
+      <li><code>writeFileSync</code> automatically creates parent directories</li>
+      <li><code>watch()</code> emits events when files change — used by HMR in framework dev servers</li>
+      <li>Supports both string (utf8) and binary (<code>Uint8Array</code>) file content</li>
+      <li><code>toSnapshot()</code> and <code>fromSnapshot()</code> allow serializing the entire filesystem</li>
+    </ul>
+
+    <h2>Runtime</h2>
+    <p>The Runtime executes JavaScript and TypeScript code with CommonJS module resolution. It shims 40+ Node.js built-in modules so code written for Node.js can run in the browser.</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS<span class="op">,</span> Runtime <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+<span class="kw">const</span> runtime <span class="op">=</span> <span class="kw">new</span> <span class="fn">Runtime</span><span class="op">(</span>vfs<span class="op">);</span>
+
+<span class="cm">// Execute code directly</span>
+runtime<span class="op">.</span><span class="fn">execute</span><span class="op">(</span><span class="str">`
+  const path = require('path');
+  console.log(path.join('/foo', 'bar', 'baz.js'));
+`</span><span class="op">);</span>
+
+<span class="cm">// Or run a file from the VFS</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app.js'</span><span class="op">,</span> <span class="str">'module.exports = { version: 1 }'</span><span class="op">);</span>
+<span class="kw">const</span> result <span class="op">=</span> runtime<span class="op">.</span><span class="fn">runFile</span><span class="op">(</span><span class="str">'/app.js'</span><span class="op">);</span>
+console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>result<span class="op">.</span>exports<span class="op">);</span> <span class="cm">// { version: 1 }</span></code></pre>
+
+    <h3>Shimmed Modules</h3>
+    <p>The runtime includes shims for these Node.js built-in modules:</p>
+    <p><code>assert</code>, <code>buffer</code>, <code>child_process</code>, <code>console</code>, <code>crypto</code>, <code>dns</code>, <code>events</code>, <code>fs</code>, <code>http</code>, <code>https</code>, <code>module</code>, <code>net</code>, <code>os</code>, <code>path</code>, <code>process</code>, <code>querystring</code>, <code>readline</code>, <code>stream</code>, <code>string_decoder</code>, <code>timers</code>, <code>tls</code>, <code>tty</code>, <code>url</code>, <code>util</code>, <code>vm</code>, <code>worker_threads</code>, <code>zlib</code>, and more.</p>
+
+    <h3>Module Resolution</h3>
+    <p>The runtime follows Node.js module resolution rules:</p>
+    <ol>
+      <li>Built-in modules (<code>require('fs')</code>, <code>require('node:path')</code>)</li>
+      <li>Relative paths (<code>require('./utils')</code>) — resolves <code>.js</code>, <code>.ts</code>, <code>.json</code>, <code>/index.js</code></li>
+      <li>npm packages (<code>require('express')</code>) — looks in <code>node_modules/</code></li>
+    </ol>
+
+    <h2>PackageManager</h2>
+    <p>The PackageManager installs real npm packages into the virtual filesystem. It fetches tarballs from the npm registry, resolves the full dependency tree, and extracts files — all in the browser.</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS<span class="op">,</span> PackageManager <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+<span class="kw">const</span> npm <span class="op">=</span> <span class="kw">new</span> <span class="fn">PackageManager</span><span class="op">(</span>vfs<span class="op">);</span>
+
+<span class="cm">// Install a single package</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'lodash'</span><span class="op">);</span>
+
+<span class="cm">// Install a specific version</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'react@18.2.0'</span><span class="op">);</span>
+
+<span class="cm">// Install all deps from package.json</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/package.json'</span><span class="op">,</span> <span class="fn">JSON</span><span class="op">.</span><span class="fn">stringify</span><span class="op">({</span>
+  dependencies<span class="op">:</span> <span class="op">{</span> express<span class="op">:</span> <span class="str">'^4.18.0'</span> <span class="op">}</span>
+<span class="op">}));</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">installFromPackageJson</span><span class="op">();</span>
+
+<span class="cm">// List installed packages</span>
+console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>npm<span class="op">.</span><span class="fn">list</span><span class="op">());</span> <span class="cm">// { express: '4.18.2', ... }</span></code></pre>
+
+    <h3>How Package Installation Works</h3>
+    <p>When you call <code>npm.install('express')</code>, the PackageManager performs these steps entirely in the browser:</p>
+    <ol>
+      <li><strong>Resolve version</strong> — Fetch the package manifest from the npm registry (<code>registry.npmjs.org</code>) and resolve semver ranges (e.g. <code>^4.18.0</code> to <code>4.18.2</code>)</li>
+      <li><strong>Build dependency tree</strong> — Recursively resolve all transitive dependencies with correct version matching, handling circular dependencies</li>
+      <li><strong>Download tarballs</strong> — Fetch <code>.tgz</code> files for each package from the npm CDN</li>
+      <li><strong>Extract to VFS</strong> — Decompress and extract tarball contents into <code>/node_modules/{name}/</code> in the virtual filesystem</li>
+      <li><strong>Transform ESM to CJS</strong> — Use esbuild-wasm to convert ES module syntax to CommonJS so the Runtime can execute it (enabled by default, can be disabled with <code>transform: false</code>)</li>
+      <li><strong>Write lockfile</strong> — Create <code>.package-lock.json</code> with all resolved versions</li>
+    </ol>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>The <code>PackageManager</code> downloads packages from the npm registry. The <strong>framework dev servers</strong> (Next.js and Vite) use a different approach — they redirect bare npm imports to <a href="https://esm.sh">esm.sh</a> for browser-side ES module loading (e.g. <code>import React from 'react'</code> becomes <code>import React from 'https://esm.sh/react@18.2.0'</code>). Both approaches can coexist in the same project.</p>
+    </div>
+
+    <pre><code><span class="cm">// Track installation progress</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'express'</span><span class="op">,</span> <span class="op">{</span>
+  onProgress<span class="op">:</span> <span class="op">(</span>msg<span class="op">)</span> <span class="op">=&gt;</span> console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>msg<span class="op">),</span>
+  save<span class="op">:</span> <span class="kw">true</span><span class="op">,</span> <span class="cm">// Add to package.json dependencies</span>
+<span class="op">});</span></code></pre>
+
+    <h3>Installing and Using a Package</h3>
+    <p>Here's a complete example — install a package from npm, then use it in your code:</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createContainer</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> <span class="op">{</span> vfs<span class="op">,</span> npm<span class="op">,</span> runtime <span class="op">}</span> <span class="op">=</span> <span class="fn">createContainer</span><span class="op">();</span>
+
+<span class="cm">// Install lodash from npm</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'lodash'</span><span class="op">);</span>
+
+<span class="cm">// Use it in your code</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/app.js'</span><span class="op">,</span> <span class="str">`
+  const _ = require('lodash');
+  const data = [1, [2, [3, [4]]]];
+  console.log(_.flattenDeep(data));  // [1, 2, 3, 4]
+  console.log(_.chunk([1,2,3,4,5,6], 2));  // [[1,2],[3,4],[5,6]]
+`</span><span class="op">);</span>
+
+runtime<span class="op">.</span><span class="fn">runFile</span><span class="op">(</span><span class="str">'/app.js'</span><span class="op">);</span>
+
+<span class="cm">// Install a specific version</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'dayjs@1.11.10'</span><span class="op">);</span>
+
+<span class="cm">// Scoped packages work too</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'@hono/node-server'</span><span class="op">);</span></code></pre>
+
+    <h2>Shell Commands (child_process)</h2>
+    <p>almostnode integrates <a href="https://github.com/vercel-labs/just-bash">just-bash</a> — a simulated bash environment written in TypeScript — to provide <code>child_process.exec()</code> support in the browser. just-bash implements 50+ bash commands and uses an <code>IFileSystem</code> interface that almostnode bridges to the VirtualFS via a <code>VirtualFSAdapter</code>. This means all shell commands operate on the same virtual filesystem your code uses.</p>
+
+    <pre><code><span class="kw">const</span> <span class="op">{</span> exec <span class="op">}</span> <span class="op">=</span> <span class="fn">require</span><span class="op">(</span><span class="str">'child_process'</span><span class="op">);</span>
+
+<span class="cm">// Run shell commands against the VirtualFS</span>
+<span class="fn">exec</span><span class="op">(</span><span class="str">'ls /src'</span><span class="op">,</span> <span class="op">(</span>err<span class="op">,</span> stdout<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>stdout<span class="op">);</span> <span class="cm">// Lists files in /src</span>
+<span class="op">});</span>
+
+<span class="cm">// Pipes and redirects work too</span>
+<span class="fn">exec</span><span class="op">(</span><span class="str">'cat /data.csv | sort | head -5'</span><span class="op">,</span> <span class="op">(</span>err<span class="op">,</span> stdout<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>stdout<span class="op">);</span>
+<span class="op">});</span>
+
+<span class="cm">// Custom 'node' command runs JS via the Runtime</span>
+<span class="fn">exec</span><span class="op">(</span><span class="str">'node /app.js'</span><span class="op">,</span> <span class="op">(</span>err<span class="op">,</span> stdout<span class="op">)</span> <span class="op">=&gt;</span> <span class="op">{</span>
+  console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>stdout<span class="op">);</span>
+<span class="op">});</span></code></pre>
+
+    <h3>Available Commands</h3>
+    <ul>
+      <li><strong>File operations</strong> — <code>cat</code>, <code>cp</code>, <code>ls</code>, <code>mkdir</code>, <code>mv</code>, <code>rm</code>, <code>rmdir</code>, <code>touch</code>, <code>stat</code>, <code>tree</code>, <code>ln</code></li>
+      <li><strong>Text processing</strong> — <code>awk</code>, <code>cut</code>, <code>grep</code>, <code>head</code>, <code>sed</code>, <code>sort</code>, <code>tail</code>, <code>tr</code>, <code>uniq</code>, <code>wc</code></li>
+      <li><strong>Utilities</strong> — <code>echo</code>, <code>env</code>, <code>find</code>, <code>pwd</code>, <code>date</code>, <code>seq</code>, <code>xargs</code>, <code>tee</code>, <code>which</code></li>
+      <li><strong>Shell features</strong> — pipes (<code>|</code>), redirects (<code>&gt;</code>, <code>&gt;&gt;</code>), environment variables, subshells</li>
+      <li><strong>Custom: <code>node &lt;script&gt;</code></strong> — Runs a JavaScript file using the almostnode Runtime</li>
+      <li><strong>Custom: <code>npm &lt;command&gt;</code></strong> — Runs npm scripts, installs packages, and lists dependencies (see below)</li>
+      <li><strong>Custom: <code>vitest run</code></strong> — Runs vitest unit tests once using real <code>@vitest/expect</code> assertions (after <code>npm install vitest</code>)</li>
+      <li><strong>Custom: <code>vitest</code> / <code>vitest watch</code></strong> — Watch mode: runs tests then re-runs automatically when VFS files change. Use with <code>container.run()</code> streaming options (see below)</li>
+      <li><strong>Custom: <code>convex &lt;args&gt;</code></strong> — Runs the Convex CLI bundle (after <code>npm install convex</code>)</li>
+    </ul>
+
+    <h3>npm Scripts</h3>
+    <p>Run scripts defined in <code>package.json</code> using the built-in <code>npm</code> command. Supports <code>npm run &lt;script&gt;</code>, <code>npm start</code>, <code>npm test</code>, <code>npm install</code>, and <code>npm ls</code>. Pre/post lifecycle scripts (<code>prebuild</code>, <code>postbuild</code>, etc.) run automatically.</p>
+
+    <pre><code><span class="kw">const</span> container <span class="op">=</span> <span class="fn">createContainer</span><span class="op">();</span>
+
+<span class="cm">// Run shell commands directly with container.run()</span>
+<span class="kw">const</span> result <span class="op">=</span> <span class="kw">await</span> container<span class="op">.</span><span class="fn">run</span><span class="op">(</span><span class="str">'npm run build'</span><span class="op">);</span>
+console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>result<span class="op">.</span>stdout<span class="op">);</span>
+
+<span class="kw">await</span> container<span class="op">.</span><span class="fn">run</span><span class="op">(</span><span class="str">'npm test'</span><span class="op">);</span>
+<span class="kw">await</span> container<span class="op">.</span><span class="fn">run</span><span class="op">(</span><span class="str">'ls /'</span><span class="op">);</span></code></pre>
+
+    <p>Try the <a href="../examples/npm-scripts-demo.html">interactive npm scripts demo</a> or the <a href="../examples/vitest-demo.html">vitest testing demo</a> to see it in action.</p>
+
+    <h3>Streaming Output &amp; Watch Mode</h3>
+    <p><code>container.run()</code> accepts optional streaming callbacks and an <code>AbortSignal</code> for long-running commands like vitest watch mode:</p>
+
+    <pre><code><span class="kw">const</span> controller <span class="op">=</span> <span class="kw">new</span> <span class="fn">AbortController</span><span class="op">();</span>
+
+<span class="cm">// Start vitest in watch mode with streaming output</span>
+container<span class="op">.</span><span class="fn">run</span><span class="op">(</span><span class="str">'vitest'</span><span class="op">,</span> <span class="op">{</span>
+  <span class="fn">onStdout</span><span class="op">:</span> <span class="op">(</span>data<span class="op">)</span> <span class="op">=&gt;</span> console<span class="op">.</span><span class="fn">log</span><span class="op">(</span>data<span class="op">),</span>
+  <span class="fn">onStderr</span><span class="op">:</span> <span class="op">(</span>data<span class="op">)</span> <span class="op">=&gt;</span> console<span class="op">.</span><span class="fn">error</span><span class="op">(</span>data<span class="op">),</span>
+  signal<span class="op">:</span> controller<span class="op">.</span>signal<span class="op">,</span>
+<span class="op">});</span>
+
+<span class="cm">// Tests re-run automatically when VFS files change.</span>
+<span class="cm">// Stop watching:</span>
+controller<span class="op">.</span><span class="fn">abort</span><span class="op">();</span></code></pre>
+
+    <h3>Installing Packages — API Overview</h3>
+    <p>There are multiple ways to install npm packages, each suited for different use cases:</p>
+
+    <table>
+      <tr>
+        <th>Method</th>
+        <th>Best for</th>
+      </tr>
+      <tr>
+        <td><code>container.npm.install('pkg')</code></td>
+        <td>Programmatic use — typed <code>InstallResult</code>, <code>onProgress</code> callback, <code>save</code>/<code>saveDev</code> options</td>
+      </tr>
+      <tr>
+        <td><code>container.npm.installFromPackageJson()</code></td>
+        <td>Install all dependencies from an existing <code>package.json</code></td>
+      </tr>
+      <tr>
+        <td><code>container.run('npm install pkg')</code></td>
+        <td>Shell workflows, interactive terminals, scripts</td>
+      </tr>
+    </table>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p><code>execSync()</code> is not supported in the browser — use the async <code>exec()</code> with callbacks, or the <code>container.run()</code> convenience method which returns a Promise. The shell operates on the VirtualFS, not the real filesystem.</p>
+    </div>
+
+    <h2>Convex Integration</h2>
+    <p>almostnode can run the <a href="https://convex.dev">Convex</a> CLI entirely in the browser, enabling in-browser Convex development with live deployment. After installing the Convex package, you can deploy functions directly from the browser.</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> VirtualFS<span class="op">,</span> Runtime<span class="op">,</span> PackageManager <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> vfs <span class="op">=</span> <span class="kw">new</span> <span class="fn">VirtualFS</span><span class="op">();</span>
+<span class="kw">const</span> npm <span class="op">=</span> <span class="kw">new</span> <span class="fn">PackageManager</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span> cwd<span class="op">:</span> <span class="str">'/project'</span> <span class="op">});</span>
+
+<span class="cm">// Install Convex</span>
+<span class="kw">await</span> npm<span class="op">.</span><span class="fn">install</span><span class="op">(</span><span class="str">'convex'</span><span class="op">);</span>
+
+<span class="cm">// Set up project structure</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/project/convex.json'</span><span class="op">,</span> <span class="str">'{ "functions": "convex/" }'</span><span class="op">);</span>
+
+<span class="cm">// IMPORTANT: Both .ts AND .js config files are required</span>
+<span class="kw">const</span> configSrc <span class="op">=</span> <span class="str">`import { defineApp } from "convex/server";
+const app = defineApp();
+export default app;`</span><span class="op">;</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/project/convex/convex.config.ts'</span><span class="op">,</span> configSrc<span class="op">);</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/project/convex/convex.config.js'</span><span class="op">,</span> configSrc<span class="op">);</span>
+
+<span class="cm">// Write your Convex functions</span>
+vfs<span class="op">.</span><span class="fn">writeFileSync</span><span class="op">(</span><span class="str">'/project/convex/tasks.ts'</span><span class="op">,</span> <span class="str">`
+  import { query } from './_generated/server';
+  export const list = query({
+    handler: async (ctx) =&gt; ctx.db.query('tasks').collect(),
+  });
+`</span><span class="op">);</span>
+
+<span class="cm">// CRITICAL: Create a fresh Runtime for each deployment</span>
+<span class="kw">const</span> cliRuntime <span class="op">=</span> <span class="kw">new</span> <span class="fn">Runtime</span><span class="op">(</span>vfs<span class="op">,</span> <span class="op">{</span> cwd<span class="op">:</span> <span class="str">'/project'</span> <span class="op">});</span>
+
+cliRuntime<span class="op">.</span><span class="fn">execute</span><span class="op">(</span><span class="str">`
+  process.env.CONVEX_DEPLOY_KEY = 'dev:your-deployment|token';
+  process.argv = ['node', 'convex', 'dev', '--once'];
+  require('./node_modules/convex/dist/cli.bundle.cjs');
+`</span><span class="op">);</span></code></pre>
+
+    <h3>How It Works</h3>
+    <ol>
+      <li>The Convex CLI bundle runs inside the almostnode Runtime via <code>runtime.execute()</code></li>
+      <li>It reads your function files from the VirtualFS</li>
+      <li>Bundles them with esbuild (shimmed in browser)</li>
+      <li>Pushes the bundled functions to your Convex deployment via the HTTP API</li>
+      <li>Generated type files (<code>_generated/api.js</code>, <code>server.js</code>) are written back to the VFS</li>
+    </ol>
+
+    <h3>Important Notes</h3>
+    <ul>
+      <li><strong>Fresh Runtime per deploy</strong> — Always create a new <code>Runtime</code> instance for each deployment. The CLI captures file contents in closures, so reusing a Runtime causes stale code to be deployed.</li>
+      <li><strong>CWD matters</strong> — Set <code>cwd: '/project'</code> so <code>path.resolve()</code> and <code>require()</code> resolve correctly.</li>
+      <li><strong>Both config formats</strong> — The CLI bundler needs both <code>convex.config.ts</code> and <code>convex.config.js</code>.</li>
+      <li><strong>Deploy key format</strong> — <code>dev:deployment-name|base64token</code>. Generate from the Convex dashboard.</li>
+      <li><strong>Async completion</strong> — The CLI runs async network requests. Poll for <code>.env.local</code> and <code>_generated/</code> directory to detect completion.</li>
+      <li><strong>Clean before deploy</strong> — Remove existing <code>_generated/</code> directories before each CLI run, or the CLI may skip the push.</li>
+    </ul>
+
+    <div class="callout">
+      <div class="callout-title">Note</div>
+      <p>Do not use <code>child_process.exec('convex dev')</code> for deployment — use <code>runtime.execute()</code> with inline code instead. See the full integration guide in <code>docs/CONVEX_CLI_INTEGRATION.md</code> for troubleshooting and advanced patterns.</p>
+    </div>
+
+    <h2>ServerBridge</h2>
+    <p>The ServerBridge connects virtual HTTP servers to real browser URLs using a service worker. When a request hits <code>/__virtual__/{port}/path</code>, the service worker intercepts it and forwards it to the registered virtual server.</p>
+
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">getServerBridge</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> bridge <span class="op">=</span> <span class="fn">getServerBridge</span><span class="op">();</span>
+
+<span class="cm">// Initialize the service worker</span>
+<span class="kw">await</span> bridge<span class="op">.</span><span class="fn">initServiceWorker</span><span class="op">();</span>
+
+<span class="cm">// Register a virtual server on port 3000</span>
+bridge<span class="op">.</span><span class="fn">registerServer</span><span class="op">(</span>myServer<span class="op">,</span> <span class="num">3000</span><span class="op">);</span>
+
+<span class="cm">// Now accessible at /__virtual__/3000/ in an iframe</span>
+<span class="kw">const</span> url <span class="op">=</span> bridge<span class="op">.</span><span class="fn">getServerUrl</span><span class="op">(</span><span class="num">3000</span><span class="op">);</span>
+iframe<span class="op">.</span>src <span class="op">=</span> url<span class="op">;</span></code></pre>
+
+    <h3>How It Works</h3>
+    <ol>
+      <li><code>initServiceWorker()</code> registers a service worker that intercepts fetch requests</li>
+      <li><code>registerServer()</code> maps a port number to a virtual server object</li>
+      <li>When the browser requests <code>/__virtual__/3000/path</code>, the service worker sends it to the registered server</li>
+      <li>The server processes the request and returns a response — all without any real network traffic</li>
+    </ol>
+
+    <h2>Putting It All Together</h2>
+    <p>The <code>createContainer()</code> helper creates all four components for you:</p>
+    <pre><code><span class="kw">import</span> <span class="op">{</span> <span class="fn">createContainer</span> <span class="op">}</span> <span class="kw">from</span> <span class="str">'almostnode'</span><span class="op">;</span>
+
+<span class="kw">const</span> <span class="op">{</span>
+  vfs<span class="op">,</span>          <span class="cm">// VirtualFS instance</span>
+  runtime<span class="op">,</span>      <span class="cm">// Runtime instance</span>
+  npm<span class="op">,</span>          <span class="cm">// PackageManager instance</span>
+  serverBridge<span class="op">,</span> <span class="cm">// ServerBridge instance</span>
+  execute<span class="op">,</span>      <span class="cm">// Shorthand for runtime.execute()</span>
+  runFile<span class="op">,</span>      <span class="cm">// Shorthand for runtime.runFile()</span>
+  createREPL<span class="op">,</span>   <span class="cm">// Create interactive REPL context</span>
+<span class="op">}</span> <span class="op">=</span> <span class="fn">createContainer</span><span class="op">();</span></code></pre>
+
+    <h2>Supported Node.js APIs</h2>
+    <p><strong>967 compatibility tests</strong> verify almostnode's Node.js API coverage.</p>
+
+    <h3>Fully Shimmed Modules</h3>
+    <table>
+      <tr>
+        <th>Module</th>
+        <th>Tests</th>
+        <th>Coverage</th>
+        <th>Notes</th>
+      </tr>
+      <tr><td><code>path</code></td><td>219</td><td>High</td><td>POSIX paths (no Windows)</td></tr>
+      <tr><td><code>buffer</code></td><td>95</td><td>High</td><td>All common operations</td></tr>
+      <tr><td><code>fs</code></td><td>76</td><td>High</td><td>Sync + promises API</td></tr>
+      <tr><td><code>url</code></td><td>67</td><td>High</td><td>WHATWG URL + legacy parser</td></tr>
+      <tr><td><code>util</code></td><td>77</td><td>High</td><td>format, inspect, promisify</td></tr>
+      <tr><td><code>process</code></td><td>60</td><td>High</td><td>env, cwd, hrtime, EventEmitter</td></tr>
+      <tr><td><code>events</code></td><td>50</td><td>High</td><td>Full EventEmitter API</td></tr>
+      <tr><td><code>os</code></td><td>58</td><td>High</td><td>Platform info (simulated)</td></tr>
+      <tr><td><code>crypto</code></td><td>57</td><td>High</td><td>Hash, HMAC, random, sign/verify</td></tr>
+      <tr><td><code>querystring</code></td><td>52</td><td>High</td><td>parse, stringify, escape</td></tr>
+      <tr><td><code>stream</code></td><td>44</td><td>Medium</td><td>Readable, Writable, Transform</td></tr>
+      <tr><td><code>zlib</code></td><td>39</td><td>High</td><td>gzip, deflate, brotli</td></tr>
+      <tr><td><code>tty</code></td><td>40</td><td>High</td><td>ReadStream, WriteStream</td></tr>
+      <tr><td><code>perf_hooks</code></td><td>33</td><td>High</td><td>Performance API</td></tr>
+    </table>
+
+    <h3>Stubbed Modules</h3>
+    <p>These modules export empty objects or no-op functions. They exist so that <code>require()</code> calls don't throw, but they don't provide real functionality:</p>
+    <ul>
+      <li><code>net</code>, <code>tls</code>, <code>dns</code>, <code>dgram</code></li>
+      <li><code>cluster</code>, <code>worker_threads</code></li>
+      <li><code>vm</code>, <code>v8</code>, <code>inspector</code></li>
+      <li><code>async_hooks</code></li>
+    </ul>
+
+    <div class="page-nav">
+      <a href="./">
+        <div class="label">Previous</div>
+        <div class="title">Getting Started</div>
+      </a>
+      <a href="./security.html" class="next">
+        <div class="label">Next</div>
+        <div class="title">Security &amp; Sandbox</div>
+      </a>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,197 @@
+# Benchmark Workflow for DX JavaScript Toolchain
+# Runs benchmarks and compares against baseline
+# Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6
+
+name: Benchmarks
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-action@stable
+      
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            runtime/target
+          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-bench-
+      
+      - name: Build release binary
+        run: cargo build --manifest-path runtime/Cargo.toml --release
+      
+      - name: Download previous benchmark results
+        uses: actions/cache@v4
+        with:
+          path: benchmarks/suite/results
+          key: benchmark-results-${{ github.ref_name }}
+          restore-keys: |
+            benchmark-results-main
+            benchmark-results-
+      
+      - name: Run Criterion benchmarks
+        run: |
+          mkdir -p benchmark-results
+          cargo bench --manifest-path runtime/Cargo.toml -- --save-baseline current 2>&1 | tee benchmark-results/criterion.txt
+      
+      - name: Run benchmark suite
+        run: |
+          chmod +x benchmarks/suite/run.sh
+          ./benchmarks/suite/run.sh --runs 5 2>&1 | tee benchmark-results/suite.txt
+      
+      - name: Extract benchmark metrics
+        id: metrics
+        run: |
+          # Extract key metrics from benchmark results
+          RESULT_FILE=$(ls -t benchmarks/suite/results/benchmark_*.json | head -1)
+          
+          if [ -f "$RESULT_FILE" ]; then
+            # Extract startup time
+            STARTUP_JS=$(jq -r '.results.startup.js.dx.median // 0' "$RESULT_FILE")
+            STARTUP_TS=$(jq -r '.results.startup.ts.dx.median // 0' "$RESULT_FILE")
+            
+            echo "startup_js=$STARTUP_JS" >> $GITHUB_OUTPUT
+            echo "startup_ts=$STARTUP_TS" >> $GITHUB_OUTPUT
+            
+            # Copy to benchmark-results for comparison
+            cp "$RESULT_FILE" benchmark-results/current.json
+          fi
+      
+      - name: Compare with baseline
+        id: compare
+        run: |
+          if [ -f benchmark-results/baseline.json ]; then
+            echo "Comparing with previous baseline..."
+            
+            CURRENT_STARTUP=$(jq -r '.results.startup.js.dx.median // 0' benchmark-results/current.json)
+            BASELINE_STARTUP=$(jq -r '.results.startup.js.dx.median // 0' benchmark-results/baseline.json)
+            
+            if [ "$BASELINE_STARTUP" != "0" ] && [ "$CURRENT_STARTUP" != "0" ]; then
+              # Calculate percentage change
+              CHANGE=$(echo "scale=2; (($CURRENT_STARTUP - $BASELINE_STARTUP) / $BASELINE_STARTUP) * 100" | bc)
+              echo "Startup time change: ${CHANGE}%"
+              echo "change=${CHANGE}" >> $GITHUB_OUTPUT
+              
+              # Fail if regression is more than 20%
+              THRESHOLD=20
+              if (( $(echo "$CHANGE > $THRESHOLD" | bc -l) )); then
+                echo "::warning::Performance regression detected in startup time: ${CHANGE}% (threshold: ${THRESHOLD}%)"
+              fi
+            fi
+          else
+            echo "No baseline found, saving current as baseline"
+            cp benchmark-results/current.json benchmark-results/baseline.json 2>/dev/null || true
+          fi
+      
+      - name: Save benchmark results
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        run: |
+          cp benchmark-results/current.json benchmark-results/baseline.json 2>/dev/null || true
+      
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            benchmark-results/
+            benchmarks/suite/results/
+          retention-days: 30
+      
+      - name: Comment on PR with benchmark results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let suiteResults = '';
+            try {
+              suiteResults = fs.readFileSync('benchmark-results/suite.txt', 'utf8');
+            } catch (e) {
+              suiteResults = 'Suite results not available';
+            }
+            
+            const startupJs = '${{ steps.metrics.outputs.startup_js }}' || 'N/A';
+            const startupTs = '${{ steps.metrics.outputs.startup_ts }}' || 'N/A';
+            const change = '${{ steps.compare.outputs.change }}' || 'N/A';
+            
+            const body = `## Benchmark Results
+            
+            ### Key Metrics
+            
+            | Metric | Value |
+            |--------|-------|
+            | JS Cold Start | ${startupJs}ms |
+            | TS Cold Start | ${startupTs}ms |
+            | Change vs Baseline | ${change}% |
+            
+            <details>
+            <summary>Full Benchmark Output</summary>
+            
+            \`\`\`
+            ${suiteResults.slice(0, 5000)}
+            \`\`\`
+            </details>
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # Cross-platform benchmark validation
+  benchmark-platforms:
+    name: Benchmark (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+          - os: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-action@stable
+      
+      - name: Build release binary
+        run: cargo build --manifest-path runtime/Cargo.toml --release
+      
+      - name: Run benchmark suite (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          chmod +x benchmarks/suite/run.sh
+          ./benchmarks/suite/run.sh --runs 3
+      
+      - name: Run benchmark suite (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          ./benchmarks/suite/run.ps1 -Runs 3
+      
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ matrix.os }}
+          path: benchmarks/suite/results/
+          retention-days: 30

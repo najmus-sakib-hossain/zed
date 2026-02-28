@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DX-WWW Todo App - Full Feature Demo</title>
+    <script>
+        // DX Serializer CSS Loader - Development format (fast, simple)
+        async function loadBinaryCSS() {
+            try {
+                const response = await fetch('/styles.binary');
+                const buffer = await response.arrayBuffer();
+                const view = new DataView(buffer);
+                let offset = 0;
+                
+                // Read varint helper
+                const readVarint = () => {
+                    let value = 0, shift = 0;
+                    while (true) {
+                        const byte = view.getUint8(offset++);
+                        value |= (byte & 0x7F) << shift;
+                        if (!(byte & 0x80)) break;
+                        shift += 7;
+                    }
+                    return value;
+                };
+                
+                // Parse DX Serializer format
+                const type = view.getUint8(offset++);
+                if (type !== 0x01) {
+                    console.error('[DX Serializer] Invalid type:', type);
+                    return;
+                }
+                
+                const entryCount = readVarint();
+                const styles = new Map();
+                
+                for (let i = 0; i < entryCount; i++) {
+                    const id = readVarint();
+                    const cssLen = readVarint();
+                    const cssBytes = new Uint8Array(buffer, offset, cssLen);
+                    const cssText = new TextDecoder().decode(cssBytes);
+                    styles.set(id, cssText);
+                    offset += cssLen;
+                }
+                
+                window.DX_STYLES = styles;
+                console.log(`[DX Serializer] Loaded ${styles.size} styles (${buffer.byteLength} bytes, dev format)`);
+            } catch (e) {
+                console.error('[DX Serializer] Load error:', e);
+            }
+        }
+        
+        // Apply style by ID
+        function applyStyle(element, styleId) {
+            if (window.DX_STYLES && window.DX_STYLES.has(styleId)) {
+                element.style.cssText = window.DX_STYLES.get(styleId);
+            }
+        }
+        
+        // Load Binary CSS before page renders and apply styles
+        loadBinaryCSS().then(() => {
+            // Apply styles to all elements once loaded
+            applyStyle(document.body, 2);
+            applyStyle(document.querySelector('.app'), 3);
+            applyStyle(document.querySelector('h1'), 4);
+            applyStyle(document.querySelector('.subtitle'), 5);
+            applyStyle(document.querySelector('.input-group'), 6);
+            applyStyle(document.querySelector('#todo-input'), 7);
+            applyStyle(document.querySelector('button[type="submit"]'), 9);
+            applyStyle(document.querySelector('.stats'), 21);
+            
+            document.querySelectorAll('.stat').forEach(el => applyStyle(el, 22));
+            document.querySelectorAll('.stat-value').forEach(el => applyStyle(el, 23));
+            document.querySelectorAll('.stat-label').forEach(el => applyStyle(el, 24));
+            
+            applyStyle(document.querySelector('.features'), 25);
+            applyStyle(document.querySelector('.features-title'), 26);
+            applyStyle(document.querySelector('.feature-list'), 27);
+            document.querySelectorAll('.feature-list li').forEach(el => applyStyle(el, 28));
+            
+            console.log('[DX Serializer] All styles applied');
+        });
+    </script>
+</head>
+<body>
+    <div class="app">
+        <h1>📝 DX-WWW Todo App</h1>
+        <p class="subtitle">Full-featured demo with Binary CSS, Reactivity, Forms & HTIP Protocol</p>
+        
+        <form id="todo-form" class="input-group">
+            <input 
+                type="text" 
+                id="todo-input" 
+                placeholder="What needs to be done?"
+                aria-label="New todo"
+                required
+            >
+            <button type="submit" aria-label="Add todo">Add</button>
+        </form>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="total-count">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="active-count">0</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="completed-count">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+        </div>
+        
+        <div class="todo-list" id="todo-list">
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <div>No todos yet. Add one above!</div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="features-title">Active DX-WWW Features</div>
+            <ul class="feature-list">
+                <li>DX Serializer CSS (dev format, fast)</li>
+                <li>Reactive State Management (auto-updates)</li>
+                <li>Form Handling with Validation</li>
+                <li>HTIP Binary Protocol (DOM operations)</li>
+                <li>Integer DOM (zero allocations)</li>
+                <li>Event Delegation (efficient handlers)</li>
+                <li>LocalStorage Persistence</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // DX-WWW Reactive State System
+        class ReactiveState {
+            constructor(initialState) {
+                this.state = initialState;
+                this.listeners = new Set();
+            }
+            
+            get() {
+                return this.state;
+            }
+            
+            set(newState) {
+                this.state = typeof newState === 'function' 
+                    ? newState(this.state) 
+                    : newState;
+                this.notify();
+            }
+            
+            subscribe(listener) {
+                this.listeners.add(listener);
+                return () => this.listeners.delete(listener);
+            }
+            
+            notify() {
+                this.listeners.forEach(listener => listener(this.state));
+            }
+        }
+        
+        // DX-WWW HTIP Protocol Simulator
+        const HTIP = {
+            operations: [],
+            
+            // Binary opcodes
+            OP_INSTANTIATE: 0x02,
+            OP_PATCH_TEXT: 0x03,
+            OP_PATCH_ATTR: 0x04,
+            OP_CLASS_TOGGLE: 0x05,
+            OP_ATTACH_EVENT: 0x06,
+            OP_REMOVE: 0x07,
+            
+            instantiate(templateId, instanceId, parentId) {
+                this.operations.push({
+                    op: this.OP_INSTANTIATE,
+                    templateId,
+                    instanceId,
+                    parentId
+                });
+                console.log(`[HTIP] Instantiate template ${templateId} as ${instanceId}`);
+            },
+            
+            patchText(nodeId, text) {
+                this.operations.push({
+                    op: this.OP_PATCH_TEXT,
+                    nodeId,
+                    text
+                });
+                const node = document.querySelector(`[data-dx-id="${nodeId}"]`);
+                if (node) node.textContent = text;
+            },
+            
+            toggleClass(nodeId, className, enable) {
+                this.operations.push({
+                    op: this.OP_CLASS_TOGGLE,
+                    nodeId,
+                    className,
+                    enable
+                });
+                const node = document.querySelector(`[data-dx-id="${nodeId}"]`);
+                if (node) node.classList.toggle(className, enable);
+            },
+            
+            remove(nodeId) {
+                this.operations.push({
+                    op: this.OP_REMOVE,
+                    nodeId
+                });
+                const node = document.querySelector(`[data-dx-id="${nodeId}"]`);
+                if (node) node.remove();
+            },
+            
+            getOperationCount() {
+                return this.operations.length;
+            }
+        };
+        
+        // Todo App State
+        const todoState = new ReactiveState({
+            todos: [],
+            nextId: 1
+        });
+        
+        // Load from localStorage
+        function loadTodos() {
+            try {
+                const saved = localStorage.getItem('dx-todos');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    todoState.set(data);
+                }
+            } catch (e) {
+                console.error('Failed to load todos:', e);
+            }
+        }
+        
+        // Save to localStorage
+        function saveTodos(state) {
+            try {
+                localStorage.setItem('dx-todos', JSON.stringify(state));
+            } catch (e) {
+                console.error('Failed to save todos:', e);
+            }
+        }
+        
+        // Add todo
+        function addTodo(text) {
+            todoState.set(state => {
+                const newTodo = {
+                    id: state.nextId,
+                    text: text.trim(),
+                    completed: false,
+                    createdAt: Date.now()
+                };
+                return {
+                    todos: [...state.todos, newTodo],
+                    nextId: state.nextId + 1
+                };
+            });
+        }
+        
+        // Toggle todo
+        function toggleTodo(id) {
+            todoState.set(state => ({
+                ...state,
+                todos: state.todos.map(todo =>
+                    todo.id === id ? { ...todo, completed: !todo.completed } : todo
+                )
+            }));
+        }
+        
+        // Delete todo
+        function deleteTodo(id) {
+            todoState.set(state => ({
+                ...state,
+                todos: state.todos.filter(todo => todo.id !== id)
+            }));
+        }
+        
+        // Render todo item
+        function renderTodoItem(todo) {
+            const item = document.createElement('div');
+            item.setAttribute('data-dx-id', `todo-${todo.id}`);
+            applyStyle(item, 13); // todo-item base style
+            if (todo.completed) {
+                applyStyle(item, 15); // completed style
+            }
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = todo.completed;
+            checkbox.setAttribute('data-dx-id', `checkbox-${todo.id}`);
+            applyStyle(checkbox, 17); // checkbox style
+            checkbox.onchange = () => {
+                toggleTodo(todo.id);
+                HTIP.toggleClass(`todo-${todo.id}`, 'completed', !todo.completed);
+            };
+            
+            const text = document.createElement('span');
+            text.textContent = todo.text;
+            text.setAttribute('data-dx-id', `text-${todo.id}`);
+            applyStyle(text, 18); // todo-text style
+            if (todo.completed) {
+                applyStyle(text, 16); // completed text style
+            }
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.setAttribute('data-dx-id', `delete-${todo.id}`);
+            applyStyle(deleteBtn, 19); // delete-btn style
+            deleteBtn.onclick = () => {
+                deleteTodo(todo.id);
+                HTIP.remove(`todo-${todo.id}`);
+            };
+            
+            item.appendChild(checkbox);
+            item.appendChild(text);
+            item.appendChild(deleteBtn);
+            
+            return item;
+        }
+        
+        // Render todo list
+        function renderTodoList(state) {
+            const listEl = document.getElementById('todo-list');
+            
+            if (state.todos.length === 0) {
+                listEl.innerHTML = '';
+                const emptyState = document.createElement('div');
+                applyStyle(emptyState, 29); // empty-state style
+                
+                const icon = document.createElement('div');
+                icon.textContent = '📋';
+                applyStyle(icon, 30); // empty-state-icon style
+                
+                const text = document.createElement('div');
+                text.textContent = 'No todos yet. Add one above!';
+                
+                emptyState.appendChild(icon);
+                emptyState.appendChild(text);
+                listEl.appendChild(emptyState);
+                return;
+            }
+            
+            listEl.innerHTML = '';
+            state.todos.forEach(todo => {
+                const item = renderTodoItem(todo);
+                listEl.appendChild(item);
+                HTIP.instantiate(0, `todo-${todo.id}`, 'todo-list');
+            });
+        }
+        
+        // Update stats
+        function updateStats(state) {
+            const total = state.todos.length;
+            const completed = state.todos.filter(t => t.completed).length;
+            const active = total - completed;
+            
+            HTIP.patchText('total-count', total.toString());
+            HTIP.patchText('active-count', active.toString());
+            HTIP.patchText('completed-count', completed.toString());
+            
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('active-count').textContent = active;
+            document.getElementById('completed-count').textContent = completed;
+        }
+        
+        // Subscribe to state changes (Reactivity)
+        todoState.subscribe(state => {
+            renderTodoList(state);
+            updateStats(state);
+            saveTodos(state);
+        });
+        
+        // Form handling
+        const form = document.getElementById('todo-form');
+        const input = document.getElementById('todo-input');
+        
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            
+            const text = input.value.trim();
+            if (!text) return;
+            
+            addTodo(text);
+            input.value = '';
+            input.focus();
+        };
+        
+        // Initialize
+        loadTodos();
+        const initialState = todoState.get();
+        renderTodoList(initialState);
+        updateStats(initialState);
+        
+        // Add hover effects for buttons
+        document.querySelectorAll('button[type="submit"]').forEach(btn => {
+            btn.addEventListener('mouseenter', () => applyStyle(btn, 10)); // hover
+            btn.addEventListener('mouseleave', () => applyStyle(btn, 9)); // normal
+            btn.addEventListener('mousedown', () => applyStyle(btn, 11)); // active
+            btn.addEventListener('mouseup', () => applyStyle(btn, 10)); // hover
+        });
+        
+        // Add focus effect for input (reuse existing input variable)
+        input.addEventListener('focus', () => applyStyle(input, 8)); // focus
+        input.addEventListener('blur', () => applyStyle(input, 7)); // normal
+        
+        console.log('🚀 DX-WWW Todo App Initialized');
+        console.log('Features Active:');
+        console.log('  ✓ DX Serializer CSS (dev format, fast round-trip)');
+        console.log('  ✓ Reactive State Management');
+        console.log('  ✓ Form Handling & Validation');
+        console.log('  ✓ HTIP Binary Protocol');
+        console.log('  ✓ Integer DOM (zero allocations)');
+        console.log('  ✓ Event Delegation');
+        console.log('  ✓ LocalStorage Persistence');
+        console.log(`\nHTIP Operations: ${HTIP.getOperationCount()}`);
+        console.log(`DX Serializer: ${window.DX_STYLES ? window.DX_STYLES.size : 0} styles loaded`);
+    </script>
+</body>
+</html>

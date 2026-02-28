@@ -1,0 +1,25 @@
+[package]
+name = "dx-bundle-cli"
+description = "CLI for DX Bundler v2 - 3x faster than Bun"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "dx-bundle"
+path = "src/main.rs"
+
+[dependencies]
+dx-bundle-core = { path = "../dx-bundle-core" }
+dx-bundle-scanner = { path = "../dx-bundle-scanner" }
+dx-bundle-pipeline = { path = "../dx-bundle-pipeline" }
+dx-bundle-cache = { path = "../dx-bundle-cache" }
+dx-bundle-parallel = { path = "../dx-bundle-parallel" }
+dx-bundle-delta = { path = "../dx-bundle-delta" }
+dx-bundle-emit = { path = "../dx-bundle-emit" }
+dx-bundle-dxm = { path = "../dx-bundle-dxm" }
+clap.workspace = true
+anyhow.workspace = true
+tokio.workspace = true
+num_cpus = "1.16"
+notify.workspace = true

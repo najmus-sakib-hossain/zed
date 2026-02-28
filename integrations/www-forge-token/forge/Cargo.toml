@@ -1,0 +1,62 @@
+[package]
+name = "forge"
+version = "0.1.0"
+edition = "2021"
+description = "Blazing-fast version control for massive media assets"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive", "env", "color"] }
+anyhow = "1.0"
+thiserror = "2.0"
+blake3 = "1.5"
+fastcdc = "3.1"
+rkyv = { version = "0.8", features = ["bytecheck", "alloc", "std"] }
+bytecheck = "0.8"
+redb = "2.1"
+memmap2 = "0.9"
+zstd = { version = "0.13", features = ["zstdmt"] }
+tokio = { version = "1", features = ["full"] }
+s2n-quic = "1.2"
+num_cpus = "1.16"
+hex = "0.4"
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+indicatif = "0.17"
+walkdir = "2"
+bytes = "1"
+pathdiff = "0.2"
+glob = "0.3"
+mimalloc = { version = "0.1", default-features = false }
+crossbeam-channel = "0.5"
+toml = "0.8"
+async-trait = "0.1"
+reqwest = { version = "0.12", features = ["json", "multipart", "stream"] }
+octocrab = "0.43"
+object_store = { version = "0.12", features = ["aws"] }
+open = "5"
+base64 = "0.22"
+futures = "0.3"
+tokio-util = { version = "0.7", features = ["io"] }
+
+[dev-dependencies]
+tempfile = "3"
+criterion = { version = "0.5", features = ["html_reports"] }
+rand = "0.8"
+assert_cmd = "2"
+predicates = "3"
+
+[[bench]]
+name = "ingest"
+harness = false
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

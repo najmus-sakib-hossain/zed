@@ -1,0 +1,10 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "express": "^5.2.1",
+    "react": "^19.2.3"
+  },
+  "devDependencies": {}
+}

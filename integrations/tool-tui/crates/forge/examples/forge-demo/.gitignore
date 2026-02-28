@@ -1,0 +1,26 @@
+# This is a Forge repository, not a Git repository!
+# The .forge/ directory contains all version control metadata
+
+# Forge metadata (keep this)
+!.forge/
+
+# Build artifacts
+target/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Rust
+Cargo.lock

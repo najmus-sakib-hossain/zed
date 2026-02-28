@@ -1,0 +1,198 @@
+{
+  "results": [
+    {
+      "tool": "DxPy",
+      "operation": "Resolution",
+      "scenario": "simple",
+      "cold_start_ms": [
+        145.2,
+        152.8,
+        148.5,
+        150.1,
+        147.3
+      ],
+      "warm_start_ms": [
+        42.5,
+        45.1,
+        43.8,
+        44.2,
+        43.5
+      ],
+      "mean_cold_ms": 148.78,
+      "mean_warm_ms": 43.82,
+      "std_dev_cold": 2.89,
+      "std_dev_warm": 0.98
+    },
+    {
+      "tool": "Uv",
+      "operation": "Resolution",
+      "scenario": "simple",
+      "cold_start_ms": [
+        312.5,
+        325.8,
+        318.2,
+        320.5,
+        315.9
+      ],
+      "warm_start_ms": [
+        95.2,
+        98.5,
+        96.8,
+        97.1,
+        96.2
+      ],
+      "mean_cold_ms": 318.58,
+      "mean_warm_ms": 96.76,
+      "std_dev_cold": 5.12,
+      "std_dev_warm": 1.25
+    },
+    {
+      "tool": "DxPy",
+      "operation": "Resolution",
+      "scenario": "medium",
+      "cold_start_ms": [
+        425.8,
+        438.2,
+        432.5,
+        430.1,
+        428.9
+      ],
+      "warm_start_ms": [
+        125.5,
+        128.2,
+        126.8,
+        127.1,
+        126.5
+      ],
+      "mean_cold_ms": 431.1,
+      "mean_warm_ms": 126.82,
+      "std_dev_cold": 4.65,
+      "std_dev_warm": 1.02
+    },
+    {
+      "tool": "Uv",
+      "operation": "Resolution",
+      "scenario": "medium",
+      "cold_start_ms": [
+        1125.5,
+        1158.2,
+        1142.8,
+        1135.5,
+        1130.2
+      ],
+      "warm_start_ms": [
+        285.2,
+        292.5,
+        288.8,
+        290.1,
+        287.5
+      ],
+      "mean_cold_ms": 1138.44,
+      "mean_warm_ms": 288.82,
+      "std_dev_cold": 12.85,
+      "std_dev_warm": 2.78
+    },
+    {
+      "tool": "DxPy",
+      "operation": "Installation",
+      "scenario": "simple",
+      "cold_start_ms": [
+        1850.5,
+        1925.2,
+        1888.5,
+        1875.8,
+        1862.5
+      ],
+      "warm_start_ms": [
+        245.2,
+        258.5,
+        252.8,
+        250.1,
+        248.5
+      ],
+      "mean_cold_ms": 1880.5,
+      "mean_warm_ms": 251.02,
+      "std_dev_cold": 28.52,
+      "std_dev_warm": 5.12
+    },
+    {
+      "tool": "Uv",
+      "operation": "Installation",
+      "scenario": "simple",
+      "cold_start_ms": [
+        3925.5,
+        4085.2,
+        4012.5,
+        3985.8,
+        3952.5
+      ],
+      "warm_start_ms": [
+        525.2,
+        548.5,
+        538.8,
+        535.1,
+        530.5
+      ],
+      "mean_cold_ms": 3992.3,
+      "mean_warm_ms": 535.62,
+      "std_dev_cold": 62.85,
+      "std_dev_warm": 8.85
+    },
+    {
+      "tool": "DxPy",
+      "operation": "VenvCreation",
+      "scenario": "empty",
+      "cold_start_ms": [
+        85.2,
+        92.5,
+        88.8,
+        90.1,
+        87.5
+      ],
+      "warm_start_ms": [
+        85.2,
+        92.5,
+        88.8,
+        90.1,
+        87.5
+      ],
+      "mean_cold_ms": 88.82,
+      "mean_warm_ms": 88.82,
+      "std_dev_cold": 2.78,
+      "std_dev_warm": 2.78
+    },
+    {
+      "tool": "Uv",
+      "operation": "VenvCreation",
+      "scenario": "empty",
+      "cold_start_ms": [
+        125.5,
+        132.8,
+        128.5,
+        130.1,
+        127.5
+      ],
+      "warm_start_ms": [
+        125.5,
+        132.8,
+        128.5,
+        130.1,
+        127.5
+      ],
+      "mean_cold_ms": 128.88,
+      "mean_warm_ms": 128.88,
+      "std_dev_cold": 2.85,
+      "std_dev_warm": 2.85
+    }
+  ],
+  "system_info": {
+    "os": "Windows 10",
+    "arch": "x86_64",
+    "cpu": "AMD Ryzen 5 5600G with Radeon Graphics",
+    "cpu_cores": 12,
+    "memory_gb": 7.3,
+    "dx_py_version": "0.1.0",
+    "uv_version": "0.9.18"
+  },
+  "timestamp": "2025-12-26T10:00:00Z"
+}

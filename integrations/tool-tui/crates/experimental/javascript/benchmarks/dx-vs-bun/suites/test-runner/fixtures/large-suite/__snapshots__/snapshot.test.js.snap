@@ -1,0 +1,961 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot Tests Array Snapshots array snapshot 0 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 1 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 1,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 2 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 2,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 4,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 3 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 3,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 6,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 9,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 4 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 4,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 8,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 12,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 16,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 5 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 5,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 10,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 15,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 20,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 25,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 6 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 6,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 12,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 18,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 24,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 30,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 36,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 7 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 7,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 14,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 21,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 28,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 35,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 42,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 49,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 8 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 8,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 16,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 24,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 32,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 40,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 48,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 56,
+  },
+  {
+    "index": 8,
+    "label": "item-8",
+    "value": 64,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 9 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 9,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 18,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 27,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 36,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 45,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 54,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 63,
+  },
+  {
+    "index": 8,
+    "label": "item-8",
+    "value": 72,
+  },
+  {
+    "index": 9,
+    "label": "item-9",
+    "value": 81,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 10 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 10,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 20,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 30,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 40,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 50,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 60,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 70,
+  },
+  {
+    "index": 8,
+    "label": "item-8",
+    "value": 80,
+  },
+  {
+    "index": 9,
+    "label": "item-9",
+    "value": 90,
+  },
+  {
+    "index": 10,
+    "label": "item-10",
+    "value": 100,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 11 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 11,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 22,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 33,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 44,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 55,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 66,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 77,
+  },
+  {
+    "index": 8,
+    "label": "item-8",
+    "value": 88,
+  },
+  {
+    "index": 9,
+    "label": "item-9",
+    "value": 99,
+  },
+  {
+    "index": 10,
+    "label": "item-10",
+    "value": 110,
+  },
+  {
+    "index": 11,
+    "label": "item-11",
+    "value": 121,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 12 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 12,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 24,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 36,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 48,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 60,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 72,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 84,
+  },
+  {
+    "index": 8,
+    "label": "item-8",
+    "value": 96,
+  },
+  {
+    "index": 9,
+    "label": "item-9",
+    "value": 108,
+  },
+  {
+    "index": 10,
+    "label": "item-10",
+    "value": 120,
+  },
+  {
+    "index": 11,
+    "label": "item-11",
+    "value": 132,
+  },
+  {
+    "index": 12,
+    "label": "item-12",
+    "value": 144,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 13 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 13,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 26,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 39,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 52,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 65,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 78,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 91,
+  },
+  {
+    "index": 8,
+    "label": "item-8",
+    "value": 104,
+  },
+  {
+    "index": 9,
+    "label": "item-9",
+    "value": 117,
+  },
+  {
+    "index": 10,
+    "label": "item-10",
+    "value": 130,
+  },
+  {
+    "index": 11,
+    "label": "item-11",
+    "value": 143,
+  },
+  {
+    "index": 12,
+    "label": "item-12",
+    "value": 156,
+  },
+  {
+    "index": 13,
+    "label": "item-13",
+    "value": 169,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 14 1`] = `
+[
+  {
+    "index": 0,
+    "label": "item-0",
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "label": "item-1",
+    "value": 14,
+  },
+  {
+    "index": 2,
+    "label": "item-2",
+    "value": 28,
+  },
+  {
+    "index": 3,
+    "label": "item-3",
+    "value": 42,
+  },
+  {
+    "index": 4,
+    "label": "item-4",
+    "value": 56,
+  },
+  {
+    "index": 5,
+    "label": "item-5",
+    "value": 70,
+  },
+  {
+    "index": 6,
+    "label": "item-6",
+    "value": 84,
+  },
+  {
+    "index": 7,
+    "label": "item-7",
+    "value": 98,
+  },
+  {
+    "index": 8,
+    "label": "item-8",
+    "value": 112,
+  },
+  {
+    "index": 9,
+    "label": "item-9",
+    "value": 126,
+  },
+  {
+    "index": 10,
+    "label": "item-10",
+    "value": 140,
+  },
+  {
+    "index": 11,
+    "label": "item-11",
+    "value": 154,
+  },
+  {
+    "index": 12,
+    "label": "item-12",
+    "value": 168,
+  },
+  {
+    "index": 13,
+    "label": "item-13",
+    "value": 182,
+  },
+  {
+    "index": 14,
+    "label": "item-14",
+    "value": 196,
+  },
+]
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 0 1`] = `
+{
+  "id": 0,
+  "name": "item-0",
+  "nested": {
+    "a": 0,
+    "b": 1,
+    "c": {
+      "deep": 0,
+    },
+  },
+  "value": 0,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 1 1`] = `
+{
+  "id": 1,
+  "name": "item-1",
+  "nested": {
+    "a": 1,
+    "b": 2,
+    "c": {
+      "deep": 2,
+    },
+  },
+  "value": 10,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 2 1`] = `
+{
+  "id": 2,
+  "name": "item-2",
+  "nested": {
+    "a": 2,
+    "b": 3,
+    "c": {
+      "deep": 4,
+    },
+  },
+  "value": 20,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 3 1`] = `
+{
+  "id": 3,
+  "name": "item-3",
+  "nested": {
+    "a": 3,
+    "b": 4,
+    "c": {
+      "deep": 6,
+    },
+  },
+  "value": 30,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 4 1`] = `
+{
+  "id": 4,
+  "name": "item-4",
+  "nested": {
+    "a": 4,
+    "b": 5,
+    "c": {
+      "deep": 8,
+    },
+  },
+  "value": 40,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 5 1`] = `
+{
+  "id": 5,
+  "name": "item-5",
+  "nested": {
+    "a": 5,
+    "b": 6,
+    "c": {
+      "deep": 10,
+    },
+  },
+  "value": 50,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 6 1`] = `
+{
+  "id": 6,
+  "name": "item-6",
+  "nested": {
+    "a": 6,
+    "b": 7,
+    "c": {
+      "deep": 12,
+    },
+  },
+  "value": 60,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 7 1`] = `
+{
+  "id": 7,
+  "name": "item-7",
+  "nested": {
+    "a": 7,
+    "b": 8,
+    "c": {
+      "deep": 14,
+    },
+  },
+  "value": 70,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 8 1`] = `
+{
+  "id": 8,
+  "name": "item-8",
+  "nested": {
+    "a": 8,
+    "b": 9,
+    "c": {
+      "deep": 16,
+    },
+  },
+  "value": 80,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 9 1`] = `
+{
+  "id": 9,
+  "name": "item-9",
+  "nested": {
+    "a": 9,
+    "b": 10,
+    "c": {
+      "deep": 18,
+    },
+  },
+  "value": 90,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 10 1`] = `
+{
+  "id": 10,
+  "name": "item-10",
+  "nested": {
+    "a": 10,
+    "b": 11,
+    "c": {
+      "deep": 20,
+    },
+  },
+  "value": 100,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 11 1`] = `
+{
+  "id": 11,
+  "name": "item-11",
+  "nested": {
+    "a": 11,
+    "b": 12,
+    "c": {
+      "deep": 22,
+    },
+  },
+  "value": 110,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 12 1`] = `
+{
+  "id": 12,
+  "name": "item-12",
+  "nested": {
+    "a": 12,
+    "b": 13,
+    "c": {
+      "deep": 24,
+    },
+  },
+  "value": 120,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 13 1`] = `
+{
+  "id": 13,
+  "name": "item-13",
+  "nested": {
+    "a": 13,
+    "b": 14,
+    "c": {
+      "deep": 26,
+    },
+  },
+  "value": 130,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 14 1`] = `
+{
+  "id": 14,
+  "name": "item-14",
+  "nested": {
+    "a": 14,
+    "b": 15,
+    "c": {
+      "deep": 28,
+    },
+  },
+  "value": 140,
+}
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 0 1`] = `
+"Line 1: 0
+Line 2: 0
+Line 3: 0"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 1 1`] = `
+"Line 1: 1
+Line 2: 2
+Line 3: 3"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 2 1`] = `
+"Line 1: 2
+Line 2: 4
+Line 3: 6"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 3 1`] = `
+"Line 1: 3
+Line 2: 6
+Line 3: 9"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 4 1`] = `
+"Line 1: 4
+Line 2: 8
+Line 3: 12"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 5 1`] = `
+"Line 1: 5
+Line 2: 10
+Line 3: 15"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 6 1`] = `
+"Line 1: 6
+Line 2: 12
+Line 3: 18"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 7 1`] = `
+"Line 1: 7
+Line 2: 14
+Line 3: 21"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 8 1`] = `
+"Line 1: 8
+Line 2: 16
+Line 3: 24"
+`;
+
+exports[`Snapshot Tests String Snapshots string snapshot 9 1`] = `
+"Line 1: 9
+Line 2: 18
+Line 3: 27"
+`;

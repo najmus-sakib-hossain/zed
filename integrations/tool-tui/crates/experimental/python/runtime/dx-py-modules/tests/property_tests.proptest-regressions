@@ -1,0 +1,11 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 12ce3b3920bba6502aab2a4f55245b8b6fe0571d3797b9ee2bdbace992235a76 # shrinks to is_package = false, num_imports = 0, num_exports = 1
+cc 08ef0fd8f63e84cff76a4ece3c08fc068903161c668c4b5588ff560e44acb088 # shrinks to module_name = "a", export_names = ["a"], is_package = false
+cc 28b9af7ff66f82202ee5f1bdb48a96b6f0662f8353cd4d8c168c7099f2396c64 # shrinks to symbols = ["p", "p"], queries = ["A"]
+cc 32488996aa17292add2a9b629740da810d9fadd197c016053454cb9ef5ce2f97 # shrinks to symbols = ["c_25", "a", "a", "p_4s6_", "k", "l__616", "a", "vct431b96__w4", "t____p67__h_i", "g3vi__", "kq0_91", "mti2gcrk5_", "w"]
+cc 7144085e1314d99be9e4ff222a8fea353794866a12ba39b0fdcf8cd72e313752 # shrinks to symbols = ["o4_0__5ll4w", "uo_umer", "a__x3o9_hf293lh_7vi_3", "f", "cw_3__l0k3jmc2_q", "o0223qkc1r7g8ddc_", "ohz2__", "w_e_9_dr5__f4b7b_03", "k57i_nny9jdx9fy_1pw", "s0_45w421d0tg4_khh49", "j", "x19_i5a6bo4", "z", "tcat6_8b__p_08ji173", "a3__0tl_4__j9r0_0v", "l0fqv_9m77e8__sks__x", "rx54q_b", "k_2__z6m__hi_6276g_", "o_0_xzqsgy_"]

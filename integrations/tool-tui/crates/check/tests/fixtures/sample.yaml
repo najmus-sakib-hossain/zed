@@ -1,0 +1,8 @@
+name: sample
+version: 1.0.0
+dependencies:
+  - react
+  - vue
+config:
+  enabled: true
+  timeout: 30

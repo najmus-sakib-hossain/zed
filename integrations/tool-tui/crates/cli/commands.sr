@@ -1,0 +1,13 @@
+[[command]]
+name                         = tree
+description                  = Display directory tree
+category                     = Utility
+capabilities                 = fs:read
+version                      = 1.0.0
+example                      = dx tree .
+
+[[argument]]
+name                         = path
+positional                   = true
+position                     = 1
+description                  = Directory path

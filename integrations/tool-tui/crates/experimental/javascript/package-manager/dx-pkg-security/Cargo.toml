@@ -1,0 +1,13 @@
+[package]
+name = "dx-pkg-security"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+anyhow = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+sha2 = "0.10"
+
+[dev-dependencies]
+proptest = "1.4"

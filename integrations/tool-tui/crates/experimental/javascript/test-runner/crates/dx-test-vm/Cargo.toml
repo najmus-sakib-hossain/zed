@@ -1,0 +1,9 @@
+[package]
+name = "dx-test-vm"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+dx-test-core = { path = "../dx-test-core" }

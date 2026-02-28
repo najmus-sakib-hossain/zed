@@ -1,0 +1,310 @@
+{
+  "publisher": "octohash",
+  "name": "powermode-plus",
+  "displayName": "Power Mode Plus",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.20.0",
+  "description": "Your code is powerful, unleash it!",
+  "author": "jinghaihan",
+  "license": "MIT",
+  "homepage": "https://github.com/jinghaihan/vscode-power-mode#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jinghaihan/vscode-power-mode.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jinghaihan/vscode-power-mode/issues"
+  },
+  "keywords": [
+    "power mode",
+    "combo",
+    "shake",
+    "animation",
+    "explosion"
+  ],
+  "categories": [
+    "Themes",
+    "Other"
+  ],
+  "main": "./dist/index.js",
+  "icon": "res/icon.png",
+  "files": [
+    "LICENSE.md",
+    "assets/*",
+    "dist/*",
+    "res/*"
+  ],
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "powermode.enablePowerMode",
+        "title": "Enable Power Mode",
+        "when": "!config.powermode.enabled",
+        "enablement": "!config.powermode.enabled"
+      },
+      {
+        "command": "powermode.disablePowerMode",
+        "title": "Disable Power Mode",
+        "when": "config.powermode.enabled",
+        "enablement": "config.powermode.enabled"
+      }
+    ],
+    "configuration": [
+      {
+        "title": "General",
+        "order": 0,
+        "properties": {
+          "powermode.enabled": {
+            "order": 0,
+            "default": false,
+            "type": "boolean",
+            "description": "Enable to activate POWER MODE!!!"
+          },
+          "powermode.presets": {
+            "order": 1,
+            "type": "string",
+            "enum": [
+              "particles",
+              "fireworks",
+              "flames",
+              "magic",
+              "simple-rift",
+              "exploding-rift"
+            ],
+            "default": "fireworks",
+            "description": "Choose between different preset gifs to use when powermode is activated"
+          }
+        }
+      },
+      {
+        "title": "Combo",
+        "order": 1,
+        "properties": {
+          "powermode.combo.location": {
+            "order": 0,
+            "type": "string",
+            "default": "default",
+            "enum": [
+              "editor",
+              "statusbar",
+              "default",
+              "off"
+            ],
+            "enumDescriptions": [
+              "Show the combo in the editor. The true 'Power Mode' experience",
+              "Use the status bar. A more subdued experience.",
+              "Use the default value. May be override by other settings.",
+              "Turn off the combo entirely."
+            ],
+            "description": "Control where all the combo information is visible."
+          },
+          "powermode.combo.threshold": {
+            "default": 0,
+            "type": "number",
+            "description": "The combo number needed to activate POWER MODE!!! and start shaking and exploding the screen! If the value is 0, POWER MODE will always be active."
+          },
+          "powermode.combo.timeout": {
+            "default": 10,
+            "type": "number",
+            "description": "The number of seconds before the combo resets. If the value is 0, the timer will never reset."
+          },
+          "powermode.combo.counterEnabled": {
+            "type": "string",
+            "default": "default",
+            "enum": [
+              "show",
+              "hide",
+              "default"
+            ],
+            "enumDescriptions": [
+              "Show the combo counter",
+              "Hide the combo counter",
+              "Use the default value. May be overridden by other settings."
+            ],
+            "description": "Control whether the combo counter is visible."
+          },
+          "powermode.combo.counterSize": {
+            "type": "number",
+            "default": 3,
+            "minimum": 0,
+            "description": "Control the size of the Combo Meter text"
+          },
+          "powermode.combo.timerEnabled": {
+            "type": "string",
+            "default": "default",
+            "enum": [
+              "show",
+              "hide",
+              "default"
+            ],
+            "enumDescriptions": [
+              "Show the combo timer",
+              "Hide the combo timer",
+              "Use the default value. May be overridden by other settings."
+            ],
+            "description": "Control whether the combo timer is visible."
+          },
+          "powermode.combo.customCss": {
+            "description": "Set custom CSS that will apply to the combo element.",
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      {
+        "title": "Shake",
+        "order": 2,
+        "properties": {
+          "powermode.shake.enabled": {
+            "order": 0,
+            "type": "boolean",
+            "default": true,
+            "description": "Set to false to disable shaking while typing"
+          },
+          "powermode.shake.intensity": {
+            "type": "number",
+            "default": 3,
+            "description": "The intensity with which the screen shakes"
+          }
+        }
+      },
+      {
+        "title": "Explosions",
+        "order": 3,
+        "properties": {
+          "powermode.explosions.enabled": {
+            "order": 0,
+            "type": "boolean",
+            "default": true,
+            "description": "Set to false to disable explosions while typing"
+          },
+          "powermode.explosions.maxExplosions": {
+            "type": "number",
+            "default": 1,
+            "description": "The maximum number of simultaneous explosions"
+          },
+          "powermode.explosions.size": {
+            "type": "number",
+            "default": 6,
+            "description": "The size of the explosions. For value X, the height is set to X rem and the width to X ch"
+          },
+          "powermode.explosions.frequency": {
+            "type": "number",
+            "default": 2,
+            "description": "The number of key strokes needed to trigger an explosion. 2 means every second keystroke will explode, 1 means every key stroke."
+          },
+          "powermode.explosions.offset": {
+            "type": "number",
+            "default": 0.35,
+            "description": "The vertical offset of the explosions. Increasing it will move the explosions up, decreasing it will move them down."
+          },
+          "powermode.explosions.customExplosions": {
+            "order": 16,
+            "type": "array",
+            "items": "string",
+            "default": [],
+            "markdownDescription": "This value will go into the 'url()' part of a background image. It should be a base64 encoded gif or **https** URL _without_ quotes."
+          },
+          "powermode.explosions.backgroundMode": {
+            "type": "string",
+            "default": "mask",
+            "enum": [
+              "mask",
+              "image"
+            ],
+            "enumDescriptions": [
+              "Uses the gifs as a mask to let the background color come through (similar to atom power mode)",
+              "Display the actual gif."
+            ],
+            "description": "Affects the css properties used to display the gif."
+          },
+          "powermode.explosions.gifMode": {
+            "type": "string",
+            "default": "continue",
+            "enum": [
+              "continue",
+              "restart"
+            ],
+            "enumDescriptions": [
+              "Resume playing it from its previous point",
+              "Restart the gif each time it is shown. This is useful when you have multiple visible gifs, but may reduce performance"
+            ],
+            "description": "Control the 'playback' mode of the gifs."
+          },
+          "powermode.explosions.explosionOrder": {
+            "description": "Determines how the explosions are cycled. 'random' (default) picks from the list randomly. 'sequential' goes through the list in order, and a number will select the explosion at that (zero based)index in the list",
+            "oneOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "random",
+                  "sequential"
+                ]
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "default": "random"
+          },
+          "powermode.explosions.duration": {
+            "description": "Determines how long an explosion lasts (in milliseconds). Set to 0 for it to last forever.",
+            "type": "number",
+            "default": 1000
+          },
+          "powermode.explosions.customCss": {
+            "description": "Set custom CSS that will apply to the explosion element.",
+            "type": "object",
+            "default": {}
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "dev": "pnpm build --watch --sourcemap",
+    "build": "tsdown",
+    "package": "vsce package --no-dependencies",
+    "deps": "taze major -I",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "release": "bumpp",
+    "generate": "vscode-ext-gen --output src/generated/meta.ts  --scope powermode",
+    "prepare": "simple-git-hooks && pnpm generate",
+    "bootstrap": "pnpm install",
+    "prepublishOnly": "pnpm build",
+    "vscode:prepublish": "pnpm build"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "catalog:lint",
+    "@types/node": "catalog:types",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "catalog:cli",
+    "bumpp": "catalog:cli",
+    "eslint": "catalog:lint",
+    "lint-staged": "catalog:lint",
+    "pncat": "catalog:cli",
+    "reactive-vscode": "catalog:vscode",
+    "simple-git-hooks": "catalog:lint",
+    "taze": "catalog:cli",
+    "tsdown": "catalog:build",
+    "typescript": "catalog:tsc",
+    "vitest": "catalog:test",
+    "vscode-ext-gen": "catalog:vscode",
+    "vsxpub": "catalog:cli"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*": "eslint --fix"
+  }
+}

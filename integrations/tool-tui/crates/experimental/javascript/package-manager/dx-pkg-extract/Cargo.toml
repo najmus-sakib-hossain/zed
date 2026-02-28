@@ -1,0 +1,25 @@
+[package]
+name = "dx-pkg-extract"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+# Tarball extraction
+flate2 = "1.0"
+tar = "0.4"
+
+# SIMD-accelerated decompression
+libdeflater = "1.0"
+
+# Parallel extraction
+rayon = "1.8"
+walkdir = "2"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0"
+
+[dev-dependencies]
+tempfile = "3"

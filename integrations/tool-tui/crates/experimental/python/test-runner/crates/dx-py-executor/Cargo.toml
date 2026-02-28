@@ -1,0 +1,16 @@
+[package]
+name = "dx-py-executor"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+dx-py-core = { path = "../dx-py-core" }
+dx-py-daemon = { path = "../dx-py-daemon" }
+crossbeam = { workspace = true }
+rayon = { workspace = true }
+thiserror = { workspace = true }
+num_cpus = "1.16"
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = "3.24"

@@ -1,0 +1,323 @@
+[workspace]
+resolver = "2"
+default-members = ["crates/cli-onboard"]
+members = [
+    # =========================================================================
+    # DX CLI (main entry point)
+    # =========================================================================
+    "crates/cli",
+    "crates/cli-onboard",  # Minimal onboarding test binary
+    "crates/style",
+    "crates/style/playground",
+    "crates/forge",
+    "crates/media",
+    "crates/media/icon",
+    "crates/media/font",
+    "crates/workspace",
+    "crates/driven",
+    "crates/i18n",
+    "crates/serializer",
+    "crates/markdown",
+
+    # =========================================================================
+    # EXPERIMENTAL (in experimental/ folder) - COMMENTED OUT
+    # =========================================================================
+    # "crates/experimental/generator",
+    # "crates/experimental/security",
+    # "crates/experimental/www/debug",
+    # "crates/experimental/www/error",
+
+    # =========================================================================
+    # DX AGENT (AI Gateway System)
+    # =========================================================================
+    "crates/agent/protocol",
+    "crates/agent/gateway",
+    "crates/agent/daemon",
+    "crates/agent/channels",
+    "crates/agent/sessions",
+    "crates/agent/browser",
+    "crates/agent/tools",
+    "crates/agent/runtime",
+    "crates/agent/media",
+    "crates/agent/sandbox",
+    "crates/agent/voice",
+    "crates/agent/hooks",
+    "crates/agent/workers",
+    "crates/agent/tests",
+
+    # =========================================================================
+    # DX TOOLS (no dx- prefix)
+    # =========================================================================
+    "crates/check",
+
+    # =========================================================================
+    # DX STACK - JavaScript/TypeScript (in javascript/ folder)
+    # =========================================================================
+    # "crates/javascript/runtime",  # Has own workspace, excluded
+
+    # =========================================================================
+    # DX WWW - Web Framework (in experimental/www/ folder) - COMMENTED OUT
+    # =========================================================================
+    # # Build Pipeline
+    # "crates/experimental/www/build",
+
+    # # Core Runtime
+    # "crates/experimental/www/framework-core",
+    # "crates/experimental/www/dom",
+    # "crates/experimental/www/morph",
+    # "crates/experimental/www/sched",
+
+    # # Binary Protocol
+    # "crates/experimental/www/binary",
+    # "crates/experimental/www/packet",
+
+    # # Client Runtimes (WASM)
+    # "crates/experimental/www/client",
+    # "crates/experimental/www/client-tiny",
+
+    # # Server & Cache
+    # "crates/experimental/www/server",
+    # "crates/experimental/www/cache",
+
+    # # Data Layer
+    # "crates/experimental/www/form",
+    # "crates/experimental/www/query",
+    # "crates/experimental/www/db",
+
+    # # Logic Layer
+    # "crates/experimental/www/state",
+    # "crates/experimental/www/auth",
+
+    # # Resilience Layer
+    # "crates/experimental/www/sync",
+    # "crates/experimental/www/offline",
+    # "crates/experimental/www/guard",
+    # "crates/experimental/www/interaction",
+
+    # # Polish Layer
+    # "crates/experimental/www/fallback",
+    # "crates/experimental/www/a11y",
+    # "crates/experimental/www/print",
+    # "crates/experimental/www/rtl",
+
+    # # Compiler (transpiler-to-binary pipeline)
+    # "crates/experimental/www/core",
+
+    # # Binary Dawn - Cross-platform I/O reactor
+    # "crates/experimental/www/reactor",
+    # "crates/experimental/www/db-teleport",
+]
+
+# Exclude nested workspaces (they manage their own internal crates)
+exclude = [
+    "crates/javascript/bundler",         # Has 10 internal crates
+    "crates/javascript/test-runner",     # Has own workspace
+    "crates/javascript/package-manager", # Has 12 internal crates
+    "crates/javascript/compatibility",   # Has 12 internal sub-crates
+    "crates/javascript/runtime",         # Has own workspace
+    "crates/dcp",                        # Has own workspace
+    "crates/cli/src/commands/tree",      # Vendored tokei
+    "playground",                        # Experiments
+    "benchmarks",                        # Performance tests
+    "apps/desktop",                      # Standalone desktop app
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["dx-www Runtime Team <team@dx-www.dev>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/dx-www/dx-www-runtime"
+homepage = "https://dx-www.dev"
+documentation = "https://docs.dx-www.dev"
+
+[workspace.metadata]
+default-run = "dx"
+
+# ============================================================================
+# WORKSPACE LINTS - Safety and Quality
+# ============================================================================
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+
+[workspace.lints.clippy]
+# Safety lints - require documentation for unsafe blocks
+undocumented_unsafe_blocks = "warn"
+
+# Panic prevention - discourage unwrap/expect in production code
+# Note: Tests can use #[allow(clippy::unwrap_used)] as needed
+unwrap_used = "warn"
+expect_used = "warn"
+
+# Correctness and performance
+correctness = { level = "deny", priority = -1 }
+perf = { level = "warn", priority = -1 }
+
+[workspace.dependencies]
+# WASM Interop - Latest Stable
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = [
+    "Window",
+    "Document",
+    "Node",
+    "Element",
+    "HtmlElement",
+    "HtmlTemplateElement",
+    "DocumentFragment",
+    "Text",
+    "Comment",
+    "Performance",
+    "console",
+] }
+
+# Zero-Copy Serialization
+bincode = "2.0.0-rc.3"
+bytemuck = { version = "1.21", features = ["derive"] }
+
+# Memory Management
+bumpalo = "3.16"
+once_cell = "1.20"
+
+# Error Handling
+console_error_panic_hook = "0.1"
+
+# Ecosystem crate dependencies (latest versions)
+regex-automata = "0.4"
+bitflags = "2.6"
+reqwest = { version = "0.12", default-features = false }
+gloo-net = "0.6"
+dashmap = "6.1"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+sqlx = { version = "0.8", features = [
+    "postgres",
+    "runtime-tokio-rustls",
+], default-features = false }
+tokio-postgres = "0.7"
+deadpool-postgres = "0.14"
+zerocopy = { version = "0.8", features = ["derive"] }
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+argon2 = "0.5"
+webauthn-rs = "0.5"
+indexed_db_futures = "0.5"
+lz4_flex = "0.11"
+tokio-tungstenite = "0.24"
+flume = "0.11"
+yrs = "0.21"
+maud = "0.26"
+
+# OXC Parser ecosystem (for JS/TS parsing)
+oxc_parser = "0.52"
+oxc_allocator = "0.52"
+oxc_ast = "0.52"
+oxc_span = "0.52"
+oxc_diagnostics = "0.52"
+oxc_syntax = "0.52"
+
+miette = "7.4"
+lightningcss = "1.0.0-alpha.71"
+unic-langid = "0.9"
+base64 = "0.22"
+atomic = "0.6"
+parking_lot = "0.12"
+bytes = "1.9"
+chrono = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+anyhow = "1.0"
+blake3 = "1.5"
+memmap2 = "0.9"
+proptest = "1.4"
+criterion = { version = "0.5", features = ["html_reports"] }
+tokio = { version = "1.42", features = ["full"] }
+
+# Internal Workspace Crates
+# =========================================================================
+# DX TOOLS
+# =========================================================================
+dx-style = { path = "crates/style" }
+dx-forge = { path = "crates/forge" }
+dx-media = { path = "crates/media" }
+dx-icon = { path = "crates/media/icon" }
+dx-font = { path = "crates/media/font" }
+dx-workspace = { path = "crates/workspace" }
+dx-driven = { path = "crates/driven" }
+dx-i18n = { path = "crates/i18n" }
+dx-serializer = { path = "crates/serializer" }
+markdown = { path = "crates/markdown" }
+
+# Experimental - COMMENTED OUT
+# dx-generator = { path = "crates/experimental/generator" }
+# dx-security = { path = "crates/experimental/security" }
+# dx-www-debug = { path = "crates/experimental/www/debug" }
+# dx-www-error = { path = "crates/experimental/www/error" }
+dx-check = { path = "crates/check" }
+
+# =========================================================================
+# DX AGENT (AI Gateway)
+# =========================================================================
+dx-agent-protocol = { path = "crates/agent/protocol" }
+dx-agent-gateway = { path = "crates/agent/gateway" }
+dx-agent-daemon = { path = "crates/agent/daemon" }
+dx-agent-channels = { path = "crates/agent/channels" }
+dx-agent-sessions = { path = "crates/agent/sessions" }
+dx-agent-browser = { path = "crates/agent/browser" }
+dx-agent-tools = { path = "crates/agent/tools" }
+dx-agent-runtime = { path = "crates/agent/runtime" }
+dx-agent-media = { path = "crates/agent/media" }
+dx-agent-sandbox = { path = "crates/agent/sandbox" }
+dx-agent-voice = { path = "crates/agent/voice" }
+dx-agent-hooks = { path = "crates/agent/hooks" }
+dx-agent-workers = { path = "crates/agent/workers" }
+
+# =========================================================================
+# DX WWW (Experimental) - COMMENTED OUT
+# =========================================================================
+# dx-www-core = { path = "crates/experimental/www/framework-core" }
+# dx-www-dom = { path = "crates/experimental/www/dom" }
+# dx-www-morph = { path = "crates/experimental/www/morph" }
+# dx-www-sched = { path = "crates/experimental/www/sched" }
+# dx-www-compiler = { path = "crates/experimental/www/core" }
+# dx-www-binary = { path = "crates/experimental/www/binary" }
+# dx-www-packet = { path = "crates/experimental/www/packet" }
+# dx-www-client = { path = "crates/experimental/www/client" }
+# dx-www-client-tiny = { path = "crates/experimental/www/client-tiny" }
+# dx-www-server = { path = "crates/experimental/www/server" }
+# dx-www-cache = { path = "crates/experimental/www/cache" }
+# dx-www-form = { path = "crates/experimental/www/form" }
+# dx-www-query = { path = "crates/experimental/www/query" }
+# dx-www-db = { path = "crates/experimental/www/db" }
+# dx-www-state = { path = "crates/experimental/www/state" }
+# dx-www-auth = { path = "crates/experimental/www/auth" }
+# dx-www-sync = { path = "crates/experimental/www/sync" }
+# dx-www-offline = { path = "crates/experimental/www/offline" }
+# dx-www-guard = { path = "crates/experimental/www/guard" }
+# dx-www-interaction = { path = "crates/experimental/www/interaction" }
+# dx-www-fallback = { path = "crates/experimental/www/fallback" }
+# dx-www-a11y = { path = "crates/experimental/www/a11y" }
+# dx-www-print = { path = "crates/experimental/www/print" }
+# dx-www-rtl = { path = "crates/experimental/www/rtl" }
+
+# # Binary Dawn
+# dx-www-reactor = { path = "crates/experimental/www/reactor" }
+# dx-www-db-teleport = { path = "crates/experimental/www/db-teleport" }
+
+
+# ============================================================================
+# AGGRESSIVE SIZE OPTIMIZATION (9KB TARGET)
+# ============================================================================
+
+[profile.dev]
+panic = "unwind" # Use unwind for dev to allow tests to run properly
+
+[profile.bench]
+inherits = "release"
+# Note: panic setting removed as it's ignored for bench profile
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

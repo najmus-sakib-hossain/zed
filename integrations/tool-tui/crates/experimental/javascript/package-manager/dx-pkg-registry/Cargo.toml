@@ -1,0 +1,15 @@
+[package]
+name = "dx-pkg-registry"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+tokio = { version = "1.35", features = ["full"] }
+bytemuck = { version = "1.14", features = ["derive"] }
+thiserror = "2.0"
+
+[dev-dependencies]
+tokio-test = "0.4"

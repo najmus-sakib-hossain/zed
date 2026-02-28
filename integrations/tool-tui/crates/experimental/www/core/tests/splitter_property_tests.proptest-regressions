@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 76d562e622c55a13b1b0a1f093cfa430af16df95e61cdb39fa02d1323c1b22e2 # shrinks to jsx_body = "<ul>{state.items.map((item) => <li key={item.id}>{item.name}</li>)}</ul>"

@@ -1,0 +1,391 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot Tests Array Snapshots array snapshot 0 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 1 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 1,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 2 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 2,
+  },
+  {
+    "index": 2,
+    "value": 4,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 3 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 3,
+  },
+  {
+    "index": 2,
+    "value": 6,
+  },
+  {
+    "index": 3,
+    "value": 9,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 4 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 4,
+  },
+  {
+    "index": 2,
+    "value": 8,
+  },
+  {
+    "index": 3,
+    "value": 12,
+  },
+  {
+    "index": 4,
+    "value": 16,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 5 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 5,
+  },
+  {
+    "index": 2,
+    "value": 10,
+  },
+  {
+    "index": 3,
+    "value": 15,
+  },
+  {
+    "index": 4,
+    "value": 20,
+  },
+  {
+    "index": 5,
+    "value": 25,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 6 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 6,
+  },
+  {
+    "index": 2,
+    "value": 12,
+  },
+  {
+    "index": 3,
+    "value": 18,
+  },
+  {
+    "index": 4,
+    "value": 24,
+  },
+  {
+    "index": 5,
+    "value": 30,
+  },
+  {
+    "index": 6,
+    "value": 36,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 7 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 7,
+  },
+  {
+    "index": 2,
+    "value": 14,
+  },
+  {
+    "index": 3,
+    "value": 21,
+  },
+  {
+    "index": 4,
+    "value": 28,
+  },
+  {
+    "index": 5,
+    "value": 35,
+  },
+  {
+    "index": 6,
+    "value": 42,
+  },
+  {
+    "index": 7,
+    "value": 49,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 8 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 8,
+  },
+  {
+    "index": 2,
+    "value": 16,
+  },
+  {
+    "index": 3,
+    "value": 24,
+  },
+  {
+    "index": 4,
+    "value": 32,
+  },
+  {
+    "index": 5,
+    "value": 40,
+  },
+  {
+    "index": 6,
+    "value": 48,
+  },
+  {
+    "index": 7,
+    "value": 56,
+  },
+  {
+    "index": 8,
+    "value": 64,
+  },
+]
+`;
+
+exports[`Snapshot Tests Array Snapshots array snapshot 9 1`] = `
+[
+  {
+    "index": 0,
+    "value": 0,
+  },
+  {
+    "index": 1,
+    "value": 9,
+  },
+  {
+    "index": 2,
+    "value": 18,
+  },
+  {
+    "index": 3,
+    "value": 27,
+  },
+  {
+    "index": 4,
+    "value": 36,
+  },
+  {
+    "index": 5,
+    "value": 45,
+  },
+  {
+    "index": 6,
+    "value": 54,
+  },
+  {
+    "index": 7,
+    "value": 63,
+  },
+  {
+    "index": 8,
+    "value": 72,
+  },
+  {
+    "index": 9,
+    "value": 81,
+  },
+]
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 0 1`] = `
+{
+  "id": 0,
+  "name": "item-0",
+  "nested": {
+    "a": 0,
+    "b": 1,
+  },
+  "value": 0,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 1 1`] = `
+{
+  "id": 1,
+  "name": "item-1",
+  "nested": {
+    "a": 1,
+    "b": 2,
+  },
+  "value": 10,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 2 1`] = `
+{
+  "id": 2,
+  "name": "item-2",
+  "nested": {
+    "a": 2,
+    "b": 3,
+  },
+  "value": 20,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 3 1`] = `
+{
+  "id": 3,
+  "name": "item-3",
+  "nested": {
+    "a": 3,
+    "b": 4,
+  },
+  "value": 30,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 4 1`] = `
+{
+  "id": 4,
+  "name": "item-4",
+  "nested": {
+    "a": 4,
+    "b": 5,
+  },
+  "value": 40,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 5 1`] = `
+{
+  "id": 5,
+  "name": "item-5",
+  "nested": {
+    "a": 5,
+    "b": 6,
+  },
+  "value": 50,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 6 1`] = `
+{
+  "id": 6,
+  "name": "item-6",
+  "nested": {
+    "a": 6,
+    "b": 7,
+  },
+  "value": 60,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 7 1`] = `
+{
+  "id": 7,
+  "name": "item-7",
+  "nested": {
+    "a": 7,
+    "b": 8,
+  },
+  "value": 70,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 8 1`] = `
+{
+  "id": 8,
+  "name": "item-8",
+  "nested": {
+    "a": 8,
+    "b": 9,
+  },
+  "value": 80,
+}
+`;
+
+exports[`Snapshot Tests Object Snapshots object snapshot 9 1`] = `
+{
+  "id": 9,
+  "name": "item-9",
+  "nested": {
+    "a": 9,
+    "b": 10,
+  },
+  "value": 90,
+}
+`;

@@ -1,0 +1,25 @@
+{
+  "name": "@midday/import",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test --exit src"
+  },
+  "dependencies": {
+    "change-case": "catalog:",
+    "chrono-node": "^2.9.0",
+    "date-fns": "catalog:",
+    "uuid": "catalog:"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./mappings": "./src/mappings.ts",
+    "./transform": "./src/transform.ts",
+    "./validate": "./src/validate.ts"
+  }
+}

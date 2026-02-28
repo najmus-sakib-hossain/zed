@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 2edb84d6fe23c1488a4f355cfb52c1116f7feb8ff4d423b1a3b770d89aaa6aa1 # shrinks to num_modules = 2
+cc 6d4441be87da3a67b34d23be7145110ed44a2590178ad06b9d3a835da910f0bb # shrinks to esm_path = "\\/a.mjs", cjs_path = "0/a.cjs"
+cc f04ab9e7285108b1e8cf95ae185679d7ac0d666dcc71aece9630787d0874ded6 # shrinks to entry_path = "\u{b}/a.js"

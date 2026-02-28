@@ -1,0 +1,55 @@
+name                         = dx
+version                      = 1.0.0
+description                  = Dx theme
+
+[dark]
+background                   = 0,0,0
+foreground                   = 255,255,255
+card                         = 9,9,9
+card_foreground              = 255,255,255
+popover                      = 18,18,18
+popover_foreground           = 255,255,255
+primary                      = 0,201,80
+primary_foreground           = 255,255,255
+secondary                    = 34,34,34
+secondary_foreground         = 255,255,255
+muted                        = 29,29,29
+muted_foreground             = 164,164,164
+accent                       = 0,201,80
+accent_foreground            = 255,255,255
+destructive                  = 255,91,91
+destructive_foreground       = 0,0,0
+border                       = 36,36,36
+input                        = 51,51,51
+ring                         = 164,164,164
+
+[dark_modes]
+agent                        = 0,201,80
+plan                         = 255,174,4
+ask                          = 38,113,244
+
+[light]
+background                   = 252,252,252
+foreground                   = 0,0,0
+card                         = 255,255,255
+card_foreground              = 0,0,0
+popover                      = 252,252,252
+popover_foreground           = 0,0,0
+primary                      = 0,0,0
+primary_foreground           = 255,255,255
+secondary                    = 235,235,235
+secondary_foreground         = 0,0,0
+muted                        = 245,245,245
+muted_foreground             = 82,82,82
+accent                       = 235,235,235
+accent_foreground            = 0,0,0
+destructive                  = 229,75,79
+destructive_foreground       = 255,255,255
+border                       = 228,228,228
+input                        = 235,235,235
+ring                         = 0,0,0
+
+[light_modes]
+agent                        = 0,160,60
+plan                         = 200,130,0
+ask                          = 30,90,200

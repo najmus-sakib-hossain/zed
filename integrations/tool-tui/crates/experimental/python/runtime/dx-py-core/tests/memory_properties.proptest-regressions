@@ -1,0 +1,21 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc a7f4e65a75c1a0e4d7e11d144b423c0dfc83c82c6ff3ad845222afbca5b348db # shrinks to obj_type = 3
+cc 67522f903bae63a2ac678de101e3b18630446535ef3741871b53c292b3e51b79 # shrinks to has_del = true, ref_ops = 10
+cc df50bb0023fb93c1bae7d5fd98cc9c6b6bfc9744b0a999f01d2d62f9a579b6aa # shrinks to ref_count = 6
+cc 127601f715f5cc94726c1023662e3503259511eed205c4e7e104a935b11e5678 # shrinks to obj_type = 2
+cc 73fb8457da0791a601e25cdafbe7ec35b07b2f657c054a0008289be447b05685 # shrinks to obj_type = 2
+cc 04e4e4e402fcc6f195ef99f3c2b31ca0da0f34c92ee96aa1ffe48941939b4fb8 # shrinks to obj_type = 1
+cc 368f8cc6b27adf462a3227b2da4f647b50d4280f7d8e2898e4e44556874ac916 # shrinks to obj_type = 2
+cc 028096a95eda82670c5cc1bc5060f708558985f964975123062f402ccf868996 # shrinks to obj_type = 1
+cc 7724a64c1b2582fdadd516a970c3e40c4c9f4e94f7e197e3131cf583cc88b772 # shrinks to obj_type = 2
+cc 3541fafc3d7ef79d3395737d8e6d007403e0c99aa11eb60fce6842c062bdf8ea # shrinks to obj_type = 1
+cc a24e9ae16e629fb2b46e8db269d14a5f1d0c81d95e029886e20f85570e29c527 # shrinks to obj_type = 3
+cc 183f7dbdeb5dc686276eed33f0011c9a9738d26883061d3f39f98500411b81c2 # shrinks to obj_type = 3
+cc bece2f260e8eb891785e914fa311ddb2b4ea1bd4d39138495397c43898f37c48 # shrinks to obj_type = 1
+cc 4ff01a4bb3711cb6b3e8020add01d563bbee00f1f6f8c0c2d67852e65880ceee # shrinks to ref_count = 4
+cc 81d2d458e9442b1e1b98ea5d8d5032f069d6948fcc8af7df579bf35773aeddcb # shrinks to obj_type = 1

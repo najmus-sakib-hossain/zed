@@ -1,0 +1,10 @@
+[package]
+name = "cot-compress"
+version.workspace = true
+edition.workspace = true
+description = "Chain-of-thought compression — 30-60% savings on reasoning tokens"
+
+[dependencies]
+dx-core = { workspace = true }
+regex-lite = { workspace = true }
+async-trait = { workspace = true }

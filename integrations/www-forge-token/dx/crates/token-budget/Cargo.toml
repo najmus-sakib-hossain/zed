@@ -1,0 +1,12 @@
+[package]
+name = "token-budget"
+version.workspace = true
+edition.workspace = true
+description = "Global token budget enforcer — prevents context overflow"
+
+[dependencies]
+dx-core = { workspace = true }
+async-trait = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

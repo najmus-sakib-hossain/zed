@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTTP Server — almostnode agent runtime</title>
+    <link rel="stylesheet" href="./shared-styles.css" />
+    <style>
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 200px;
+        gap: 1px;
+        background: var(--border);
+        height: calc(100vh - 44px);
+      }
+      .terminal-panel { grid-column: 1 / -1; }
+      @media (max-width: 768px) {
+        .layout {
+          grid-template-columns: 1fr;
+          grid-template-rows: 1fr 300px 200px;
+        }
+        .terminal-panel { grid-column: 1; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-topbar">
+      <a href="../index.html" class="back">← demos</a>
+      <span class="sep">/</span>
+      <a href="../index.html" class="logo">almostnode</a>
+      <span class="sep">/</span>
+      <span class="title">HTTP Server</span>
+      <span class="tag">http · require()</span>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">server.js</span>
+          <button id="runBtn" class="btn btn-primary">Run Server</button>
+        </div>
+        <textarea id="editor">const http = require('http');
+
+const server = http.createServer((req, res) => {
+  console.log(`${req.method} ${req.url}`);
+
+  if (req.url === '/') {
+    res.setHeader('Content-Type', 'text/html');
+    res.end(`
+      &lt;!DOCTYPE html&gt;
+      &lt;html&gt;
+        &lt;head&gt;
+          &lt;style&gt;
+            body {
+              font-family: system-ui, sans-serif;
+              padding: 2rem;
+              background: #0c0c0c;
+              min-height: 100vh;
+              margin: 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #c0c0c0;
+            }
+            .card {
+              border: 1px solid #2a2a2a;
+              padding: 2rem;
+              max-width: 480px;
+            }
+            h1 { color: #00ff88; margin-top: 0; }
+            a { color: #00ff88; }
+          &lt;/style&gt;
+        &lt;/head&gt;
+        &lt;body&gt;
+          &lt;div class="card"&gt;
+            &lt;h1&gt;Agent Runtime Active&lt;/h1&gt;
+            &lt;p&gt;This HTTP server is running inside an isolated browser runtime.&lt;/p&gt;
+            &lt;p&gt;Try &lt;a href="/api/time"&gt;/api/time&lt;/a&gt; or &lt;a href="/api/random"&gt;/api/random&lt;/a&gt;&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/body&gt;
+      &lt;/html&gt;
+    `);
+  } else if (req.url === '/api/time') {
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ time: new Date().toISOString() }));
+  } else if (req.url === '/api/random') {
+    res.setHeader('Content-Type', 'application/json');
+    res.end(JSON.stringify({ random: Math.random() }));
+  } else {
+    res.statusCode = 404;
+    res.end('Not Found');
+  }
+});
+
+server.listen(3000, () => {
+  console.log('Server running on port 3000');
+});</textarea>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-label">Preview</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="status-dot" id="statusDot"></div>
+            <span class="panel-label" id="status">Ready</span>
+          </div>
+        </div>
+        <iframe id="preview" class="preview-frame"></iframe>
+      </div>
+
+      <div class="panel terminal-panel">
+        <div class="panel-header">
+          <span class="panel-label">Console</span>
+        </div>
+        <div id="terminal" class="terminal"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/demo.ts"></script>
+  </body>
+</html>

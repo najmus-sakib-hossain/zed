@@ -1,0 +1,95 @@
+[package]
+name = "rlm"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+description = "High-performance Recursive Language Models for processing arbitrarily long contexts"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/yourusername/rlm"
+keywords = ["llm", "ai", "nlp", "recursive", "language-model"]
+categories = ["text-processing", "api-bindings"]
+readme = "README.md"
+
+[dependencies]
+# Scripting engine for safe code execution
+rhai = "1.20"
+
+# HTTP client for LLM API calls
+reqwest = { version = "0.12", features = ["json", "stream"] }
+tokio = { version = "1.42", features = ["full"] }
+tokio-stream = "0.1"
+futures = "0.3"
+
+# JSON handling
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Regex support
+regex = "1.11"
+
+# Fast string search (SIMD)
+memchr = "2.7"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "2.0"
+
+# Environment variables
+dotenvy = "0.15"
+
+# Async traits
+async-trait = "0.1"
+
+[dev-dependencies]
+# For examples and testing
+tokio-test = "0.4"
+
+[[example]]
+name = "benchmark"
+path = "examples/benchmark.rs"
+
+[[example]]
+name = "parallel_benchmark"
+path = "examples/parallel_benchmark.rs"
+
+[[example]]
+name = "fast_search"
+path = "examples/fast_search.rs"
+
+[[example]]
+name = "phase1_demo"
+path = "examples/phase1_demo.rs"
+
+[[example]]
+name = "cache_demo"
+path = "examples/cache_demo.rs"
+
+[[example]]
+name = "streaming_demo"
+path = "examples/streaming_demo.rs"
+
+[[example]]
+name = "phase2_complete"
+path = "examples/phase2_complete.rs"
+
+[[example]]
+name = "multi_model_demo"
+path = "examples/multi_model_demo.rs"
+
+[[example]]
+name = "phase3_complete"
+path = "examples/phase3_complete.rs"
+
+[[example]]
+name = "ultimate_demo"
+path = "examples/ultimate_demo.rs"
+
+[[example]]
+name = "simple_test"
+path = "examples/simple_test.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

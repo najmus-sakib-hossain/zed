@@ -1,0 +1,440 @@
+[package]
+name = "dx-forge"
+version.workspace = true
+edition.workspace = true
+rust-version = "1.85"
+authors.workspace = true
+description = "Alpha-stage build orchestration engine with file watching, event handling, and tool coordination. Core features work; many APIs are experimental or unimplemented."
+license.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/dx-forge"
+readme = "README.md"
+keywords = ["vcs", "orchestration", "lsp", "developer-tools", "dx"]
+categories = ["development-tools", "filesystem", "command-line-utilities"]
+include = [
+    "src/**",
+    "examples/**",
+    "tests/**",
+    "Cargo.toml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "FORGE.md",
+    "orchestration.toml",
+    "CONTRIBUTING.md",
+    "docs/**",
+]
+
+# =============================================================================
+# FEATURE FLAGS
+# =============================================================================
+# Feature flags allow users to opt-in to heavy dependencies only when needed.
+# This reduces compile times and binary size for users who don't need all features.
+#
+# Requirements: 8.3 (feature flags for heavy deps), 8.5 (feature-gate single-module deps)
+# =============================================================================
+
+[features]
+# Default features include commonly needed functionality
+default = ["daemon", "semantic-analysis"]
+
+# CRDT support for collaborative editing (automerge)
+# Enables: src/crdt/ module with CrdtDocument
+crdt = ["dep:automerge"]
+
+# Daemon/server features (axum, tower, tower-http)
+# Enables: src/daemon/lsp_server.rs (axum-based), src/server/ module
+daemon = ["dep:axum", "dep:tower", "dep:tower-http"]
+
+# Semantic analysis with tree-sitter
+# Enables: src/server/semantic_analyzer.rs with full tree-sitter parsing
+semantic-analysis = ["dep:tree-sitter", "dep:tree-sitter-rust"]
+
+# All features enabled
+full = ["crdt", "daemon", "semantic-analysis"]
+
+[[bin]]
+name = "forge-cli"
+path = "src/bin/cli.rs"
+required-features = []
+
+[[bin]]
+name = "forge-lsp"
+path = "src/bin/lsp.rs"
+required-features = []
+
+[[example]]
+name = "complete_dx_workflow"
+path = "examples/complete_dx_workflow.rs"
+
+[[example]]
+name = "example_tools"
+path = "examples/example_tools.rs"
+
+[[example]]
+name = "full_workflow"
+path = "examples/full_workflow.rs"
+
+[[example]]
+name = "orchestration"
+path = "examples/orchestration.rs"
+
+[[example]]
+name = "quick_test"
+path = "examples/quick_test.rs"
+
+[[example]]
+name = "r2_demo"
+path = "examples/r2_demo.rs"
+
+[[example]]
+name = "simple"
+path = "examples/simple.rs"
+
+[[example]]
+name = "test_all_features"
+path = "examples/test_all_features.rs"
+
+[[example]]
+name = "traffic_branch_and_lsp"
+path = "examples/traffic_branch_and_lsp.rs"
+
+[[example]]
+name = "web_ui"
+path = "examples/web_ui.rs"
+
+[[example]]
+name = "dx_orchestrator_demo"
+path = "examples/dx_orchestrator_demo.rs"
+
+[[example]]
+name = "forge_daemon_demo"
+path = "examples/forge_daemon_demo.rs"
+
+[dependencies]
+# =============================================================================
+# CORE ASYNC RUNTIME
+# =============================================================================
+# tokio: Primary async runtime for all async operations (file I/O, networking, timers)
+# Used throughout: daemon, watcher, server, storage, platform_io
+tokio = { version = "1.48.0", features = ["full"] }
+# async-trait: Enables async methods in traits (required for IoBackend, StorageBackend traits)
+# Used in: platform_io/mod.rs, storage traits
+async-trait = "0.1"
+
+# =============================================================================
+# CRDT ENGINES
+# Purpose: Conflict-free replicated data types for collaborative editing
+# =============================================================================
+# automerge: CRDT document engine for collaborative text editing
+# Used in: src/crdt/document.rs for CrdtDocument implementation
+# FEATURE-GATED: Only needed when "crdt" feature is enabled
+automerge = { version = "1.0.0-beta.3", optional = true }
+
+# =============================================================================
+# VERSION CONTROL
+# =============================================================================
+# git2: REMOVED in Task 11.3 - No imports found in codebase
+# If git interop is needed in the future, add it back as an optional feature
+
+# =============================================================================
+# STORAGE
+# =============================================================================
+# rusqlite: SQLite database for persistent storage (snapshots, blobs, metadata)
+# Used in: storage/sqlite.rs, storage/blob.rs
+rusqlite = { version = "0.37.0", features = ["bundled"] }
+# bincode: Binary serialization for efficient blob storage
+# Used in: storage operations for compact serialization
+bincode = "1.3.3"
+# lz4: Fast compression for blob storage
+# Used in: storage/blob.rs for compress/decompress operations
+lz4 = "1.28.0"
+
+# =============================================================================
+# FAST DATA STRUCTURES
+# =============================================================================
+# ahash: Fast non-cryptographic hash for HashMaps (faster than default SipHash)
+# Used in: various HashMap operations for performance
+ahash = "0.8.12"
+# dashmap: Concurrent HashMap for thread-safe shared state
+# Used in: server/api.rs, sync/remote.rs for concurrent access
+dashmap = "6.1.0"
+# parking_lot: Faster Mutex/RwLock implementations
+# Used throughout: crdt, storage, watcher, server modules
+parking_lot = "0.12.5"
+# bytes: REMOVED in Task 11.3 - No direct imports found
+# Only .as_bytes() method calls on strings were used, which don't require this crate
+
+# =============================================================================
+# FILE WATCHING
+# =============================================================================
+# notify: Cross-platform file system notification library
+# Used in: watcher.rs, watcher_legacy/detector.rs for file change detection
+notify = { version = "8.2.0", features = ["serde"] }
+# notify-debouncer-full: Debouncing layer for notify events
+# Used in: watcher_legacy/detector.rs for debounced file events
+notify-debouncer-full = "0.6.0"
+
+# =============================================================================
+# UTILITIES
+# =============================================================================
+# uuid: Unique identifier generation (v4 random UUIDs)
+# Used in: server/api.rs, various ID generation
+uuid = { version = "1.11.0", features = ["v4", "serde"] }
+# anyhow: Flexible error handling with context
+# Used throughout: all modules for Result<T> error handling
+anyhow = "1.0.100"
+# chrono: Date/time handling with timezone support
+# Used in: version/snapshot.rs, context/traffic_branch.rs for timestamps
+chrono = { version = "0.4.42", features = ["serde"] }
+# once_cell: Lazy static initialization
+# Used in: watcher_legacy/detector.rs, cache_warmer.rs, sync/clock.rs
+once_cell = "1.21.3"
+# thiserror: Derive macros for error types
+# Used in: publish/, credits/ modules for error definitions
+thiserror = "2.0.16"
+# crossbeam: Concurrent programming utilities (channels, queues)
+# Used in: watcher.rs, storage/oplog.rs for cross-thread communication
+crossbeam = "0.8.4"
+# rayon: Data parallelism library for parallel iterators
+# Used in: storage/blob.rs, watcher_legacy/cache_warmer.rs for parallel processing
+rayon = "1.11.0"
+
+# =============================================================================
+# CLI
+# =============================================================================
+# clap: Command-line argument parsing with derive macros
+# Used in: bin/cli.rs for CLI interface
+clap = { version = "4.5.50", features = ["derive"] }
+# colored: Terminal color output
+# Used in: various modules for colored console output
+colored = "3.0.0"
+
+# =============================================================================
+# SERIALIZATION
+# =============================================================================
+# serde: Serialization/deserialization framework
+# Used throughout: all data structures with Serialize/Deserialize
+serde = { version = "1.0.228", features = ["derive"] }
+# serde_json: JSON serialization
+# Used in: config parsing, API responses, LSP communication
+serde_json = "1.0.145"
+# serde_cbor: CBOR binary serialization for WebSocket messages
+# Used in: sync/remote.rs, server/api.rs for binary message encoding
+serde_cbor = "0.11.2"
+# toml: TOML config file parsing
+# Used in: config parsing (orchestration.toml, etc.)
+toml = "0.8"
+
+# =============================================================================
+# DX SERIALIZER INTEGRATION
+# =============================================================================
+# dx_serializer: Internal serialization library
+dx_serializer = { path = "../serializer", package = "dx-serializer" }
+
+# =============================================================================
+# TEXT PROCESSING
+# =============================================================================
+# ropey: Efficient rope data structure for large text editing
+# Used in: storage/mod.rs, crdt/document.rs for text manipulation
+ropey = "1.6.1"
+# similar: Text diffing library for computing file differences
+# Used in: daemon/server.rs, context/traffic_branch.rs for diff computation
+similar = { version = "2.7.0", features = ["inline"] }
+# memchr: SIMD-accelerated byte searching
+# Used in: watcher_legacy/detector.rs for fast newline detection
+memchr = "2.7"
+# regex: Regular expression matching
+# Used in: patterns.rs for pattern matching
+regex = "1.11"
+
+# =============================================================================
+# HTTP CLIENT
+# =============================================================================
+# reqwest: HTTP client for R2 storage and remote sync
+# Used in: storage/r2.rs, sync/remote.rs for HTTP requests
+reqwest = { version = "0.12.8", default-features = false, features = [
+    "json",
+    "rustls-tls",
+] }
+# Manual AWS Signature V4 implementation for R2 (simpler than full SDK)
+# Used in: storage/r2.rs for S3-compatible request signing
+http = "1.2.0"
+
+# =============================================================================
+# CODE ANALYSIS
+# =============================================================================
+# tree-sitter: Incremental parsing library for code analysis
+# Used in: server/semantic_analyzer.rs for syntax analysis
+# FEATURE-GATED: Only needed when "semantic-analysis" feature is enabled
+tree-sitter = { version = "0.24.7", optional = true }
+# tree-sitter-rust: Rust grammar for tree-sitter
+# Used in: server/semantic_analyzer.rs for Rust code parsing
+tree-sitter-rust = { version = "0.24.0", optional = true }
+
+# =============================================================================
+# DIRECTORY WALKING
+# =============================================================================
+# jwalk: REMOVED in Task 11.3 - No imports found, duplicate of ignore crate
+# walkdir: REMOVED in Task 11.3 - No imports found, duplicate of ignore crate
+# ignore: Directory walking with .gitignore support
+# Used in: watcher_legacy/cache_warmer.rs, watcher.rs for gitignore-aware walking
+ignore = "0.4.24"
+
+# =============================================================================
+# NETWORKING (HTTP SERVER & WEBSOCKET)
+# =============================================================================
+# axum: Web framework for HTTP server and WebSocket support
+# Used in: server/api.rs, daemon/lsp_server.rs, examples/web_ui.rs
+# FEATURE-GATED: Only needed when "daemon" feature is enabled
+axum = { version = "0.8.1", features = ["ws"], optional = true }
+# tower: Service abstraction layer (used with axum)
+# Used implicitly by axum for middleware
+tower = { version = "0.5.2", features = ["full"], optional = true }
+# tower-http: HTTP-specific tower middleware (CORS, static files)
+# Used in: server/api.rs for CORS, examples/web_ui.rs for static file serving
+tower-http = { version = "0.6.2", features = ["full"], optional = true }
+
+# =============================================================================
+# WEBSOCKET CLIENT
+# =============================================================================
+# tokio-tungstenite: WebSocket client for remote sync
+# Used in: sync/remote.rs, daemon/server.rs for WebSocket connections
+tokio-tungstenite = "0.28.0"
+# futures: Async utilities (streams, sinks)
+# Used in: sync/remote.rs, server/api.rs for async stream handling
+futures = "0.3.31"
+# url: URL parsing
+# Used in: sync/remote.rs for WebSocket URL handling
+url = "2.5.4"
+
+# =============================================================================
+# PERFORMANCE
+# =============================================================================
+# memmap2: Memory-mapped file I/O for large files
+# Used in: watcher_legacy/detector.rs, storage/blob.rs for efficient file reading
+memmap2 = "0.9.9"
+# num_cpus: CPU count detection for thread pool sizing
+# Used in: daemon/worker.rs, platform_io/selector.rs, core/forge.rs
+num_cpus = "1.16.0"
+
+# =============================================================================
+# HASHING
+# Purpose: Different hash algorithms for different use cases
+# Requirement 8.2: Each serves a distinct purpose
+# =============================================================================
+# sha2: SHA-256 for content-addressable storage and cryptographic hashing
+# Used in: storage/blob.rs, storage/r2.rs, server/api.rs, version/snapshot.rs
+# Purpose: Content integrity verification, blob IDs, R2 authentication
+sha2 = "0.10.9"
+# blake3: Fast cryptographic hash for caching
+# Used in: dx_cache.rs for fast content hashing in cache keys
+# Purpose: Performance-critical hashing where SHA-256 is too slow
+blake3 = "1.8.2"
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+# log: Logging facade (legacy, used alongside tracing)
+log = "0.4"
+# tracing: Structured logging and diagnostics
+# Used throughout: all modules for structured logging
+tracing = "0.1"
+# tracing-subscriber: Tracing output configuration
+# Used in: initialization for log output formatting
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+# tracing-appender: File-based log output
+# Used in: log file rotation and persistence
+tracing-appender = "0.2"
+
+# =============================================================================
+# SYSTEM UTILITIES
+# =============================================================================
+# whoami: Get current username
+# Used in: version/snapshot.rs, server/api.rs, context/annotations.rs
+whoami = "1.5.2"
+# windows-sys: Windows API bindings
+# Used for: Windows-specific file system operations
+windows-sys = { version = "0.59.0", features = ["Win32_Storage_FileSystem"] }
+# dirs: Platform-specific directory paths (home, config, etc.)
+# Used in: core/editor_integration.rs, api/dx_experience.rs
+dirs = "5.0.1"
+
+# =============================================================================
+# R2 STORAGE & API AUTHENTICATION
+# =============================================================================
+# base64: Base64 encoding for API payloads
+# Used in: server/api.rs for content encoding
+base64 = "0.22.1"
+# hex: Hexadecimal encoding for hash output
+# Used in: storage/r2.rs for signature encoding
+hex = "0.4.3"
+# hmac: HMAC authentication for R2 API signing
+# Used in: storage/r2.rs for AWS Signature V4
+hmac = "0.12.1"
+# dotenvy: Load environment variables from .env files
+# Used in: storage/r2.rs for R2 credentials
+dotenvy = "0.15.7"
+
+# =============================================================================
+# WEB UI (EXAMPLES)
+# =============================================================================
+# zip: ZIP archive creation for web UI bundling
+# Used in: examples/web_ui.rs for asset bundling
+# CANDIDATE FOR FEATURE-GATING: Only needed for web-ui example
+zip = "2.2.2"
+# md5: REMOVED in Task 11.3 - Replaced with sha2 for consistency
+# examples/web_ui.rs now uses sha2 for content hashing
+
+# =============================================================================
+# DEPENDENCY AUDIT SUMMARY (Task 11.1, 11.2, 11.3)
+# =============================================================================
+# 
+# FEATURE-GATED DEPENDENCIES (Requirement 8.3, 8.5):
+# - automerge: CRDT dependency, gated behind "crdt" feature
+# - axum, tower, tower-http: Server dependencies, gated behind "daemon" feature
+# - tree-sitter, tree-sitter-rust: Semantic analysis, gated behind "semantic-analysis" feature
+#
+# REMOVED DEPENDENCIES (Task 11.3 - Requirement 8.1, 8.2, 8.6):
+# - yrs: REMOVED in Task 11.2 - Was unused, violated Req 8.1 (both automerge and yrs)
+# - git2: REMOVED in Task 11.3 - No imports found in codebase
+# - jwalk: REMOVED in Task 11.3 - No imports found, duplicate of ignore crate
+# - walkdir: REMOVED in Task 11.3 - No imports found, duplicate of ignore crate
+# - bytes: REMOVED in Task 11.3 - No direct usage found
+# - md5: REMOVED in Task 11.3 - Replaced with sha2 in examples/web_ui.rs
+#
+# HASHING LIBRARIES JUSTIFICATION (Requirement 8.2):
+# - sha2: Content-addressable storage, R2 authentication, web UI hashing (cryptographic)
+# - blake3: Fast caching in dx_cache.rs (performance-critical)
+#
+# DEFAULT FEATURES:
+# - daemon: Enables HTTP server and WebSocket support
+# - semantic-analysis: Enables tree-sitter based code analysis
+#
+# OPTIONAL FEATURES:
+# - crdt: Enables automerge-based collaborative editing
+# - full: Enables all features
+#
+# DEPENDENCY COUNT REDUCTION (Requirement 8.6):
+# - Original count: 59 dependencies (before Task 11.2)
+# - After Task 11.2: 58 dependencies (removed yrs)
+# - After Task 11.3: 54 dependencies (removed git2, jwalk, walkdir, bytes, md5)
+# - Total reduction: 5 dependencies = 8.5% reduction
+# - Note: 20% target (12 dependencies) requires additional feature-gating or removal
+# =============================================================================
+
+[dev-dependencies]
+# tempfile: Temporary directory/file creation for tests
+tempfile = "3.10.1"
+# proptest: Property-based testing framework
+proptest = "1.4"
+# tokio-test: Tokio testing utilities
+tokio-test = "0.4"
+
+# =============================================================================
+# PLATFORM-SPECIFIC DEPENDENCIES
+# =============================================================================
+[target.'cfg(target_os = "linux")'.dependencies]
+# io-uring: Linux io_uring for high-performance async I/O
+# Used in: platform_io/io_uring.rs for native Linux I/O backend
+io-uring = "0.7"

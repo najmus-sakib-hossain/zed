@@ -1,0 +1,23 @@
+mode                         = vim
+vim_modes                    = true
+vim_relative_numbers         = true
+line_numbers                 = relative
+tab_width                    = 4
+use_spaces                   = true
+word_wrap                    = false
+show_whitespace              = false
+highlight_current_line       = true
+scroll_margin                = 3
+theme                        = base16-ocean.dark
+
+[minimap]
+enabled                      = true
+width                        = 15
+show_viewport                = true
+show_syntax                  = true
+lines_per_row                = 4
+
+[vim]
+exit_insert:
+- ESC
+- jk

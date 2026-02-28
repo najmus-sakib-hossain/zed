@@ -1,0 +1,9 @@
+{
+    "name": "small-test-suite",
+    "version": "1.0.0",
+    "description": "Small test suite fixture (50 tests) for benchmark comparison",
+    "scripts": {
+        "test": "bun test",
+        "test:dx": "dx-test"
+    }
+}

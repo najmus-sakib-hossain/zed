@@ -1,0 +1,48 @@
+[package]
+name = "dx-py-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Ultra-fast Python package manager CLI"
+
+[[bin]]
+name = "dx-py"
+path = "src/main.rs"
+
+[dependencies]
+dx-py-core = { path = "../dx-py-core" }
+dx-py-package-manager = { path = "../dx-py-package-manager" }
+dx-py-compat = { path = "../dx-py-compat" }
+dx-py-layout = { path = "../dx-py-layout" }
+dx-py-store = { path = "../dx-py-store" }
+dx-py-workspace = { path = "../../project-manager" }
+clap = { version = "4.4", features = ["derive"] }
+clap_complete = "4.4"
+thiserror.workspace = true
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.8"
+toml_edit = "0.22"
+dirs = "5.0"
+tokio = { version = "1.48", features = ["rt-multi-thread", "macros"] }
+sha2 = "0.10"
+blake3 = "1.5"
+
+[dev-dependencies]
+tempfile = "3.10"
+criterion = { version = "0.5", features = ["html_reports"] }
+blake3 = "1.5"
+serde_json = "1.0"
+rand = "0.8"
+proptest = "1.4"
+
+[[bench]]
+name = "benchmarks"
+harness = false
+
+[[bench]]
+name = "comparison"
+harness = false
+
+[[bench]]
+name = "layout_benchmarks"
+harness = false

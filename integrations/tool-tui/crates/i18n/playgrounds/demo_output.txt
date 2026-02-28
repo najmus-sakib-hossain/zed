@@ -1,0 +1,133 @@
+warning: field `lang` is never read
+ --> src\tts\google.rs:9:5
+  |
+8 | pub struct GoogleTTS {
+  |            --------- field in this struct
+9 |     lang: String,
+  |     ^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `voice` is never read
+ --> src\tts\edge.rs:9:5
+  |
+8 | pub struct EdgeTTS {
+  |            ------- field in this struct
+9 |     voice: String,
+  |     ^^^^^
+
+warning: `i18n` (lib) generated 2 warnings
+   Compiling i18n v0.1.0 (F:\Code\i18n)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.93s
+     Running `target\debug\i18n-demo.exe`
+=== i18n Library Demo ===
+
+📝 Demo 1: Translation with JSON Data
+
+Original messages (JSON):
+[
+  {
+    "id": "msg_1",
+    "text": "Hello, world!",
+    "language": "en"
+  },
+  {
+    "id": "msg_2",
+    "text": "Good morning, how are you?",
+    "language": "en"
+  },
+  {
+    "id": "msg_3",
+    "text": "Thank you for using our service.",
+    "language": "en"
+  },
+  {
+    "id": "msg_4",
+    "text": "Welcome to the internationalization library.",
+    "language": "en"
+  }
+]
+
+Translating to Spanish...
+
+✓ msg_1: Hello, world! → ¡Hola Mundo!
+✓ msg_2: Good morning, how are you? → Buenos días, ¿cómo estás?
+✓ msg_3: Thank you for using our service. → Gracias por utilizar nuestro servicio.
+✓ msg_4: Welcome to the internationalization library. → Bienvenido a la biblioteca de internacionalización.
+
+Translated messages (JSON):
+[
+  {
+    "id": "msg_1",
+    "original_text": "Hello, world!",
+    "translated_text": "¡Hola Mundo!",
+    "source_language": "en",
+    "target_language": "es"
+  },
+  {
+    "id": "msg_2",
+    "original_text": "Good morning, how are you?",
+    "translated_text": "Buenos días, ¿cómo estás?",
+    "source_language": "en",
+    "target_language": "es"
+  },
+  {
+    "id": "msg_3",
+    "original_text": "Thank you for using our service.",
+    "translated_text": "Gracias por utilizar nuestro servicio.",
+    "source_language": "en",
+    "target_language": "es"
+  },
+  {
+    "id": "msg_4",
+    "original_text": "Welcome to the internationalization library.",
+    "translated_text": "Bienvenido a la biblioteca de internacionalización.",
+    "source_language": "en",
+    "target_language": "es"
+  }
+]
+
+💾 Saved translations to: translations.json
+
+============================================================
+
+🔊 Demo 2: Text-to-Speech with JSON Data
+
+Messages for TTS (JSON):
+[
+  {
+    "id": "tts_1",
+    "text": "Hello, this is a test of the text to speech system.",
+    "language": "en"
+  },
+  {
+    "id": "tts_2",
+    "text": "Welcome to our application!",
+    "language": "en"
+  },
+  {
+    "id": "tts_3",
+    "text": "Thank you for listening.",
+    "language": "en"
+  }
+]
+
+Generating audio files...
+
+Using Google TTS:
+Google TTS: Generating mock audio for 'Hello, this is a test of the text to speech system.'
+✓ Generated: audio_output/tts_1_google.mp3
+Google TTS: Generating mock audio for 'Welcome to our application!'
+✓ Generated: audio_output/tts_2_google.mp3
+Google TTS: Generating mock audio for 'Thank you for listening.'
+✓ Generated: audio_output/tts_3_google.mp3
+
+Using Edge TTS:
+Edge TTS: Generating mock audio for 'Hello, this is a test of the text to speech system.'
+✓ Generated: audio_output/tts_1_edge.mp3
+Edge TTS: Generating mock audio for 'Welcome to our application!'
+✓ Generated: audio_output/tts_2_edge.mp3
+Edge TTS: Generating mock audio for 'Thank you for listening.'
+✓ Generated: audio_output/tts_3_edge.mp3
+
+💾 Saved audio metadata to: audio_metadata.json

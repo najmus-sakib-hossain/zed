@@ -1,0 +1,111 @@
+[package]
+name = "dx-driven"
+version.workspace = true
+edition.workspace = true
+rust-version = "1.85"
+authors.workspace = true
+description = "Professional AI-assisted development orchestrator with binary-first architecture"
+repository.workspace = true
+documentation = "https://docs.rs/dx-driven"
+keywords = ["ai", "development", "orchestrator", "rules", "binary"]
+categories = ["development-tools", "command-line-utilities"]
+readme = "README.md"
+license.workspace = true
+
+[lib]
+name = "driven"
+path = "src/lib.rs"
+
+[[bin]]
+name = "driven"
+path = "src/main.rs"
+
+[dependencies]
+# Zero-copy serialization (DX ecosystem)
+bytemuck = { version = "1.21", features = ["derive"] }
+bytes = "1.9"
+zerocopy = { version = "0.8", features = ["derive"] }
+
+# Hashing and checksums
+blake3 = "1.5"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+
+# File system and watching
+notify = "7.0"
+walkdir = "2.5"
+globset = "0.4"
+glob = "0.3"
+ignore = "0.4"
+which = "7.0"
+
+# Parsing and text processing
+regex = "1.11"
+memchr = "2.7"
+
+# CLI framework
+clap = { version = "4.5", features = ["derive", "env"] }
+dialoguer = "0.11"
+console = "0.15"
+indicatif = "0.17"
+
+# Serialization for config files
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# DX Ecosystem Integration
+dx-serializer = { path = "../serializer" }
+markdown = { path = "../markdown" }
+
+# DCP Integration
+dcp = { path = "../dcp" }
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+miette = { version = "7.4", features = ["fancy"] }
+
+# Memory mapping for zero-copy file access
+memmap2 = "0.9"
+
+# Async runtime (for file watching)
+tokio = { version = "1.42", features = [
+    "rt-multi-thread",
+    "fs",
+    "sync",
+    "macros",
+] }
+
+# SIMD-accelerated operations
+simdutf8 = "0.1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# UUID generation
+uuid = { version = "1.11", features = ["v4"] }
+
+# Date/time handling
+chrono = { version = "0.4", features = ["serde"] }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tempfile = "3.14"
+pretty_assertions = "1.4"
+insta = "1.41"
+proptest = "1.4"
+
+[features]
+default = ["cli"]
+cli = []
+simd = []
+
+[[bench]]
+name = "format_parsing"
+harness = false
+
+[[bench]]
+name = "conversion"
+harness = false

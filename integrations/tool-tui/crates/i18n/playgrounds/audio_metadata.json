@@ -1,0 +1,20 @@
+[
+  {
+    "id": "tts_1",
+    "text": "Hello, this is a test of the text to speech system.",
+    "language": "en",
+    "audio_file": "playgrounds/audio_output/tts_1_google.mp3"
+  },
+  {
+    "id": "tts_2",
+    "text": "Welcome to our application!",
+    "language": "en",
+    "audio_file": "playgrounds/audio_output/tts_2_google.mp3"
+  },
+  {
+    "id": "tts_3",
+    "text": "Thank you for listening.",
+    "language": "en",
+    "audio_file": "playgrounds/audio_output/tts_3_google.mp3"
+  }
+]

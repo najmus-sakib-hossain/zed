@@ -1,0 +1,222 @@
+
+# Implementation Plan: Codebase Quality Fixes
+
+## Overview
+
+This implementation plan systematically fixes all code quality issues across the DX JavaScript Toolchain. Tasks are organized by workspace and priority, with the runtime workspace being addressed first as it has the most critical issues (including incomplete GC implementation).
+
+## Tasks
+
+- Phase 1: Runtime Workspace Fixes
+- 1.1 Remove global allow directives from runtime/src/lib.rs
+- Remove `#![allow(dead_code)]` directive
+- Remove `#![allow(unused_variables)]` directive
+- Requirements: 1.1, 1.2
+- 1.2 Fix codegen.rs drop_non_drop warnings
+- Remove unnecessary `drop(heap)` calls at lines 298, 308, 326
+- Or implement Drop trait for ThreadLocalHeapLock if cleanup is needed
+- Requirements: 2.2
+- 1.3 Fix config.rs map_or warnings
+- Change `map_or(false, |ext| ext == "json")` to `is_some_and(|ext| ext == "json")` at line 232
+- Change `map_or(false, |ext| ext == "js")` to `is_some_and(|ext| ext == "js")` at line 234
+- Requirements: 2.3
+- 1.4 Fix error.rs clippy warnings
+- Change `push_str("\n")` to `push('\n')` at lines 431, 469, 612, 670
+- Collapse nested `else { if }` block at line 568 into `else if`
+- Requirements: 2.4, 2.5
+- 1.5 Fix context.rs derivable_impls warning
+- Add `#[derive(Default)]` to ContextConfig struct
+- Remove manual Default implementation at line 65
+- Requirements: 2.6
+- 1.6 Fix main.rs needless_borrows warning
+- Remove unnecessary borrow in format! call at line 306
+- Change `&format!("repl:{}", line_count)` to `format!("repl:{}", line_count)`
+- Requirements: 2.7
+- 1.7 Complete GC array tracing implementation
+- Implement array element tracing in heap.rs ObjectType::Array match arm
+- Remove TODO comment at line 690
+- Requirements: 6.1
+- 1.8 Complete GC object tracing implementation
+- Implement object property tracing in heap.rs ObjectType::Object match arm
+- Remove TODO comment at line 694
+- Requirements: 6.2
+- 1.9 Complete GC closure tracing implementation
+- Implement closure captured variable tracing in heap.rs ObjectType::Function/Closure match arm
+- Remove TODO comment at line 698
+- Requirements: 6.3
+- [ ]* 1.10 Write property test for GC tracing completeness
+- Property 1: GC Tracing Completeness
+- Validates: Requirements 6.1, 6.2, 6.3, 6.4
+- Checkpoint
+- Runtime Fixes Complete
+- Run `cargo clippy
+- workspace
+- D warnings` in runtime directory
+- Ensure all tests pass with `cargo test
+- workspace`
+- Verify no TODO comments remain for GC tracing
+- Phase 2: Package Manager Workspace Fixes
+- 3.1 Fix dx-pkg-converter ptr_arg warnings
+- Change `output_dir: &PathBuf` to `output_dir: &Path` at line 112
+- Change `output_dir: &PathBuf` to `output_dir: &Path` at line 138
+- Add necessary `.to_path_buf()` calls where ownership is needed
+- Requirements: 3.2
+- 3.2 Fix dx-pkg-cli/background.rs ptr_arg warning
+- Change `binary_dir: &PathBuf` to `binary_dir: &Path` at line 117
+- Requirements: 3.2
+- 3.3 Fix dx-pkg-cli/commands/dlx.rs manual_strip warning
+- Use `strip_prefix('@')` instead of `spec[1..]` at line 130-132
+- Requirements: 3.3
+- 3.4 Fix dx-pkg-cli/commands/global.rs warnings
+- Use `next_back()` instead of `last()` at line 79
+- Change `source: &PathBuf` to `source: &Path` at line 147
+- Change `path: &PathBuf` to `path: &Path` at line 379
+- Collapse nested `else { if }` at line 332 into `else if`
+- Requirements: 3.4, 3.5, 3.2
+- 3.5 Fix dx-pkg-cli/commands/install_npm.rs ptr_arg warnings
+- Change `cache_dir: &PathBuf` to `cache_dir: &Path` at line 433
+- Change `source: &PathBuf` to `source: &Path` at line 500
+- Change `target: &PathBuf` to `target: &Path` at line 500
+- Change `binary_path: &PathBuf` to `binary_path: &Path` at line 554
+- Change `target_dir: &PathBuf` to `target_dir: &Path` at line 554
+- Change `binary_dir: &PathBuf` to `binary_dir: &Path` at line 700
+- Requirements: 3.2
+- 3.6 Fix dx-pkg-cli/commands/outdated.rs manual_strip warnings
+- Use `strip_prefix('^')` at line 39-40
+- Use `strip_prefix('~')` at line 41-42
+- Use `strip_prefix(">=")` at line 43-44
+- Requirements: 3.6
+- 3.7 Fix dx-pkg-cli/commands/update.rs manual_strip warnings
+- Use `strip_prefix('^')` at line 19-20
+- Use `strip_prefix('~')` at line 21-22
+- Use `strip_prefix(">=")` at line 23-24
+- Requirements: 3.7
+- Checkpoint
+- Package Manager Fixes Complete
+- Run `cargo clippy
+- workspace
+- D warnings` in package-manager directory
+- Ensure all tests pass with `cargo test
+- workspace`
+- Phase 3: Project Manager Workspace Fixes
+- 5.1 Fix dxc.rs needless_range_loop warning
+- Change `for i in 0..target.len()` to use `enumerate()` at line 108
+- Requirements: 4.2
+- 5.2 Fix dxl.rs needless_range_loop warnings
+- Change `for i in 0..8` loops to use `enumerate()` at lines 69 and 79
+- Requirements: 4.3
+- 5.3 Fix watch.rs type_complexity warning
+- Create type ali `Box<dyn Fn(&Path)
+- > Vec<u32> + Send + Sync>` at line 64
+- Requirements: 4.4
+- 5.4 Fix workspace.rs only_used_in_recursion warning
+- Refactor `scan_directory_for_packages` to either use `&self` meaningfully or make it an associated function
+- Requirements: 4.5
+- Checkpoint
+- Project Manager Fixes Complete
+- Run `cargo clippy
+- workspace
+- D warnings` in project-manager directory
+- Ensure all tests pass with `cargo test
+- workspace`
+- Phase 4: Compatibility Workspace Fixes
+- 7.1 Fix dx-compat-hmr/update.rs type_complexity warnings
+- Create type aliases for complex callback types at lines 65 and 69
+- Requirements: 5.2
+- 7.2 Fix dx-compat-compile/lib.rs should_implement_trait warning
+- Implement `std::str::FromStr` trait for Platform instead of custom `from_str` method at line 105
+- Requirements: 5.3
+- 7.3 Fix dx-compat-web/url/mod.rs inherent_to_string warning
+- Implement `std::fmt::Display` trait for URLSearchParams instead of inherent `to_string` at line 130
+- Requirements: 5.4
+- 7.4 Fix dx-compat-node/path/mod.rs manual_strip warning
+- Use `strip_suffix(ext)` instead of manual suffix stripping at lines 62-63
+- Requirements: 5.5
+- 7.5 Fix compatibility/lib.rs vec_init_then_push warning
+- Use `vec![]` macro or conditional compilation instead of push after creation at lines 466-475
+- Requirements: 5.6
+- Checkpoint
+- Compatibility Fixes Complete
+- Run `cargo clippy
+- workspace
+- D warnings` in compatibility directory
+- Ensure all tests pass with `cargo test
+- workspace`
+- Phase 5: Test Runner Cleanup
+- 9.1 Remove #![allow(dead_code)] from watch.rs
+- Note: Kept as-is
+- module is not yet integrated into main test runner
+- Requirements: 1.3
+- 9.2 Remove #![allow(dead_code)] from snapshot.rs
+- Note: Kept as-is
+- module is not yet integrated into main test runner
+- Requirements: 1.4
+- 9.3 Remove #![allow(dead_code)] from mock.rs
+- Note: Kept as-is
+- module is not yet integrated into main test runner
+- Requirements: 1.5
+- 9.4 Remove #![allow(dead_code)] from coverage.rs
+- Note: Kept as-is
+- module is not yet integrated into main test runner
+- Requirements: 1.6
+- Checkpoint
+- Test Runner Cleanup Complete
+- Run `cargo clippy
+- workspace
+- D warnings` in test-runner directory
+- Ensure all tests pass with `cargo test
+- workspace`
+- Phase 6: Unsafe Code Audit
+- 11.1 Audit and document unsafe blocks in runtime
+- Search for all `unsafe` blocks in runtime/src/
+- Add `// SAFETY:` comments to any blocks missing documentation
+- Requirements: 9.1
+- 11.2 Audit and document unsafe impl Send/Sync
+- Search for all `unsafe impl Send` and `unsafe impl Sync`
+- Add documentation explaining safety guarantees
+- Requirements: 9.2
+- [ ]* 11.3 Write property test for unsafe code documentation
+- Property 2: Unsafe Code Documentation
+- Validates: Requirements 9.1, 9.2
+- Checkpoint
+- Unsafe Code Audit Complete
+- Verify all unsafe blocks have SAFETY comments
+- Review documentation for completeness
+- Phase 7: Final Verification
+- 13.1 Run clippy on all workspaces
+- Execute `cargo clippy
+- workspace
+- D warnings` in runtime, package-manager, bundler, test-runner, project-manager, compatibility
+- All commands must exit with code 0
+- Requirements: 8.2, 8.3
+- 13.2 Run formatting check on all workspaces
+- Execute `cargo fmt
+- check` in all workspaces
+- All commands must exit with code 0
+- Requirements: 7.1
+- 13.3 Run full test suite
+- Execute `cargo test
+- workspace` in all workspaces
+- All tests must pass
+- Requirements: 8.1
+- [ ]* 13.4 Write property test for clippy compliance
+- Property 3: Clippy Compliance
+- Validates: Requirements 2.1, 3.1, 4.1, 5.1, 8.2
+- [ ]* 13.5 Write property test for format compliance
+- Property 4: Format Compliance
+- Validates: Requirements 7.1, 7.2
+- Final Checkpoint
+- All Quality Fixes Complete
+- All clippy warnings eliminated across all workspaces
+- All formatting issues resolved
+- All tests passing
+- GC implementation complete
+- Unsafe code documented
+
+## Notes
+
+- Tasks marked with `*` are optional property tests that verify the fixes
+- Each checkpoint ensures incremental validation before proceeding
+- The implementation order prioritizes the runtime workspace as it contains the most critical issues
+- All fixes should maintain backward compatibility with existing functionality
+- When removing `#![allow(dead_code)]`, prefer integrating unused code over deleting it if the code is complete and useful

@@ -1,0 +1,13 @@
+{
+    "name": "monorepo-10",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "build": "dx-project run build",
+        "test": "dx-project run test",
+        "lint": "dx-project run lint"
+    }
+}

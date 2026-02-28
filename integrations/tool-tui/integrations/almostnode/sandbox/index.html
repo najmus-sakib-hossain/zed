@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>almostnode Sandbox</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .status {
+      text-align: center;
+    }
+    .status h1 {
+      color: #333;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="status">
+    <h1>almostnode Sandbox</h1>
+    <p id="status">Loading...</p>
+  </div>
+
+  <script type="module">
+    // For local development with vite dev server, load from source files
+    // For production, this would be from unpkg or your CDN
+    const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+    // Dynamic import based on environment
+    // In production, change this to: 'https://unpkg.com/almostnode/dist/index.js'
+    const { VirtualFS, Runtime } = await import(isLocalDev ? '../src/index.ts' : 'https://unpkg.com/almostnode/dist/index.js');
+
+    const statusEl = document.getElementById('status');
+
+    let vfs = null;
+    let runtime = null;
+
+    // Handle messages from parent
+    window.addEventListener('message', async (event) => {
+      const { type, id, code, filename, vfsSnapshot, options, path, content } = event.data;
+
+      try {
+        switch (type) {
+          case 'init':
+            statusEl.textContent = 'Initializing VFS...';
+
+            // Initialize VFS from snapshot
+            vfs = VirtualFS.fromSnapshot(vfsSnapshot);
+
+            // Create runtime with options
+            runtime = new Runtime(vfs, {
+              cwd: options?.cwd,
+              env: options?.env,
+              onConsole: (method, args) => {
+                // Forward console to parent
+                parent.postMessage({
+                  type: 'console',
+                  consoleMethod: method,
+                  consoleArgs: args,
+                }, '*');
+              },
+            });
+
+            statusEl.textContent = `Ready (${Object.keys(vfsSnapshot.files || {}).length} files)`;
+            console.log('[Sandbox] Initialized with VFS snapshot');
+            break;
+
+          case 'syncFile':
+            // Sync file changes from parent
+            if (vfs) {
+              if (content === null) {
+                try {
+                  vfs.unlinkSync(path);
+                  console.log('[Sandbox] Deleted:', path);
+                } catch (e) {
+                  // Ignore if file doesn't exist
+                }
+              } else {
+                // Ensure parent directory exists
+                const dir = path.substring(0, path.lastIndexOf('/'));
+                if (dir && !vfs.existsSync(dir)) {
+                  vfs.mkdirSync(dir, { recursive: true });
+                }
+                vfs.writeFileSync(path, content);
+                console.log('[Sandbox] Synced:', path);
+              }
+            }
+            break;
+
+          case 'execute':
+            if (!runtime) {
+              parent.postMessage({ type: 'error', id, error: 'Runtime not initialized' }, '*');
+              return;
+            }
+            statusEl.textContent = `Executing: ${filename || 'inline'}`;
+            const execResult = runtime.execute(code, filename);
+            parent.postMessage({ type: 'result', id, result: execResult }, '*');
+            statusEl.textContent = 'Ready';
+            break;
+
+          case 'runFile':
+            if (!runtime) {
+              parent.postMessage({ type: 'error', id, error: 'Runtime not initialized' }, '*');
+              return;
+            }
+            statusEl.textContent = `Running: ${filename}`;
+            const runResult = runtime.runFile(filename);
+            parent.postMessage({ type: 'result', id, result: runResult }, '*');
+            statusEl.textContent = 'Ready';
+            break;
+
+          case 'clearCache':
+            if (runtime) {
+              runtime.clearCache();
+              console.log('[Sandbox] Cache cleared');
+            }
+            break;
+        }
+      } catch (error) {
+        console.error('[Sandbox] Error:', error);
+        if (id) {
+          parent.postMessage({
+            type: 'error',
+            id,
+            error: error instanceof Error ? error.message : String(error),
+          }, '*');
+        }
+        statusEl.textContent = `Error: ${error.message}`;
+      }
+    });
+
+    // Signal ready to parent
+    statusEl.textContent = 'Ready (waiting for init)';
+    parent.postMessage({ type: 'ready' }, '*');
+    console.log('[Sandbox] Ready, waiting for parent to send init message');
+  </script>
+</body>
+</html>

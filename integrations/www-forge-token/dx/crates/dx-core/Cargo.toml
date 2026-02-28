@@ -1,0 +1,11 @@
+[package]
+name = "dx-core"
+version.workspace = true
+edition.workspace = true
+description = "Shared types and traits for the dx token-saving pipeline"
+
+[dependencies]
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

@@ -1,0 +1,19 @@
+{
+  "name": "@midday/desktop-client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/plugin-dialog": "^2.6.0",
+    "@tauri-apps/plugin-fs": "~2",
+    "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-upload": "~2"
+  },
+  "exports": {
+    "./platform": "./src/platform.ts",
+    "./deep-links": "./src/platform.ts",
+    "./desktop-variants": "./src/desktop-variants.ts",
+    "./core": "./src/core.ts"
+  }
+}

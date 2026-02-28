@@ -1,0 +1,776 @@
+
+# Implementation Plan: DX-Py-Runtime
+
+## Overview
+
+This implementation plan covers all 15 game-changing features of the revolutionary Python runtime. Each feature has its own phase with dedicated tasks and property-based tests to ensure correctness.
+
+## Tasks
+
+- Feature 1: Binary Python Bytecode (DPB)
+- Zero Parse Format
+- 1.1 Create dx-py-bytecode crate structure
+- Create Cargo.toml with dependencies (memmap2, blake3)
+- Define module structure for format, compiler, loader, printer
+- Requirements: 1.1
+- 1.2 Implement DpbHeader (64-byte cache-line aligned)
+- Implement DpbHeader struct with repr(C, align(64))
+- Implement magic bytes "DPB\x01" validation
+- Implement section offset fields (code, constants, names, symbols, types, debug)
+- Implement BLAKE3 content hash field
+- Requirements: 1.1, 1.2, 1.3, 1.12
+- 1.3 Write property test for DPB header alignment
+- Property 19: DPB Header Alignment
+- Validates: Requirements 1.1, 1.2
+- 1.4 Implement DpbOpcode enum (256 opcodes)
+- Implement all load/store opcodes (0x00-0x1F)
+- Implement binary operation opcodes (0x20-0x3F)
+- Implement comparison opcodes (0x40-0x4F)
+- Implement control flow opcodes (0x50-0x6F)
+- Implement function call opcodes (0x70-0x7F)
+- Implement object creation opcodes (0x80-0x8F)
+- Implement exception handling opcodes (0x90-0x9F)
+- Implement async opcodes (0xA0-0xAF)
+- Requirements: 1.7
+- 1.5 Implement DpbCompiler (AST to DPB)
+- Implement compile() method for Python AST
+- Implement bytecode emission for all constructs
+- Implement constant pool building
+- Implement name table with string interning
+- Implement pre-resolved symbol generation
+- Requirements: 1.8
+- 1.6 Implement DpbLoader with memory mapping
+- Implement load() with mmap (zero-copy)
+- Implement get_code() returning slice into mmap
+- Implement get_constant() with O(1) access
+- Implement get_symbol() for pre-resolved lookups
+- Requirements: 1.4, 1.5, 1.6
+- 1.7 Implement DpbPrettyPrinter (decompiler)
+- Implement disassemble() for human-readable output
+- Implement print_annotated() with type info
+- Requirements: 1.9
+- 1.8 Write property test for DPB round-trip
+- Property 1: DPB Round-Trip Consistency
+- Validates: Requirements 1.10
+- 1.9 Checkpoint
+- Feature 1 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 2: SIMD-Accelerated String Operations
+- 2.1 Create dx-py-simd crate structure
+- Create Cargo.toml with SIMD feature flags
+- Define SimdStringEngine trait
+- Implement SimdDispatcher for runtime CPU detection
+- Requirements: 2.7
+- 2.2 Implement AVX2 substring search (32 bytes/iteration)
+- Implement find_avx2() with _mm256 intrinsics
+- Implement first-byte matching with mask extraction
+- Implement full needle verification at match positions
+- Requirements: 2.1
+- 2.3 Implement AVX2 string equality comparison
+- Implement eq_avx2() comparing 32 bytes at a time
+- Implement early exit on mismatch
+- Implement scalar fallback for remainder
+- Requirements: 2.2
+- 2.4 Implement AVX2 case conversion
+- Implement to_lowercase_avx2() with range checks
+- Implement to_uppercase_avx2()
+- Handle ASCII range (A-Z, a-z) with SIMD
+- Requirements: 2.3
+- 2.5 Implement AVX2 split and join operations
+- Implement split() with SIMD delimiter search
+- Implement join() with SIMD memory copy
+- Requirements: 2.4, 2.5
+- 2.6 Implement AVX2 count and replace operations
+- Implement count() with SIMD occurrence counting
+- Implement replace() with SIMD search and replace
+- Requirements: 2.6, 2.12
+- 2.7 Implement scalar fallback engine
+- Implement ScalarStringEngine with same interface
+- Ensure identical results to SIMD
+- Requirements: 2.7, 2.8
+- 2.8 Implement NEON fallback for ARM
+- Implement NeonStringEngine for aarch64
+- Use NEON intrinsics for ARM SIMD
+- Requirements: 2.7
+- 2.9 Write property test for SIMD string correctness
+- Property 4: SIMD String Operation Correctness
+- Test find, count, eq, lower, upper, split, join, replace
+- Validates: Requirements 2.9
+- 2.10 Checkpoint
+- Feature 2 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 3: Lock-Free Parallel Garbage Collector
+- 3.1 Create dx-py-gc crate structure
+- Create Cargo.toml with crossbeam, rayon dependencies
+- Define GC traits and interfaces
+- Requirements: 3.1
+- 3.2 Implement LockFreeRefCount (64-bit atomic)
+- Implement atomic u64 with strong/weak split
+- Implement inc_strong(), dec_strong() with proper ordering
+- Implement inc_weak(), dec_weak()
+- Implement mark_for_cycle() for cycle detection
+- Requirements: 3.1, 3.2
+- 3.3 Write property test for reference count consistency
+- Property 9: Reference Count Consistency
+- Validates: Requirements 3.1
+- 3.4 Implement EpochGc (epoch-based reclamation)
+- Implement global_epoch with atomic counter
+- Implement thread_epochs for per-thread tracking
+- Implement garbage_lists for deferred reclamation
+- Implement enter_epoch(), exit_epoch()
+- Implement defer_free(), try_collect()
+- Requirements: 3.3
+- 3.5 Implement CycleDetector (concurrent)
+- Implement add_root() for potential cycle roots
+- Implement detect_cycles() with parallel tracing
+- Implement work-stealing for trace parallelism
+- Use snapshot-at-the-beginning for consistency
+- Requirements: 3.4, 3.5
+- 3.6 Implement parallel tracing with work stealing
+- Implement trace_object() with child enumeration
+- Implement work-stealing queues for load balancing
+- Scale to all available CPU cores
+- Requirements: 3.6, 3.10
+- 3.7 Write property test for GC pause time bound
+- Property 20: GC Pause Time Bound
+- Verify max pause < 100μs
+- Validates: Requirements 3.7
+- 3.8 Checkpoint
+- Feature 3 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 4: Tiered JIT with Cranelift Backend
+- 4.1 Create dx-py-jit crate structure
+- Create Cargo.toml with cranelift-codegen, cranelift-jit dependencies
+- Define CompilationTier enum (Interpreter, BaselineJit, OptimizingJit, AotOptimized)
+- Define JIT traits and interfaces
+- Requirements: 4.1
+- 4.2 Implement FunctionProfile for profiling
+- Implement call_count with AtomicU64
+- Implement type_feedback vector for bytecode locations
+- Implement branch_counts for hot path detection
+- Implement deopt_count tracking
+- Requirements: 4.1, 4.6
+- 4.3 Implement TypeFeedback for type recording
+- Implement observed_types array (up to 4 types)
+- Implement record() for type observation
+- Implement is_monomorphic(), get_types()
+- Requirements: 4.6
+- 4.4 Implement TieredJit compiler
+- Implement check_promotion() for tier decisions
+- Implement compile() dispatcher for tiers
+- Implement compiled_code cache with DashMap
+- Requirements: 4.1, 4.2, 4.3, 4.4
+- 4.5 Implement Tier 1 baseline JIT
+- Implement compile_baseline() with 1:1 bytecode to IR
+- Implement Cranelift IR emission for all opcodes
+- Implement code finalization with JITModule
+- Requirements: 4.2
+- 4.6 Implement Tier 2 optimizing JIT
+- Implement compile_optimized() with type specialization
+- Implement emit_int_add_specialized() for int+int
+- Implement emit_float_add_simd() for float+float
+- Implement emit_generic_add_with_guard() with type guards
+- Requirements: 4.3
+- 4.7 Write property test for JIT tier promotion
+- Property 18: JIT Tier Promotion Threshold
+- Verify Tier 1 at 100 calls, Tier 2 at 1000, Tier 3 at 10000
+- Validates: Requirements 4.2, 4.3, 4.4
+- 4.8 Implement On-Stack Replacement (OSR)
+- Implement OsrManager with osr_entries map
+- Implement compile_and_enter() for hot loops
+- Implement frame snapshot for OSR entry
+- Requirements: 4.7
+- 4.9 Checkpoint
+- Feature 4 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 5: Speculative Type Prediction
+- 5.1 Implement InlineCache (monomorphic)
+- Implement cached_type with AtomicU8
+- Implement state tracking (Uninitialized, Monomorphic, Polymorphic, Megamorphic)
+- Implement lookup() with fast path
+- Implement update() for cache population
+- Requirements: 5.1
+- 5.2 Implement PolymorphicInlineCache (PIC)
+- Implement entries array (up to 4 types)
+- Implement lookup() checking all entries
+- Implement add_entry() with overflow to megamorphic
+- Requirements: 5.2
+- 5.3 Write property test for inline cache hit rate
+- Property 11: Inline Cache Hit Rate
+- Verify 99% hit rate for monomorphic sites
+- Validates: Requirements 5.4
+- 5.4 Implement TypePredictor with statistics
+- Implement type_stats map per bytecode location
+- Implement predict() with confidence threshold
+- Implement record() for type observation
+- Requirements: 5.6, 5.7
+- 5.5 Implement DeoptHandler
+- Implement deopt_info map from code address to state
+- Implement deoptimize() for frame restoration
+- Implement value location restoration (register, stack, constant)
+- Requirements: 5.8, 5.9
+- 5.6 Write property test for deoptimization correctness
+- Property 6: JIT Deoptimization Correctness
+- Validates: Requirements 5.11
+- 5.7 Checkpoint
+- Feature 5 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 6: Memory Teleportation FFI (Zero-Copy)
+- 6.1 Create dx-py-ffi crate structure
+- Create Cargo.toml with pyo3, numpy dependencies
+- Define FFI traits and interfaces
+- Requirements: 6.1
+- 6.2 Implement TeleportedArray for NumPy
+- Implement from_numpy() with direct pointer sharing
+- Implement shape, strides, dtype metadata
+- Implement owner reference for lifetime management
+- Requirements: 6.1, 6.2, 6.7
+- 6.3 Implement zero-copy slice access
+- Implement as_slice() returning slice into NumPy memory
+- Implement as_mut_slice() for mutable access
+- Requirements: 6.1, 6.8
+- 6.4 Write property test for zero-copy FFI
+- Property 13: Zero-Copy FFI Pointer Sharing
+- Verify pointer equality with original NumPy array
+- Validates: Requirements 6.1
+- 6.5 Implement SIMD operations on teleported arrays
+- Implement add_scalar_f64_simd() with AVX2
+- Implement mul_scalar_f64_simd()
+- Implement element-wise operations
+- Requirements: 6.3
+- 6.6 Implement GIL-free execution
+- Implement execute_gil_free() with py.allow_threads()
+- Ensure thread safety for pure computation
+- Requirements: 6.4
+- 6.7 Implement CApiCompat layer
+- Implement api_table with function pointers
+- Implement py_incref(), py_decref(), py_type()
+- Implement type checking functions (PyLong_Check, etc.)
+- Requirements: 6.11
+- 6.8 Implement FastFfi for low-overhead calls
+- Implement function pointer cache
+- Implement call() with zero-copy arguments
+- Target <10ns call overhead
+- Requirements: 6.5
+- 6.9 Checkpoint
+- Feature 6 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 7: Binary Module Format (DPM)
+- 7.1 Create dx-py-modules crate structure
+- Create Cargo.toml with memmap2 dependency
+- Define module loading traits
+- Requirements: 7.1
+- 7.2 Implement DpmHeader structure
+- Implement magic bytes "DPM\x01"
+- Implement section offsets (imports, exports, functions, classes, constants)
+- Implement type_annotations_offset for JIT hints
+- Implement init_bytecode for module initialization
+- Implement content_hash for integrity
+- Requirements: 7.1, 7.2, 7.4, 7.5, 7.6, 7.7
+- 7.3 Implement ExportTable with perfect hashing
+- Implement seed-based perfect hash function
+- Implement ExportEntry with name_hash, kind, value_offset
+- Implement get() with O(1) lookup
+- Requirements: 7.3
+- 7.4 Write property test for perfect hash lookup
+- Property 14: Perfect Hash Export Lookup
+- Verify O(1) lookup for all symbols
+- Validates: Requirements 7.3
+- 7.5 Implement ImportEntry structure
+- Implement module_name_offset, symbol_name_offset
+- Implement ImportFlags (FROM_IMPORT, STAR_IMPORT, RELATIVE)
+- Requirements: 7.2
+- 7.6 Implement DpmLoader with memory mapping
+- Implement load() with mmap (zero-copy)
+- Implement get_symbol() with O(1) export lookup
+- Implement module cache with DashMap
+- Requirements: 7.8
+- 7.7 Implement DpmCompiler
+- Implement extract_imports(), extract_exports()
+- Implement build_export_table() with perfect hash
+- Implement serialize() to binary format
+- Requirements: 7.9
+- 7.8 Write property test for DPM round-trip
+- Property 2: DPM Module Round-Trip Consistency
+- Validates: Requirements 7.10
+- 7.9 Checkpoint
+- Feature 7 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 8: Thread-Per-Core Parallel Executor
+- 8.1 Create dx-py-parallel crate structure
+- Create Cargo.toml with crossbeam, core_affinity dependencies
+- Define ParallelExecutor traits
+- Requirements: 8.1
+- 8.2 Implement Worker thread structure
+- Implement local_queue with crossbeam::deque::Worker
+- Implement core_id for affinity
+- Implement thread handle management
+- Requirements: 8.1, 8.2
+- 8.3 Implement ParallelExecutor
+- Implement new() creating one thread per physical core
+- Implement core pinning with core_affinity
+- Implement global_queue with Injector
+- Implement stealers vector for work stealing
+- Requirements: 8.1, 8.2, 8.3
+- 8.4 Implement worker_loop with work stealing
+- Implement local queue priority
+- Implement global queue fallback
+- Implement stealing from other workers
+- Implement parking on no work
+- Requirements: 8.3, 8.4
+- 8.5 Implement submit() for task submission
+- Implement Task struct with boxed closure
+- Implement priority support
+- Implement worker wake-up
+- Requirements: 8.4
+- 8.6 Implement parallel_map() API
+- Implement parallel iteration over items
+- Implement result collection with synchronization
+- Implement completion notification
+- Requirements: 8.5
+- 8.7 Write property test for parallel scaling
+- Property 12: Parallel Executor Linear Scaling
+- Verify 0.9*N speedup on N cores
+- Validates: Requirements 8.6
+- 8.8 Implement ParallelPyObject
+- Implement atomic type_tag
+- Implement LockFreeRefCount integration
+- Implement cas_field() for atomic updates
+- Requirements: 8.9, 8.10
+- 8.9 Checkpoint
+- Feature 8 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 9: Stack Allocation Fast Path
+- 9.1 Implement EscapeAnalyzer
+- Implement stack_candidates and escaped sets
+- Implement alloc_sites map for allocation tracking
+- Requirements: 9.1
+- 9.2 Implement escape analysis passes
+- Implement first pass: identify allocation sites
+- Implement second pass: mark escaping objects
+- Handle returns, stores, calls as escape points
+- Requirements: 9.2, 9.3, 9.4, 9.5, 9.8, 9.9
+- 9.3 Write property test for escape analysis soundness
+- Property 10: Escape Analysis Soundness
+- Validates: Requirements 9.1
+- 9.4 Implement StackTuple
+- Implement with const generics for size
+- Implement PyObjectHeader for stack objects
+- Implement get() for element access
+- Requirements: 9.2
+- 9.5 Implement StackList
+- Implement fixed-capacity list
+- Implement push() with overflow check
+- Implement fallback to heap on overflow
+- Requirements: 9.3
+- 9.6 Implement TaggedValue for small integers
+- Implement tag bits for type discrimination
+- Implement from_small_int() for
+- 2^60 to 2^60-1
+- Implement is_small_int(), as_small_int()
+- Implement from_ptr() for object pointers
+- Requirements: 9.7
+- 9.7 Write property test for stack allocation equivalence
+- Property 7: Stack Allocation Semantic Equivalence
+- Validates: Requirements 9.11
+- 9.8 Checkpoint
+- Feature 9 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 10: Binary Protocol IPC (HBTP for Python)
+- 10.1 Create dx-py-ipc crate structure
+- Create Cargo.toml with memmap2, bincode dependencies
+- Define HBTP protocol traits
+- Requirements: 10.1
+- 10.2 Implement HbtpHeader (8 bytes)
+- Implement magic (0xDEAD), msg_type, flags, payload_len
+- Implement MessageType enum (TransferObject, TransferArray, CallFunction, etc.)
+- Implement HbtpFlags bitflags (COMPRESSED, SHARED_MEMORY, REQUIRES_ACK)
+- Requirements: 10.1, 10.2, 10.3
+- 10.3 Implement SharedMemoryArena
+- Implement create() with named shared memory
+- Implement open() for cross-process access
+- Implement alloc() with bump allocator
+- Implement write(), get() for data access
+- Requirements: 10.6
+- 10.4 Implement SharedArrayHandle
+- Implement from_array() copying to shared memory
+- Implement as_array() returning view into shared memory
+- Implement shape, strides, dtype metadata
+- Requirements: 10.2
+- 10.5 Implement HbtpChannel
+- Implement send_queue, recv_queue with SegQueue
+- Implement send_array() with zero-copy for large arrays
+- Implement recv_array() returning shared view
+- Requirements: 10.4, 10.5
+- 10.6 Write property test for HBTP round-trip
+- Property 3: HBTP Serialization Round-Trip
+- Validates: Requirements 10.11
+- 10.7 Checkpoint
+- Feature 10 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 11: Reactive Bytecode Cache
+- 11.1 Create dx-py-cache crate structure
+- Create Cargo.toml with memmap2, notify, blake3 dependencies
+- Define cache traits and interfaces
+- Requirements: 11.1
+- 11.2 Implement CacheEntry structure
+- Implement source_hash with BLAKE3
+- Implement data_offset, data_size for mmap access
+- Implement validated_at timestamp
+- Implement tier for compilation level
+- Requirements: 11.3, 11.4
+- 11.3 Implement ReactiveCache
+- Implement open() with mmap
+- Implement index with DashMap
+- Implement file watcher with notify
+- Requirements: 11.1, 11.2
+- 11.4 Implement O(1) cache lookup
+- Implement get() with path hashing
+- Implement is_valid_quick() with timestamp check
+- Implement validate_full() with content hash
+- Requirements: 11.1, 11.5
+- 11.5 Implement cache storage
+- Implement store() with source hash computation
+- Implement allocate() for space management
+- Implement atomic mmap writes
+- Requirements: 11.7, 11.8
+- 11.6 Implement file watching and invalidation
+- Implement watch() for directory monitoring
+- Implement process_invalidations() for change handling
+- Implement start_background_validation() thread
+- Requirements: 11.2, 11.6
+- 11.7 Write property test for cache invalidation
+- Property 17: Cache Invalidation Correctness
+- Validates: Requirements 11.6
+- 11.8 Checkpoint
+- Feature 11 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 12: SIMD-Accelerated Collections
+- 12.1 Implement SimdStorage enum
+- Implement Ints variant with Vec
+- Implement Floats variant with Vec
+- Implement Mixed variant with Vec
+- Requirements: 12.1, 12.2
+- 12.2 Implement SimdList with type detection
+- Implement from_py_list() with homogeneous type detection
+- Implement storage selection based on element types
+- Requirements: 12.1, 12.2
+- 12.3 Implement SIMD sum operations
+- Implement sum_ints() with AVX2 horizontal sum
+- Implement sum_floats() with AVX2
+- Handle scalar remainder
+- Requirements: 12.3
+- 12.4 Implement SIMD filter operations
+- Implement filter_gt_int() with AVX2 comparison
+- Return indices matching predicate
+- Requirements: 12.7
+- 12.5 Implement SIMD map operations
+- Implement map_mul2_int() with AVX2 shift
+- Implement general map with SIMD
+- Requirements: 12.4
+- 12.6 Implement SIMD index and count
+- Implement index() with SIMD search
+- Implement count() with SIMD matching
+- Requirements: 12.5, 12.6
+- 12.7 Implement SwissDict with SIMD probe
+- Implement ctrl bytes for SIMD matching
+- Implement find() with SSE2 probe
+- Implement EMPTY and DELETED markers
+- Requirements: 12.8
+- 12.8 Write property test for SIMD collection correctness
+- Property 5: SIMD Collection Operation Correctness
+- Validates: Requirements 12.11
+- 12.9 Checkpoint
+- Feature 12 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 13: Compiler-Inlined Decorators
+- 13.1 Implement InlineableDecorator enum
+- Define StaticMethod, ClassMethod, Property
+- Define LruCache with maxsize
+- Define Dataclass with frozen, slots
+- Define Jit, Parallel markers
+- Requirements: 13.1, 13.2, 13.3, 13.4, 13.5, 13.6, 13.7
+- 13.2 Implement DecoratorInliner
+- Implement inline() dispatcher
+- Implement custom_decorators registry
+- Requirements: 13.11
+- 13.3 Implement @staticmethod, @classmethod inlining
+- Set STATIC_METHOD flag (zero overhead)
+- Set CLASS_METHOD flag with cls injection
+- Requirements: 13.1, 13.2
+- 13.4 Implement @property inlining
+- Set PROPERTY_GETTER flag
+- Generate getter descriptor at compile time
+- Requirements: 13.3
+- 13.5 Implement @lru_cache inlining
+- Implement inline_lru_cache() with cache lookup prepend
+- Implement cache store before returns
+- Implement InlineLruCache with LRU eviction
+- Requirements: 13.4
+- 13.6 Implement @dataclass inlining
+- Implement inline_dataclass() with field extraction
+- Implement generate_init(), generate_repr(), generate_eq()
+- Implement generate_hash() for frozen classes
+- Implement slots support
+- Requirements: 13.5
+- 13.7 Implement @jit and @parallel markers
+- Set IMMEDIATE_JIT flag for @jit
+- Set AUTO_PARALLEL flag for @parallel
+- Requirements: 13.6, 13.7
+- 13.8 Write property test for decorator compatibility
+- Property 8: Decorator Inlining Compatibility
+- Validates: Requirements 13.12
+- 13.9 Checkpoint
+- Feature 13 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 14: Persistent Compilation Cache (PCC)
+- 14.1 Create dx-py-pcc crate structure
+- Create Cargo.toml with memmap2, bincode dependencies
+- Define PCC traits and interfaces
+- Requirements: 14.1
+- 14.2 Implement FunctionSignature
+- Implement source_hash, bytecode_hash, type_profile_hash
+- Implement Hash, Eq for cache lookup
+- Requirements: 14.2
+- 14.3 Implement CachedArtifact
+- Implement tier, code_offset, code_size
+- Implement relocations vector
+- Implement profile data
+- Implement created_at timestamp
+- Requirements: 14.3, 14.4
+- 14.4 Implement PersistentCompilationCache
+- Implement open() with index loading
+- Implement code_cache with mmap pages
+- Implement code_offset atomic counter
+- Requirements: 14.1, 14.3
+- 14.5 Implement cache lookup
+- Implement get() with signature lookup
+- Return code pointer from mmap
+- Requirements: 14.6
+- 14.6 Implement cache storage
+- Implement save() with code allocation
+- Implement allocate_code() with alignment
+- Implement grow_code_cache() for new pages
+- Requirements: 14.1, 14.3
+- 14.7 Implement cache persistence
+- Implement flush() with atomic index write
+- Implement mmap flush for code pages
+- Requirements: 14.1
+- 14.8 Implement cache invalidation and cleanup
+- Implement invalidate_source() for changed files
+- Implement cleanup() with LRU eviction
+- Requirements: 14.8, 14.9
+- 14.9 Checkpoint
+- Feature 14 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 15: Cross-Process Shared Objects (Entangled Objects)
+- 15.1 Create dx-py-entangled crate structure
+- Create Cargo.toml with shared_memory, uuid dependencies
+- Define entangled object traits
+- Requirements: 15.1
+- 15.2 Implement SharedMemoryRegion
+- Implement create() with named shared memory
+- Implement open() for cross-process access
+- Implement allocate() with mutex-protected bump allocator
+- Requirements: 15.1
+- 15.3 Implement EntangledObject
+- Implement id with u128 UUID
+- Implement shm reference with Arc
+- Implement offset, type_info, size
+- Implement version pointer for optimistic concurrency
+- Requirements: 15.1, 15.2, 15.3
+- 15.4 Implement zero-copy read access
+- Implement read() returning slice into shared memory
+- Implement memory barrier for consistency
+- Requirements: 15.4
+- 15.5 Implement optimistic write with CAS
+- Implement write() with version check
+- Implement compare_exchange for version update
+- Return ConcurrencyError on conflict
+- Requirements: 15.5, 15.11
+- 15.6 Write property test for entangled object consistency
+- Property 15: Entangled Object Cross-Process Consistency
+- Validates: Requirements 15.1
+- 15.7 Write property test for optimistic concurrency
+- Property 16: Optimistic Concurrency Version Ordering
+- Validates: Requirements 15.11
+- 15.8 Implement EntangledHandle for process transfer
+- Implement get_handle() returning serializable handle
+- Implement from_handle() for reconstruction
+- Requirements: 15.6
+- 15.9 Implement EntangledArray for NumPy
+- Implement from_teleported() copying to shared memory
+- Implement as_view() returning TeleportedArrayView
+- Implement add_scalar_f64() with SIMD and versioning
+- Requirements: 15.9
+- 15.10 Checkpoint
+- Feature 15 complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Integration: Core Runtime and CLI
+- 16.1 Create dx-py-core crate for object model
+- Implement PyObjectHeader with LockFreeRefCount
+- Implement PyType enum with all type tags
+- Implement core types: PyInt, PyStr, PyList, PyDict, PyTuple, PyFunction
+- Implement PyFrame for stack frames
+- Requirements: All core requirements
+- 16.2 Create dx-py-interpreter crate
+- Implement bytecode dispatch loop
+- Implement all DPB opcodes
+- Implement built-in functions
+- Integrate with JIT for hot code
+- Requirements: 1.7, 4.1
+- 16.3 Create dx-py-cli crate
+- Implement main entry point with clap
+- Implement file execution mode
+- Implement REPL mode
+- Implement command-line options
+- Requirements: 16.1, 16.2
+- 16.4 Wire all subsystems together
+- Wire DPB loader to interpreter
+- Wire interpreter to JIT
+- Wire SIMD engines to built-in operations
+- Wire FFI to NumPy integration
+- Wire parallel executor to multiprocessing
+- Wire PCC to JIT
+- Wire reactive cache to module loading
+- Requirements: All
+- 16.5 Checkpoint
+- Integration complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Performance Validation
+- 17.1 Implement performance benchmarks
+- Implement startup time benchmark
+- Implement import time benchmark
+- Implement PyPerformance suite runner
+- Implement memory usage benchmark
+- Requirements: 16.1, 16.2, 16.3, 16.4, 16.5, 16.6, 16.7, 16.8
+- 17.2 Validate cold startup target (<3ms)
+- Measure and profile startup path
+- Optimize initialization sequence
+- Requirements: 16.1
+- 17.3 Validate warm startup target (<0.5ms)
+- Measure with PCC enabled
+- Optimize cache loading path
+- Requirements: 16.2
+- 17.4 Validate import time target (<2ms for large apps)
+- Measure DPM loading performance
+- Optimize module resolution
+- Requirements: 16.4
+- 17.5 Validate GC pause target (<100μs)
+- Measure GC pause times under load
+- Tune epoch timing
+- Requirements: 16.8
+- 17.6 Validate PyPerformance target (≥5x vs PyPy)
+- Run full benchmark suite
+- Identify and optimize slow paths
+- Requirements: 16.9
+- 17.7 Validate CPython compatibility (95%+ PyPI)
+- Run compatibility test suite
+- Fix compatibility issues
+- Requirements: 16.12
+- 17.8 Checkpoint
+- Performance validation complete
+- Ensure all tests pass, ask the user if questions arise.
+- -Final Integration and Release
+- 18.1 Implement standard library compatibility
+- Implement os module basics
+- Implement io module basics
+- Implement json module with simd-json
+- Implement sys module
+- Requirements: 16.12
+- 18.2 Implement debugging support
+- Implement line number tracking
+- Implement stack trace generation
+- Implement debugger protocol
+- Requirements: All
+- 18.3 Final documentation
+- Document architecture
+- Document API
+- Document performance characteristics
+- Requirements: All
+- 18.4 Final Checkpoint
+- All tests pass
+- Ensure all tests pass, ask the user if questions arise.
+- -Feature 17: Platform-Native Async I/O (io_uring/kqueue/IOCP)
+- 19.1 Create dx-py-reactor crate structure
+- Create Cargo.toml with io-uring, libc, windows-sys dependencies
+- Define Reactor trait and IoOperation enum
+- Define Completion and IoBuffer structures
+- Requirements: 17.11
+- 19.2 Implement io_uring reactor (Linux)
+- Implement IoUringReactor with SQPOLL mode
+- Implement submit() for single operations
+- Implement submit_batch() for batched operations
+- Implement poll() and wait() for completions
+- Implement register_files() for zero-copy FD access
+- Implement register_buffers() for zero-copy buffers
+- Requirements: 17.1, 17.4, 17.5, 17.6, 17.9, 17.10
+- 19.3 Implement multi-shot accept and zero-copy send
+- Implement AcceptMulti operation for high-throughput connections
+- Implement SendZeroCopy operation for zero-copy network sends
+- Requirements: 17.7, 17.8
+- 19.4 Write property test for io_uring correctness
+- Property 21: Platform-Native Async I/O Cross-Platform Correctness
+- Validates: Requirements 17.17
+- 19.5 Implement kqueue reactor (macOS)
+- Implement KqueueReactor with kevent
+- Implement submit() and submit_batch()
+- Implement poll() and wait()
+- Requirements: 17.2
+- 19.6 Implement IOCP reactor (Windows)
+- Implement IocpReactor with CreateIoCompletionPort
+- Implement submit() and submit_batch()
+- Implement poll() and wait() with GetQueuedCompletionStatusEx
+- Requirements: 17.3
+- 19.7 Implement platform-agnostic reactor factory
+- Implement create_reactor() with platform detection
+- Implement fallback from io_uring SQPOLL to basic mode
+- Requirements: 17.11, 17.18
+- 19.8 Write property test for batched I/O
+- Property 22: Batched I/O Single Syscall
+- **Validates: Requirements 17.9, 17.10
+- 19.9 Implement ReactorPool for Thread-Per-Core integration
+- Implement one reactor per core
+- Implement get_reactor() for current thread
+- Wire to ParallelExecutor
+- Requirements: 17.12
+- 19.10 Implement PyFuture for async/await compatibility
+- Implement Future trait for PyFuture
+- Implement set_result() and set_error()
+- Implement Python async/await integration
+- Requirements: 17.22
+- 19.11 Implement async file operations
+- Implement async_read_file()
+- Implement async_write_file()
+- Implement async_read_files_batch() for parallel reads
+- Requirements: 17.19
+- 19.12 Implement async network operations
+- Implement async_accept()
+- Implement async_connect()
+- Implement async_send() and async_recv()
+- Requirements: 17.20
+- 19.13 Implement async DNS resolution
+- Implement async_resolve() for DNS lookups
+- Requirements: 17.21
+- 19.14 Write property test for multi-shot accept
+- Property 23: Multi-Shot Accept Correctness
+- Validates: Requirements 17.7
+- 19.15 Write property test for zero-copy send
+- Property 24: Zero-Copy Send Correctness
+- Validates: Requirements 17.8
+- 19.16 Checkpoint
+- Feature 17 complete
+- All 25 unit tests pass
+- Property tests implemented for cross-platform correctness
+
+## Notes
+
+- All tasks including property-based tests are required for comprehensive correctness
+- Each feature phase is self-contained and can be developed independently
+- Checkpoints ensure incremental validation after each feature
+- Property tests validate universal correctness properties
+- Unit tests validate specific examples and edge cases
+- Performance targets should be validated on reference hardware
+- Features 1-15 correspond to the original 15 game-changing features in the design
+- Feature 17 (Task 19) adds Platform-Native Async I/O with io_uring (Linux), kqueue (macOS), and IOCP (Windows)
+- Features 16-18 handle integration, validation, and release

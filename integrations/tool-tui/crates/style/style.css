@@ -1,0 +1,140 @@
+/*
+  ████████   ██             ██
+ ██░░░░░░   ░██    ██   ██ ░██
+░██        ██████ ░░██ ██  ░██  █████
+░█████████░░░██░   ░░███   ░██ ██░░░██
+░░░░░░░░██  ░██     ░██    ░██░███████
+       ░██  ░██     ██     ░██░██░░░░
+ ████████   ░░██   ██      ███░░██████
+░░░░░░░░     ░░   ░░      ░░░  ░░░░░░
+Dx Style v0.0.1 | MIT License | https://dx.com
+*/
+@layer theme, components, base, properties, utilities;
+
+@layer theme {
+  :root {
+    --font-sans: Geist, sans-serif;
+    --font-serif: Georgia, serif;
+    --font-mono: Geist Mono, monospace;
+    --radius: 0.5rem;
+    --background: oklch(98% 0.012 317.74);
+    --foreground: oklch(23% 0.01 303.73);
+    --card: oklch(98% 0.012 317.74);
+    --card-foreground: oklch(23% 0.01 303.73);
+    --popover: oklch(98% 0.012 317.74);
+    --popover-foreground: oklch(23% 0.01 303.73);
+    --primary: oklch(49% 0.092 295.5);
+    --primary-foreground: oklch(100% 0 89.88);
+    --secondary: oklch(49% 0.036 299.63);
+    --secondary-foreground: oklch(100% 0 89.88);
+    --muted: oklch(92% 0.018 314.73);
+    --muted-foreground: oklch(40% 0.016 305.69);
+    --accent: oklch(49% 0.064 358.14);
+    --accent-foreground: oklch(100% 0 89.88);
+    --destructive: oklch(51% 0.193 27.79);
+    --destructive-foreground: oklch(100% 0 89.88);
+    --border: oklch(57% 0.016 308.14);
+    --input: oklch(93% 0.012 317.74);
+    --ring: oklch(49% 0.092 295.5);
+    --chart-1: oklch(67% 0.129 294.69);
+    --chart-2: oklch(66% 0.035 301.29);
+    --chart-3: oklch(66% 0.065 359.35);
+    --chart-4: oklch(83% 0.093 297.54);
+    --chart-5: oklch(83% 0.036 301.98);
+    --sidebar: oklch(97% 0.012 317.74);
+    --sidebar-foreground: oklch(23% 0.01 303.73);
+    --sidebar-primary: oklch(49% 0.092 295.5);
+    --sidebar-primary-foreground: oklch(100% 0 89.88);
+    --sidebar-accent: oklch(92% 0.038 302.46);
+    --sidebar-accent-foreground: oklch(23% 0.035 296.3);
+    --sidebar-border: oklch(83% 0.015 308.26);
+    --sidebar-ring: oklch(49% 0.092 295.5);
+    --shadow-color: oklch(0% 0 0);
+    --shadow-opacity: 0.18;
+    --shadow-blur: 2px;
+    --shadow-spread: 0px;
+    --shadow-offset-x: 0px;
+    --shadow-offset-y: 1px;
+    --color-white: white;
+  }
+
+  .dark {
+    --background: oklch(19% 0.01 303.57);
+    --foreground: oklch(91% 0.014 314.75);
+    --card: oklch(19% 0.01 303.57);
+    --card-foreground: oklch(91% 0.014 314.75);
+    --popover: oklch(19% 0.01 303.57);
+    --popover-foreground: oklch(91% 0.014 314.75);
+    --primary: oklch(84% 0.091 297.09);
+    --primary-foreground: oklch(32% 0.093 293.26);
+    --secondary: oklch(83% 0.036 301.98);
+    --secondary-foreground: oklch(31% 0.036 298.01);
+    --muted: oklch(40% 0.016 305.69);
+    --muted-foreground: oklch(83% 0.015 308.26);
+    --accent: oklch(84% 0.066 359.42);
+    --accent-foreground: oklch(32% 0.058 358.52);
+    --destructive: oklch(84% 0.088 26.83);
+    --destructive-foreground: oklch(33% 0.134 27.57);
+    --border: oklch(66% 0.016 308.2);
+    --input: oklch(29% 0.011 300.87);
+    --ring: oklch(84% 0.091 297.09);
+    --chart-1: oklch(67% 0.129 294.69);
+    --chart-2: oklch(66% 0.035 301.29);
+    --chart-3: oklch(66% 0.065 359.35);
+    --chart-4: oklch(83% 0.093 297.54);
+    --chart-5: oklch(83% 0.036 301.98);
+    --sidebar: oklch(23% 0.01 303.73);
+    --sidebar-foreground: oklch(91% 0.014 314.75);
+    --sidebar-primary: oklch(84% 0.091 297.09);
+    --sidebar-primary-foreground: oklch(32% 0.093 293.26);
+    --sidebar-accent: oklch(40% 0.034 298.59);
+    --sidebar-accent-foreground: oklch(92% 0.038 302.46);
+    --sidebar-border: oklch(40% 0.016 305.69);
+    --sidebar-ring: oklch(84% 0.091 297.09);
+    --shadow-color: oklch(0% 0 0);
+    --shadow-opacity: 0.18;
+    --shadow-blur: 2px;
+    --shadow-spread: 0px;
+    --shadow-offset-x: 0px;
+    --shadow-offset-y: 1px;
+    --color-white: white;
+  }
+}
+
+@layer components {
+  
+}
+
+@layer base {
+  
+}
+
+@layer properties {
+  
+}
+
+@layer utilities {
+  .bg-blue-500 {
+  }
+
+  .flex {
+    display: flex;
+  }
+
+  .font-bold {
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .p-4 {
+  }
+
+  .text-lg {
+  }
+
+  .text-white {
+    color: var(--color-white);
+  }
+}

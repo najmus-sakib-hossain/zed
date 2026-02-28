@@ -1,0 +1,17 @@
+[package]
+name = "dx-pkg-store"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+dx-pkg-core = { path = "../dx-pkg-core" }
+dx-pkg-format = { path = "../dx-pkg-format" }
+memmap2 = "0.9"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }
+parking_lot = "0.12"
+thiserror = "2.0"
+
+[dev-dependencies]
+tempfile = "3.8"

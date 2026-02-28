@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DX Forge - VCS & Orchestration Engine</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="login-page" class="login-container">
+        <div class="login-box glass-panel">
+            <div class="logo-section">
+                <div class="logo-icon">⚡</div>
+                <h1>DX Forge</h1>
+                <p class="tagline">Production VCS & Orchestration Engine</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-primary">Sign In</button>
+                <div id="login-error" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="app-header glass-panel">
+            <div class="header-left">
+                <div class="logo-icon-small">⚡</div>
+                <h1 class="app-title">DX Forge</h1>
+                <div class="repo-info">
+                    <span class="repo-label">Repository:</span>
+                    <span id="repo-name" class="repo-name">...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span class="user-icon">👤</span>
+                    <span id="current-user" class="username">...</span>
+                    <span id="user-role" class="user-role">...</span>
+                </div>
+                <button id="logout-btn" class="btn btn-secondary">Logout</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar Navigation -->
+            <nav class="sidebar glass-panel">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-tab="browser">
+                        <span class="nav-icon">📁</span>
+                        <span class="nav-label">Repository</span>
+                    </li>
+                    <li class="nav-item" data-tab="timeline">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Timeline</span>
+                    </li>
+                    <li class="nav-item" data-tab="users">
+                        <span class="nav-icon">👥</span>
+                        <span class="nav-label">Users</span>
+                    </li>
+                    <li class="nav-item" data-tab="settings">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-label">Settings</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Content Area -->
+            <main class="content-area">
+                <!-- Repository Browser Tab -->
+                <div id="browser-tab" class="tab-content active">
+                    <div class="browser-layout">
+                        <!-- File Tree -->
+                        <div class="file-tree-panel glass-panel">
+                            <div class="panel-header">
+                                <h2>Files</h2>
+                                <div class="breadcrumb" id="breadcrumb"></div>
+                            </div>
+                            <div class="file-tree" id="file-tree">
+                                <div class="loading">Loading repository...</div>
+                            </div>
+                        </div>
+
+                        <!-- File Viewer -->
+                        <div class="file-viewer-panel glass-panel">
+                            <div class="panel-header">
+                                <h2 id="file-name">Select a file</h2>
+                                <div class="file-actions">
+                                    <button class="btn-icon" id="copy-code-btn" title="Copy">📋</button>
+                                </div>
+                            </div>
+                            <div class="file-content" id="file-content">
+                                <div class="empty-state">
+                                    <div class="empty-icon">📄</div>
+                                    <p>Select a file to view its contents</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timeline Tab -->
+                <div id="timeline-tab" class="tab-content">
+                    <div class="timeline-container glass-panel">
+                        <div class="panel-header">
+                            <h2>Operation Timeline</h2>
+                            <div class="timeline-filters">
+                                <input type="text" id="timeline-search" placeholder="Search operations..." class="search-input">
+                                <select id="timeline-filter" class="filter-select">
+                                    <option value="all">All Operations</option>
+                                    <option value="insert">Inserts</option>
+                                    <option value="delete">Deletes</option>
+                                    <option value="update">Updates</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="timeline-content" id="timeline-content">
+                            <div class="loading">Loading operations...</div>
+                        </div>
+                        <div class="realtime-indicator">
+                            <span class="pulse-dot"></span>
+                            <span>Real-time updates</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="users-tab" class="tab-content">
+                    <div class="users-container glass-panel">
+                        <div class="panel-header">
+                            <h2>User Management</h2>
+                            <button id="add-user-btn" class="btn btn-primary">+ Add User</button>
+                        </div>
+                        <div class="users-list" id="users-list">
+                            <div class="loading">Loading users...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div id="settings-tab" class="tab-content">
+                    <div class="settings-container glass-panel">
+                        <div class="panel-header">
+                            <h2>Settings</h2>
+                        </div>
+                        <div class="settings-content">
+                            <div class="setting-group">
+                                <h3>Auto-Update Settings</h3>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="auto-update-enabled" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label">Enable Green Traffic Auto-Updates</span>
+                                </label>
+                            </div>
+                            <div class="setting-group">
+                                <h3>Appearance</h3>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="dark-mode-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-label">Dark Mode</span>
+                                </label>
+                            </div>
+                            <div class="setting-group">
+                                <h3>Change Password</h3>
+                                <form id="change-password-form">
+                                    <div class="form-group">
+                                        <label>Current Password</label>
+                                        <input type="password" id="current-password" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>New Password</label>
+                                        <input type="password" id="new-password" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Confirm New Password</label>
+                                        <input type="password" id="confirm-password" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Update Password</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <div class="modal-header">
+                <h2>Add New User</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label>Email (optional)</label>
+                    <input type="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role" required>
+                        <option value="viewer">Viewer</option>
+                        <option value="developer">Developer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

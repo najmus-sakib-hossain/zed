@@ -1,0 +1,40 @@
+[package]
+name = "dx-agent-voice"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "DX Agent voice - TTS, STT, and voice streaming via ElevenLabs and OpenAI"
+
+[dependencies]
+# Async
+tokio = { version = "1.42", features = ["full"] }
+async-trait = "0.1"
+futures-util = "0.3"
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json", "stream"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling
+thiserror = "2.0"
+anyhow = "1.0"
+
+# Utils
+tracing = "0.1"
+bytes = "1.9"
+base64 = "0.22"
+uuid = { version = "1.0", features = ["v4"] }
+tempfile = "3.14"
+
+# Platform notifications
+notify-rust = "4"
+
+[dev-dependencies]
+tokio = { version = "1.42", features = ["full", "test-util"] }
+
+[lints]
+workspace = true

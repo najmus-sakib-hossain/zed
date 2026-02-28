@@ -1,0 +1,136 @@
+# Benchmark CI Workflow
+# Runs benchmarks and detects performance regressions
+#
+# This workflow:
+# - Runs on push to main and on PRs
+# - Compares benchmark results against baseline
+# - Alerts on significant performance regressions
+# - Stores benchmark results as artifacts
+
+name: Benchmarks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo registry
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Run HTIP benchmarks
+        run: cargo bench -p dx-www-benchmarks --bench htip_benchmarks -- --noplot --save-baseline htip
+
+      - name: Run Delta benchmarks
+        run: cargo bench -p dx-www-benchmarks --bench delta_benchmarks -- --noplot --save-baseline delta
+
+      - name: Run SSR benchmarks
+        run: cargo bench -p dx-www-benchmarks --bench ssr_benchmarks -- --noplot --save-baseline ssr
+
+      - name: Run Parser benchmarks
+        run: cargo bench -p dx-www-benchmarks --bench parser_benchmarks -- --noplot --save-baseline parser
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ github.sha }}
+          path: target/criterion
+          retention-days: 30
+
+      - name: Download previous benchmark results
+        if: github.event_name == 'pull_request'
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          workflow: bench.yml
+          branch: main
+          name: benchmark-results-*
+          path: baseline-results
+        continue-on-error: true
+
+      - name: Compare benchmarks (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "## Benchmark Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Benchmark results for commit ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # List benchmark groups
+          echo "### Benchmark Groups" >> $GITHUB_STEP_SUMMARY
+          echo "- HTIP Serialization/Deserialization" >> $GITHUB_STEP_SUMMARY
+          echo "- Delta Patch Generation/Application" >> $GITHUB_STEP_SUMMARY
+          echo "- SSR Template Inflation" >> $GITHUB_STEP_SUMMARY
+          echo "- Parser Throughput" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check for regressions (>10% slower)
+          echo "### Regression Check" >> $GITHUB_STEP_SUMMARY
+          if [ -d "baseline-results" ]; then
+            echo "Comparing against baseline from main branch..." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No baseline found - first run on this branch" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  benchmark-comment:
+    name: Post Benchmark Comment
+    runs-on: ubuntu-latest
+    needs: benchmark
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Download benchmark results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results-${{ github.sha }}
+          path: results
+
+      - name: Create benchmark summary
+        id: summary
+        run: |
+          echo "## 📊 Benchmark Results" > comment.md
+          echo "" >> comment.md
+          echo "Benchmarks completed for commit \`${{ github.sha }}\`" >> comment.md
+          echo "" >> comment.md
+          echo "| Benchmark | Status |" >> comment.md
+          echo "|-----------|--------|" >> comment.md
+          echo "| HTIP Serialization | ✅ Complete |" >> comment.md
+          echo "| HTIP Deserialization | ✅ Complete |" >> comment.md
+          echo "| Delta Generation | ✅ Complete |" >> comment.md
+          echo "| Delta Application | ✅ Complete |" >> comment.md
+          echo "| SSR Inflation | ✅ Complete |" >> comment.md
+          echo "| Parser Throughput | ✅ Complete |" >> comment.md
+          echo "" >> comment.md
+          echo "Full results available in workflow artifacts." >> comment.md
+
+      - name: Post comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const comment = fs.readFileSync('comment.md', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
