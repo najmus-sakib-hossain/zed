@@ -61,7 +61,14 @@ members = [
     "crates/dx_daemon",
     "crates/dx_grammar",
     "crates/dx_hardware",
+    "crates/dx_inference",
+    "crates/dx_input_intercept",
+    "crates/dx_llm_adapters",
+    "crates/dx_ai_ui",
     "crates/dx_media",
+    "crates/dx_orchestrator",
+    "crates/dx_providers",
+    "crates/dx_ui",
     "crates/dx_voice",
     "crates/edit_prediction",
     "crates/edit_prediction_cli",
@@ -133,6 +140,7 @@ members = [
     "crates/miniprofiler_ui",
     "crates/mistral",
     "crates/multi_buffer",
+    "crates/n8n_engine",
     "crates/nc",
     "crates/net",
     "crates/node_runtime",
@@ -323,7 +331,14 @@ dx_core = { path = "crates/dx_core" }
 dx_daemon = { path = "crates/dx_daemon" }
 dx_grammar = { path = "crates/dx_grammar" }
 dx_hardware = { path = "crates/dx_hardware" }
+dx_inference = { path = "crates/dx_inference" }
+dx_input_intercept = { path = "crates/dx_input_intercept" }
+dx_llm_adapters = { path = "crates/dx_llm_adapters" }
+dx_ai_ui = { path = "crates/dx_ai_ui" }
 dx_media = { path = "crates/dx_media" }
+dx_orchestrator = { path = "crates/dx_orchestrator" }
+dx_providers = { path = "crates/dx_providers" }
+dx_ui = { path = "crates/dx_ui" }
 dx_voice = { path = "crates/dx_voice" }
 editor = { path = "crates/editor" }
 encoding_selector = { path = "crates/encoding_selector" }
@@ -390,6 +405,7 @@ migrator = { path = "crates/migrator" }
 mistral = { path = "crates/mistral" }
 multi_buffer = { path = "crates/multi_buffer" }
 miniprofiler_ui = { path = "crates/miniprofiler_ui" }
+n8n_engine = { path = "crates/n8n_engine" }
 nc = { path = "crates/nc" }
 net = { path = "crates/net" }
 node_runtime = { path = "crates/node_runtime" }

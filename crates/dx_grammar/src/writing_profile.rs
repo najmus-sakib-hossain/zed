@@ -98,4 +98,32 @@ impl WritingProfile {
     pub fn check_sentence_length(&self) -> bool {
         !matches!(self.strictness, Strictness::Relaxed)
     }
+
+    /// Create a writing profile from an auto-detected app profile.
+    pub fn from_app_profile(app_profile: &crate::app_detection::AppWritingProfile) -> Self {
+        let strictness = if app_profile.grammar_strictness >= 0.8 {
+            Strictness::Academic
+        } else if app_profile.grammar_strictness >= 0.6 {
+            Strictness::Strict
+        } else if app_profile.grammar_strictness >= 0.3 {
+            Strictness::Standard
+        } else {
+            Strictness::Relaxed
+        };
+
+        let context = match app_profile.tone {
+            crate::app_detection::Tone::Formal | crate::app_detection::Tone::Professional => WritingContext::Professional,
+            crate::app_detection::Tone::Casual => WritingContext::Casual,
+            crate::app_detection::Tone::Technical => WritingContext::Technical,
+            crate::app_detection::Tone::Creative => WritingContext::Creative,
+        };
+
+        Self {
+            name: format!("Auto ({})", app_profile.tone.as_str()),
+            strictness,
+            context,
+            custom_dictionary: Vec::new(),
+            disabled_rules: Vec::new(),
+        }
+    }
 }

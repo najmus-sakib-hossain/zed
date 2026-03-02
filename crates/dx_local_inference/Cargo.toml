@@ -1,0 +1,23 @@
+[package]
+name = "dx_local_inference"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "GPL-3.0-or-later"
+description = "Local ML inference engine — Candle, llama.cpp, GGUF model management"
+
+[lib]
+path = "src/dx_local_inference.rs"
+
+[dependencies]
+anyhow.workspace = true
+async-trait = "0.1"
+dx_core = { path = "../dx_core" }
+futures.workspace = true
+http_client.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+smol.workspace = true
+util.workspace = true

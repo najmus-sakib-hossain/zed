@@ -56,7 +56,7 @@ impl Default for FlowBarViewModel {
     fn default() -> Self {
         Self {
             state: FlowBarState::Hidden,
-            mood: Mood::Zen,
+            mood: Mood::Text,
             transcript_preview: String::new(),
             audio_level: 0.0,
             interruptible: true,

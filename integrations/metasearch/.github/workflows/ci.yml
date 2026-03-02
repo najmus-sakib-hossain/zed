@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - run: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [fmt, clippy]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --workspace --all-targets
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace
+
+  engine-smoke-test:
+    name: Engine Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      # Runs the unit/registry tests only (no live network calls).
+      # The engine_probe integration test is #[ignore] and lives in engine-probe below.
+      - name: Run engine registry tests (no network)
+        run: cargo test --package metasearch-engine -- --nocapture
+
+  engine-probe:
+    name: Engine Probe (Live Network)
+    runs-on: ubuntu-latest
+    needs: [build]
+    # Only probe on pushes to main to avoid hammering external APIs on every PR.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - name: Probe all 74 engines with a real search query
+        # Requires >= 30 % of engines to return results (asserted inside the test).
+        # continue-on-error so a flaky external service never blocks a merge.
+        run: |
+          cargo test --package metasearch-engine --test engine_probe \
+            -- --ignored --nocapture
+        continue-on-error: true
+
+  format-engines-md:
+    name: Format ENGINES.md
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sort ENGINES.md table rows
+        run: |
+          if [ -f ENGINES.md ]; then
+            # Find line number of the first table-body row (starts with "| " but not "| Engine")
+            first_row=$(grep -n '^| ' ENGINES.md | grep -v 'Engine\|---' | head -1 | cut -d: -f1)
+            if [ -n "$first_row" ]; then
+              head_end=$((first_row - 1))
+              head -n "$head_end" ENGINES.md > /tmp/engines_header.md
+              tail -n +"$first_row" ENGINES.md | sort -f -u > /tmp/engines_body.md
+              cat /tmp/engines_header.md /tmp/engines_body.md > ENGINES.md
+              echo "ENGINES.md table rows sorted"
+            else
+              echo "ENGINES.md has no table rows to sort — skipping"
+            fi
+          fi
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ENGINES.md
+          git diff --cached --quiet || git commit -m "ci: auto-sort ENGINES.md"
+          git push || true

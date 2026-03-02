@@ -1,0 +1,40 @@
+[package]
+name = "n8n_engine"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "n8n workflow engine integration for Zed - sidecar execution, V8 routing, and hybrid execution"
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/n8n_engine.rs"
+doctest = false
+
+[features]
+default = []
+test-support = []
+
+[dependencies]
+anyhow.workspace = true
+async-trait.workspace = true
+futures.workspace = true
+gpui.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+smol.workspace = true
+tokio = { version = "1", features = ["full", "net", "io-util", "sync", "time", "process"] }
+uuid = { version = "1.0", features = ["v4", "serde"] }
+reqwest = { version = "0.11", features = ["json"] }
+util.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+# Unix domain socket support is built into tokio
+
+[target.'cfg(windows)'.dependencies]
+# Windows named pipe support
+tokio = { version = "1", features = ["full", "net"] }

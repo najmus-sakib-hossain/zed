@@ -98,7 +98,7 @@ impl ComputerUseAgent {
         &self.action_history
     }
 
-    /// Execute a single action.
+    /// Execute a single action with real platform input.
     pub fn execute(&mut self, action: ComputerAction) -> Result<()> {
         if self.action_history.len() >= self.max_actions_per_session {
             return Err(anyhow::anyhow!("Max actions per session exceeded"));
@@ -106,31 +106,53 @@ impl ComputerUseAgent {
 
         self.state = AgentState::Executing;
 
-        // Placeholder — real implementation uses platform APIs
         match &action {
             ComputerAction::MouseMove { x, y } => {
                 log::info!("Mouse move to ({}, {})", x, y);
+                crate::input::mouse_move(*x, *y)?;
             }
             ComputerAction::MouseClick { button, clicks } => {
                 log::info!("Mouse click {:?} x{}", button, clicks);
+                let btn = match button {
+                    MouseButton::Left => crate::input::MouseBtn::Left,
+                    MouseButton::Right => crate::input::MouseBtn::Right,
+                    MouseButton::Middle => crate::input::MouseBtn::Middle,
+                };
+                crate::input::mouse_click(btn, *clicks)?;
+            }
+            ComputerAction::MouseDrag { to_x, to_y } => {
+                log::info!("Mouse drag to ({}, {})", to_x, to_y);
+                crate::input::mouse_drag(*to_x, *to_y)?;
+            }
+            ComputerAction::Scroll { delta_x, delta_y } => {
+                log::info!("Scroll ({}, {})", delta_x, delta_y);
+                crate::input::scroll(*delta_x, *delta_y)?;
             }
             ComputerAction::TypeText { text } => {
                 log::info!("Typing {} chars", text.len());
+                crate::input::type_text(text)?;
             }
             ComputerAction::KeyPress { keys } => {
                 log::info!("Key press: {:?}", keys);
+                let key_strs: Vec<String> = keys.iter().map(|k| key_to_string(k)).collect();
+                let key_refs: Vec<&str> = key_strs.iter().map(|s| s.as_str()).collect();
+                crate::input::key_press(&key_refs)?;
             }
             ComputerAction::Screenshot => {
                 log::info!("Taking screenshot");
+                let _png = crate::capture::capture_full_screen()?;
             }
             ComputerAction::Wait { ms } => {
                 log::info!("Waiting {}ms", ms);
+                std::thread::sleep(std::time::Duration::from_millis(*ms));
+            }
+            ComputerAction::OpenApp { name } => {
+                log::info!("Opening app: {}", name);
+                open_application(name)?;
             }
             ComputerAction::RunCommand { command } => {
                 log::info!("Running command: {}", command);
-            }
-            _ => {
-                log::info!("Executing action: {:?}", action);
+                run_shell_command(command)?;
             }
         }
 
@@ -158,4 +180,91 @@ impl Default for ComputerUseAgent {
     fn default() -> Self {
         Self::new()
     }
+}
+
+/// Convert a Key enum to its string name for the input module.
+fn key_to_string(key: &Key) -> String {
+    match key {
+        Key::Char(c) => c.to_string(),
+        Key::Enter => "enter".to_string(),
+        Key::Tab => "tab".to_string(),
+        Key::Escape => "escape".to_string(),
+        Key::Backspace => "backspace".to_string(),
+        Key::Delete => "delete".to_string(),
+        Key::Space => "space".to_string(),
+        Key::Up => "up".to_string(),
+        Key::Down => "down".to_string(),
+        Key::Left => "left".to_string(),
+        Key::Right => "right".to_string(),
+        Key::Home => "home".to_string(),
+        Key::End => "end".to_string(),
+        Key::PageUp => "pageup".to_string(),
+        Key::PageDown => "pagedown".to_string(),
+        Key::Ctrl => "ctrl".to_string(),
+        Key::Alt => "alt".to_string(),
+        Key::Shift => "shift".to_string(),
+        Key::Meta => "meta".to_string(),
+        Key::F(n) => format!("f{}", n),
+    }
+}
+
+/// Open an application by name using platform-appropriate method.
+fn open_application(name: &str) -> Result<()> {
+    #[cfg(target_os = "windows")]
+    {
+        std::process::Command::new("cmd")
+            .args(["/C", "start", "", name])
+            .status()
+            .map_err(|e| anyhow::anyhow!("Failed to open app: {}", e))?;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .args(["-a", name])
+            .status()
+            .map_err(|e| anyhow::anyhow!("Failed to open app: {}", e))?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(name)
+            .status()
+            .or_else(|_| {
+                std::process::Command::new(name).status()
+            })
+            .map_err(|e| anyhow::anyhow!("Failed to open app: {}", e))?;
+    }
+
+    Ok(())
+}
+
+/// Run a shell command on the platform.
+fn run_shell_command(command: &str) -> Result<()> {
+    #[cfg(target_os = "windows")]
+    {
+        let output = std::process::Command::new("cmd")
+            .args(["/C", command])
+            .output()
+            .map_err(|e| anyhow::anyhow!("Command failed: {}", e))?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            log::warn!("Command exited with error: {}", stderr);
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let output = std::process::Command::new("sh")
+            .args(["-c", command])
+            .output()
+            .map_err(|e| anyhow::anyhow!("Command failed: {}", e))?;
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            log::warn!("Command exited with error: {}", stderr);
+        }
+    }
+
+    Ok(())
 }

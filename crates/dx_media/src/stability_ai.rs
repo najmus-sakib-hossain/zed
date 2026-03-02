@@ -29,7 +29,11 @@ pub struct StabilityAiProvider {
 }
 
 impl StabilityAiProvider {
-    pub fn new(config: StabilityAiConfig) -> Self {
+    pub fn new() -> Self {
+        Self::with_config(StabilityAiConfig::default())
+    }
+
+    pub fn with_config(config: StabilityAiConfig) -> Self {
         Self {
             id: dx_core::image_providers::stability_ai(),
             config,

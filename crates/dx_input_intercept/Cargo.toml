@@ -1,0 +1,22 @@
+[package]
+name = "dx_input_intercept"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "System-wide OS input interception for DX — extends grammar and edit prediction to every application"
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/dx_input_intercept.rs"
+doctest = false
+
+[dependencies]
+anyhow.workspace = true
+dx_core = { path = "../dx_core" }
+log.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+serde_json.workspace = true

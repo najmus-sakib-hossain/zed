@@ -1,0 +1,34 @@
+[package]
+name = "metasearch-server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Axum web server for the metasearch engine"
+
+[dependencies]
+metasearch-core = { path = "../metasearch-core" }
+metasearch-engine = { path = "../metasearch-engine" }
+axum.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tera.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+moka.workspace = true
+governor.workspace = true
+reqwest.workspace = true
+chrono.workspace = true
+uuid.workspace = true
+anyhow.workspace = true
+futures.workspace = true
+
+# Performance
+dashmap.workspace = true
+parking_lot.workspace = true
+rustc-hash.workspace = true
+ahash.workspace = true
+compact_str = { workspace = true }
+smallvec = { workspace = true }

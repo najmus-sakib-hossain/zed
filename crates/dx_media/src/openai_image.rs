@@ -29,7 +29,14 @@ pub struct OpenAiImageProvider {
 }
 
 impl OpenAiImageProvider {
-    pub fn new(config: OpenAiImageConfig) -> Self {
+    pub fn new() -> Self {
+        Self {
+            id: dx_core::image_providers::openai(),
+            config: OpenAiImageConfig::default(),
+        }
+    }
+
+    pub fn with_config(config: OpenAiImageConfig) -> Self {
         Self {
             id: dx_core::image_providers::openai(),
             config,

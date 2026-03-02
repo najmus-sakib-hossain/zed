@@ -1,4 +1,5 @@
 mod agent_profile;
+mod media_settings;
 
 use std::path::{Component, Path};
 use std::sync::{Arc, LazyLock};
@@ -16,6 +17,7 @@ use settings::{
 };
 
 pub use crate::agent_profile::*;
+pub use crate::media_settings::*;
 
 pub const SUMMARIZE_THREAD_PROMPT: &str = include_str!("prompts/summarize_thread_prompt.txt");
 pub const SUMMARIZE_THREAD_DETAILED_PROMPT: &str =

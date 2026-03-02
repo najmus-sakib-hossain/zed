@@ -1,0 +1,577 @@
+:root {
+  /* body background */
+  --bg-1: #0b0e14;
+  /* background of the content */
+  --bg-2: #0d1017;
+  /* input suggestions background */
+  --bg-3: #0f131a;
+  /* mostly borders */
+  --bg-4: #234;
+
+  /* main text color */
+  --fg-1: #bfbdb6;
+  /* search result description */
+  --fg-2: #bba;
+  --fg-3: #998;
+
+  /* focus outline */
+  --accent: #e6b450;
+
+  --link: #29e;
+  --link-visited: #92e;
+
+  /* green, success */
+  --positive: #7fd962;
+  /* red, error */
+  --negative: #d95757;
+
+  --syntax-string: #aad94c;
+  --syntax-special: #e6b673;
+  --syntax-constant: #d2a6ff;
+  --syntax-comment: #acb6bf8c;
+  --syntax-func: #ffb454;
+}
+
+::selection {
+  background-color: var(--accent);
+  color: var(--bg-3);
+}
+
+html {
+  height: 100%;
+}
+body {
+  font-family: monospace;
+  background-color: var(--bg-1);
+  color: var(--fg-1);
+  margin: 0;
+  line-height: 1.2;
+  height: 100%;
+}
+
+.settings-link,
+.settings-link:visited {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  color: var(--link);
+}
+.version-info {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+}
+
+.main-container {
+  /* enough space for the infobox */
+  max-width: 73.5rem;
+  margin: 0 auto;
+  word-break: break-word;
+}
+main {
+  max-width: 40rem;
+  /* margin: 0 0 0 10rem; */
+  padding: 1rem 0.5rem;
+  background-color: var(--bg-2);
+  min-height: 100%;
+}
+.search-images > main {
+  /* image search uses 100% width */
+  max-width: 100%;
+}
+.main-container.search-images {
+  max-width: none;
+}
+@media screen and (max-width: 74rem) {
+  /* small screens */
+  .main-container {
+    margin: 0 auto;
+    max-width: 40rem;
+  }
+}
+input,
+textarea,
+select {
+  font-family: monospace;
+  background-color: var(--bg-2);
+  color: var(--fg-1);
+  border: 1px solid var(--bg-4);
+  font-size: inherit;
+  padding: 0.25rem;
+}
+input:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+:focus-visible {
+  outline: 1px solid var(--accent);
+}
+input[type="submit"] {
+  cursor: pointer;
+}
+a {
+  color: var(--link);
+  text-decoration: none;
+}
+a:visited {
+  color: var(--link-visited);
+}
+pre {
+  white-space: pre-wrap;
+}
+blockquote {
+  margin: 0;
+  padding-left: 0.5em;
+  border-left: 0.25em solid var(--bg-4);
+}
+
+/* index page */
+.main-container.index-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  height: 100%;
+  justify-content: center;
+  margin: 0 auto;
+  padding: 0 0.5em;
+  text-align: center;
+  max-width: 30em;
+}
+h1 {
+  margin-top: 0;
+}
+
+/* settings page */
+.settings-page .back-to-index-button {
+  bottom: 0.5em;
+  position: relative;
+  color: var(--link);
+}
+.settings-form select {
+  display: block;
+}
+#save-settings-button {
+  margin-top: 1em;
+  display: block;
+}
+#custom-css {
+  tab-size: 2;
+  width: calc(100% - 0.5rem);
+  height: 20rem;
+  border: 0;
+  outline: 1px solid var(--bg-4);
+}
+
+/* header */
+.search-form {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+}
+#search-input {
+  flex: 1;
+}
+.main-container:not(.index-page) #search-input {
+  max-width: 30em;
+}
+#search-input-suggestions {
+  position: absolute;
+  text-align: left;
+  margin-top: calc(1.9em + 1px);
+  background: var(--bg-3);
+  padding: 0.1em 0 0.3em 0;
+  border: 1px solid var(--bg-4);
+  border-top: transparent;
+  z-index: 10;
+}
+.search-input-suggestion {
+  cursor: pointer;
+  padding: 0.3em 0.3em;
+  white-space: nowrap;
+}
+.search-input-suggestion.focused,
+.search-input-suggestion:hover {
+  background: var(--bg-4);
+}
+
+/* search tabs (like images, if enabled) */
+.search-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  margin-top: -0.5rem;
+}
+.search-tab {
+  border: 1px solid var(--bg-4);
+  padding: 0.25rem;
+}
+a.search-tab {
+  color: var(--link);
+}
+
+/* search result */
+.search-result {
+  padding-top: 1rem;
+  border-top: 1px solid var(--bg-4);
+  font-size: 1rem;
+}
+.search-result-anchor {
+  display: block;
+  word-break: break-all;
+}
+.search-result-url {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--fg-3);
+}
+.search-result-title {
+  margin: 0;
+  font-size: 1rem;
+}
+.search-result-description {
+  margin: 0;
+  font-size: 0.8em;
+  color: var(--fg-2);
+}
+
+/* engine list */
+.engine-list {
+  opacity: 0.5;
+  justify-content: end;
+  display: flex;
+  gap: 0.5em;
+  font-size: 0.8rem;
+}
+
+/* featured snippet */
+.featured-snippet {
+  margin-bottom: 1rem;
+  border: 1px solid var(--bg-4);
+  padding: 0.5rem;
+  font-size: 1.2rem;
+}
+.featured-snippet .search-result-description {
+  margin-bottom: 1rem;
+  white-space: pre-wrap;
+}
+
+/* progress update */
+.progress-updates {
+  margin-bottom: 1rem;
+  border: 1px solid var(--bg-4);
+  padding: 0.5rem;
+  min-height: 5em;
+}
+.progress-update {
+  margin: 0;
+  white-space: pre-wrap;
+}
+.progress-update-time {
+  opacity: 0.5;
+}
+.progress-update-done {
+  color: var(--positive);
+  font-weight: bold;
+}
+.progress-update-error {
+  color: var(--negative);
+  font-weight: bold;
+}
+
+/* answer */
+.answer {
+  margin-bottom: 1rem;
+  border: 1px solid var(--bg-4);
+  padding: 0.5rem;
+  word-break: break-word;
+}
+.answer h3 {
+  margin: 0;
+  font-weight: normal;
+  font-size: 1.2rem;
+}
+
+/* styles that are somewhat answer-specific but get reused across other styles sometimes */
+.answer-query {
+  margin: 0;
+  opacity: 0.5;
+}
+.answer-comment {
+  color: var(--syntax-comment);
+  font-weight: normal;
+}
+
+/* styles for specific answers */
+.answer-calc-constant {
+  color: var(--syntax-constant);
+  white-space: pre-wrap;
+}
+.answer-calc-string {
+  color: var(--syntax-string);
+}
+.answer-calc-special {
+  color: var(--syntax-special);
+}
+.answer-calc-func {
+  color: var(--syntax-func);
+}
+
+.answer-dictionary-word,
+.answer-thesaurus-word {
+  margin-top: 0;
+}
+.answer-dictionary-part-of-speech {
+  font-style: italic;
+  opacity: 0.8;
+}
+.answer-dictionary-example {
+  margin-bottom: 0.5em;
+}
+
+.answer-thesaurus-item:not(:last-child) {
+  border-bottom: 1px solid var(--bg-4);
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+.answer-thesaurus-word-description {
+  font-style: italic;
+  opacity: 0.8;
+}
+.answer-thesaurus-part-of-speech {
+  font-weight: bold;
+}
+.answer-thesaurus-as-in {
+  font-style: italic;
+}
+h3.answer-thesaurus-category-title {
+  margin-top: 0.5rem;
+}
+.answer-thesaurus-strongest {
+  opacity: 1;
+}
+.answer-thesaurus-strong {
+  opacity: 0.8;
+}
+.answer-thesaurus-weak {
+  opacity: 0.6;
+}
+.answer-thesaurus-list {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8em;
+  list-style-type: none;
+}
+.answer-thesaurus-list a {
+  text-decoration: underline;
+}
+.answer-notepad {
+  width: calc(100% - 4px);
+  height: fit-content;
+  overflow-y: show;
+  background-color: transparent;
+  color: white;
+  border: none;
+  outline: none;
+  min-height: 4em;
+  font-size: 12px;
+  resize: none;
+}
+
+.answer-colorpicker-preview-container {
+  display: flex;
+  height: 228px;
+}
+.answer-colorpicker-preview {
+  width: 204px;
+  max-width: 33%;
+}
+.answer-colorpicker-picker-container {
+  position: absolute;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+.answer-colorpicker-picker,
+.answer-colorpicker-huepicker {
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  transform: translate(-0.5rem, -0.5rem);
+  border-radius: 50%;
+  border: 2px solid #fff;
+
+  touch-action: none;
+}
+.answer-colorpicker-canvas-container {
+  flex: 1;
+  position: relative;
+}
+.answer-colorpicker-canvas {
+  height: 100%;
+  width: 100%;
+
+  touch-action: none;
+}
+.answer-colorpicker-slider-container {
+  margin: 1rem;
+  position: relative;
+  height: 1rem;
+
+  touch-action: none;
+}
+.answer-colorpicker-slider {
+  height: 100%;
+  width: 100%;
+}
+.answer-colorpicker-huepicker {
+  transform: translate(-0.5rem, -50%);
+  top: 50%;
+}
+.answer-colorpicker label {
+  display: block;
+  width: fit-content;
+}
+.answer-colorpicker-hex-input-container {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+.answer-colorpicker-hex-input-container label {
+  margin: 0 auto;
+}
+#answer-colorpicker-hex-input {
+  width: 100%;
+  text-align: center;
+}
+.answer-colorpicker-other-inputs {
+  display: flex;
+  gap: 0.5rem;
+}
+.answer-colorpicker-input-container {
+  display: flex;
+}
+.answer-colorpicker-other-inputs input {
+  width: 100%;
+}
+
+/* infobox */
+.infobox {
+  margin-bottom: 1rem;
+  border: 1px solid var(--bg-4);
+  padding: 0.5rem;
+  position: absolute;
+  top: 3.5rem;
+  max-width: 30rem;
+  margin-left: 42rem;
+}
+@media screen and (max-width: 74rem) {
+  /* small screens */
+  .infobox {
+    position: static;
+    margin: 0;
+    max-width: unset;
+    margin-bottom: 1rem;
+  }
+
+  .postsearch-infobox {
+    /* displaying these properly is too hard so don't */
+    display: none;
+  }
+}
+.infobox h2 {
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+.infobox p {
+  margin: 0;
+}
+.infobox pre:not(.infobox-github-readme) {
+  border: 1px solid var(--bg-4);
+  padding: 0.5rem;
+  display: block;
+}
+.infobox pre > code {
+  font-weight: normal;
+}
+.infobox code {
+  font-weight: bold;
+}
+.infobox img {
+  max-width: 100%;
+}
+.infobox-docs_rs-version {
+  opacity: 0.5;
+  font-weight: normal;
+  font-size: 0.8em;
+}
+.infobox-github-readme .markdown-alert {
+  padding-left: 0.5em;
+  border-left: 0.25em solid var(--bg-4);
+}
+.infobox-github-readme .markdown-alert-title {
+  font-weight: bold;
+}
+.postsearch-infobox p {
+  margin-bottom: 1em;
+}
+.infobox-minecraft_wiki-article > .notaninfobox {
+  display: none !important;
+}
+.noexcerpt,
+.navigation-not-searchable {
+  display: none !important;
+}
+.mcw-mainpage-icon {
+  display: inline-block;
+}
+
+/* image results */
+.image-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.image-result {
+  min-width: 12rem;
+  position: relative;
+  flex-grow: 1;
+  overflow: hidden;
+}
+.image-result-img-container {
+  margin: 0 auto;
+  width: fit-content;
+}
+.image-result img {
+  height: 10.3rem;
+  width: auto;
+  object-fit: scale-down;
+  object-position: left;
+}
+.image-result-page-anchor {
+  display: block;
+  height: 2.25em;
+}
+.image-result-page-url {
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  font-size: 0.8rem;
+
+  white-space: nowrap;
+  width: 100%;
+  position: absolute;
+  display: block;
+}
+.image-result-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  font-size: 0.85rem;
+
+  white-space: nowrap;
+  width: 100%;
+  position: absolute;
+  display: block;
+  margin-top: 1em;
+}

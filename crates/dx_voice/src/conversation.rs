@@ -113,7 +113,7 @@ impl VoiceConversation {
             ));
         }
         self.state = ConversationState::Listening;
-        self.stt.lock().start_listening()?;
+        self.stt.lock().start_listening();
         Ok(())
     }
 
@@ -133,8 +133,8 @@ impl VoiceConversation {
     }
 
     /// Feed raw audio data from the microphone.
-    pub fn feed_audio(&self, samples: &[f32]) -> Result<()> {
-        self.stt.lock().feed_audio(samples)
+    pub fn feed_audio(&self, samples: &[f32]) {
+        self.stt.lock().feed_audio(samples);
     }
 
     /// Process a full turn: transcribe → LLM → TTS.
@@ -148,16 +148,21 @@ impl VoiceConversation {
             stt.transcribe().await?
         };
 
-        if transcription.text.trim().is_empty() {
+        let user_text = transcription
+            .cleaned_text
+            .as_deref()
+            .unwrap_or(&transcription.raw_text);
+
+        if user_text.trim().is_empty() {
             self.state = ConversationState::Listening;
-            self.stt.lock().start_listening()?;
+            self.stt.lock().start_listening();
             return Err(anyhow::anyhow!("Empty transcription"));
         }
 
         // Record user turn
         self.history.push(ConversationTurn {
             role: LlmRole::User,
-            text: transcription.text.clone(),
+            text: user_text.to_string(),
             audio_duration_seconds: Some(transcription.duration_seconds),
             timestamp: std::time::SystemTime::now(),
         });
@@ -207,7 +212,7 @@ impl VoiceConversation {
 
         // 4. Resume listening
         self.state = ConversationState::Listening;
-        self.stt.lock().start_listening()?;
+        self.stt.lock().start_listening();
 
         Ok((assistant_text, tts_output.audio_data))
     }

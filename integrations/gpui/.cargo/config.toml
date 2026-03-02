@@ -1,0 +1,14 @@
+# ─── Build-time performance flags ───────────────────────────────────────────
+# These apply to every cargo build in this workspace.
+#
+# target-cpu=native  →  enables AVX2 / AVX-512 / BMI2 on the compiling CPU
+#                       (SIMD hotpaths in symphonia, openh264-rs, plotters, typst-render …)
+# opt-level=3 for build scripts speeds up proc-macro crates (html5ever, etc.)
+
+[build]
+rustflags = [
+    "-C", "target-cpu=native",
+]
+
+[profile.release.build-override]
+opt-level = 3

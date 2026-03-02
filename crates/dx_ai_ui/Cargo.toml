@@ -1,0 +1,33 @@
+[package]
+name = "dx_ai_ui"
+version = "0.1.0"
+edition.workspace = true
+publish.workspace = true
+license = "GPL-3.0-or-later"
+description = "GPUI frontend for the DX AI Platform — panels, mood bar, session rail, flow bar, AI face widget"
+
+[lints]
+workspace = true
+
+[lib]
+path = "src/dx_ai_ui.rs"
+doctest = false
+
+[features]
+test-support = []
+
+[dependencies]
+anyhow.workspace = true
+dx_core = { path = "../dx_core" }
+dx_hardware = { path = "../dx_hardware" }
+futures.workspace = true
+gpui.workspace = true
+log.workspace = true
+parking_lot.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+settings.workspace = true
+theme.workspace = true
+ui.workspace = true
+util.workspace = true
+workspace.workspace = true

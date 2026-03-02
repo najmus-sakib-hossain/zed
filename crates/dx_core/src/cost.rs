@@ -11,8 +11,17 @@ pub struct MicroCost(pub u64);
 impl MicroCost {
     pub const ZERO: Self = Self(0);
 
+    pub fn zero() -> Self {
+        Self::ZERO
+    }
+
     pub fn from_dollars(dollars: f64) -> Self {
         Self((dollars * 1_000_000.0) as u64)
+    }
+
+    /// Create from microdollars (1/1,000,000 of a dollar).
+    pub fn from_microdollars(microdollars: u64) -> Self {
+        Self(microdollars)
     }
 
     pub fn as_dollars(&self) -> f64 {

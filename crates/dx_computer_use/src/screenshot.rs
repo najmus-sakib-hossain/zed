@@ -20,15 +20,16 @@ pub struct ScreenCapture {
 }
 
 impl ScreenCapture {
-    /// Capture the entire screen.
+    /// Capture the entire screen (uses platform-native capture).
     pub fn capture_full() -> Result<Self> {
-        // Placeholder — real implementation uses platform screen capture APIs
         log::info!("Capturing full screen");
+        let png_data = crate::capture::capture_full_screen()?;
+        let (width, height) = crate::capture::png_dimensions(&png_data).unwrap_or((1920, 1080));
         Ok(Self {
-            width: 1920,
-            height: 1080,
+            width,
+            height,
             pixels: Vec::new(),
-            png_data: None,
+            png_data: Some(png_data),
             base64_png: None,
         })
     }
@@ -42,11 +43,12 @@ impl ScreenCapture {
             width,
             height
         );
+        let png_data = crate::capture::capture_region(x, y, width, height)?;
         Ok(Self {
             width,
             height,
             pixels: Vec::new(),
-            png_data: None,
+            png_data: Some(png_data),
             base64_png: None,
         })
     }
@@ -64,8 +66,9 @@ impl ScreenCapture {
         if self.png_data.is_none() {
             self.encode_png()?;
         }
-        // Placeholder — real implementation uses base64 crate
-        self.base64_png = Some(String::new());
+        if let Some(ref data) = self.png_data {
+            self.base64_png = Some(crate::capture::png_to_base64(data));
+        }
         Ok(())
     }
 }

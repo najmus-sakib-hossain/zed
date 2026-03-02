@@ -33,7 +33,11 @@ pub struct FalAiProvider {
 }
 
 impl FalAiProvider {
-    pub fn new(config: FalAiConfig) -> Self {
+    pub fn new() -> Self {
+        Self::with_config(FalAiConfig::default())
+    }
+
+    pub fn with_config(config: FalAiConfig) -> Self {
         let available = !config.api_key.is_empty();
         Self {
             id: dx_core::image_providers::fal_ai(),

@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ query }} — Metasearch</title>
+  <script>
+    (function () {
+      try {
+        var prefs = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+        var theme = prefs.theme || 'dark';
+        document.documentElement.classList.remove('light');
+        if (theme === 'light') {
+          document.documentElement.classList.add('light');
+        } else if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.classList.add('light');
+        }
+      } catch (_) {}
+    }());
+  </script>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="stylesheet" href="/static/css/shadcn-vercel.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230070f3' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><path d='m21 21-4.35-4.35'/></svg>">
+  <link rel="search" type="application/opensearchdescription+xml" title="Metasearch" href="/opensearch.xml">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+  <script>document.addEventListener('DOMContentLoaded', () => lucide.createIcons())</script>
+</head>
+<body class="results-page-body">
+
+  <!-- Page loading bar -->
+  <div class="search-loading-bar" id="page-loading-bar"></div>
+
+  <!-- ── Sticky Header ─────────────────────────────────────── -->
+  <header class="rp-header">
+    <div class="rp-header-inner">
+      <a href="/" class="brand brand--compact">
+        <span class="brand-icon brand-icon--sm"><i data-lucide="search"></i></span>
+        <span class="brand-name">Metasearch</span>
+      </a>
+
+      <form action="/search" method="get" class="rp-search-form" id="search-form">
+        <div class="rp-input-wrap" id="search-input-wrap">
+          <span class="rp-input-icon"><i data-lucide="search"></i></span>
+          <input
+            type="text"
+            name="q"
+            id="search-input"
+            class="rp-input"
+            value="{{ query }}"
+            autocomplete="off"
+            aria-autocomplete="list"
+            aria-controls="autocomplete-list"
+            aria-expanded="false"
+          >
+          <input type="hidden" name="category" value="{{ category }}">
+          <button type="submit" class="rp-submit">
+            <i data-lucide="arrow-right"></i>
+          </button>
+          <!-- Autocomplete Dropdown -->
+          <ul id="autocomplete-list" class="autocomplete-dropdown" role="listbox" hidden></ul>
+        </div>
+      </form>
+
+      <div class="rp-header-actions">
+        <button class="customize-btn" id="customize-open-btn" title="Customize search">
+          <i data-lucide="sliders-horizontal"></i>
+          <span>Customize</span>
+        </button>
+        <a href="https://github.com/najmus-sakib-hossain/metasearch" target="_blank" rel="noopener" class="icon-btn" title="GitHub">
+          <i data-lucide="github"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Category Tabs ─────────────────────────────────────── -->
+  <nav class="rp-tabs" aria-label="Search categories">
+    <div class="rp-tabs-inner">
+      <a href="/search?q={{ query | urlencode }}&category=general"
+         class="rp-tab {% if category == 'general' %}rp-tab--active{% endif %}">
+        <i data-lucide="globe"></i><span>General</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=images"
+         class="rp-tab {% if category == 'images' %}rp-tab--active{% endif %}">
+        <i data-lucide="image"></i><span>Images</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=videos"
+         class="rp-tab {% if category == 'videos' %}rp-tab--active{% endif %}">
+        <i data-lucide="play-circle"></i><span>Videos</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=news"
+         class="rp-tab {% if category == 'news' %}rp-tab--active{% endif %}">
+        <i data-lucide="newspaper"></i><span>News</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=music"
+         class="rp-tab {% if category == 'music' %}rp-tab--active{% endif %}">
+        <i data-lucide="music"></i><span>Music</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=science"
+         class="rp-tab {% if category == 'science' %}rp-tab--active{% endif %}">
+        <i data-lucide="flask-conical"></i><span>Science</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=it"
+         class="rp-tab {% if category == 'it' %}rp-tab--active{% endif %}">
+        <i data-lucide="terminal"></i><span>IT</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=files"
+         class="rp-tab {% if category == 'files' %}rp-tab--active{% endif %}">
+        <i data-lucide="folder-open"></i><span>Files</span>
+      </a>
+      <a href="/search?q={{ query | urlencode }}&category=social"
+         class="rp-tab {% if category == 'social' %}rp-tab--active{% endif %}">
+        <i data-lucide="users"></i><span>Social</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Page Body ─────────────────────────────────────────── -->
+  <div class="rp-body">
+    <main class="rp-main" id="results-main">
+
+      <!-- Info Bar -->
+      <div class="rp-infobar">
+        <div class="rp-infobar-left">
+          <span class="rp-count">
+            <i data-lucide="list"></i>
+            {{ number_of_results }} result{% if number_of_results != 1 %}s{% endif %}
+          </span>
+          <span class="rp-time">{{ search_time_ms }}ms{% if from_cache %} · cached{% endif %}</span>
+        </div>
+        {% if engines_used | length > 0 %}
+        <div class="rp-engines-used">
+          {% for engine in engines_used %}
+          <span class="rp-engine-chip">{{ engine }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ═══ EMPTY STATE ═══ -->
+      {% if results | length == 0 %}
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <i data-lucide="search-x"></i>
+        </div>
+        <h2 class="empty-title">No results found</h2>
+        <p class="empty-desc">Try different keywords, another category, or check your spelling.</p>
+        {% if engines_failed is defined and engines_failed | length > 0 %}
+        <p class="empty-warning">
+          <i data-lucide="alert-triangle"></i>
+          {{ engines_failed | length }} engine(s) failed or timed out.
+        </p>
+        {% endif %}
+        <a href="/search?q={{ query | urlencode }}&category=general" class="empty-cta">
+          <i data-lucide="globe"></i> Try General Search
+        </a>
+      </div>
+
+      {% else %}
+
+      <!-- ═══ RESULTS CONTAINER (infinite scroll target) ═══ -->
+      <div id="results-container">
+
+        <!-- ── IMAGES ── -->
+        {% if category == "images" %}
+        <div class="img-grid" id="typed-results">
+          {% for result in results %}
+          <a href="{{ result.url }}" class="img-card" target="_blank" rel="noopener" title="{{ result.title }}">
+            {% if result.thumbnail %}
+            <img src="{{ result.thumbnail }}" alt="{{ result.title }}" loading="lazy" onerror="this.closest('.img-card').classList.add('img-card--broken')">
+            {% else %}
+            <div class="img-card-placeholder"><i data-lucide="image"></i></div>
+            {% endif %}
+            <div class="img-card-overlay">
+              <span class="img-card-title">{{ result.title }}</span>
+              <span class="img-card-engine">{{ result.engine }}</span>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+
+        <!-- ── VIDEOS ── -->
+        {% elif category == "videos" %}
+        <div id="typed-results">
+          {% for result in results %}
+          <article class="vid-card">
+            <a href="{{ result.url }}" class="vid-thumb" target="_blank" rel="noopener">
+              {% if result.thumbnail %}
+              <img src="{{ result.thumbnail }}" alt="{{ result.title }}" loading="lazy">
+              {% else %}
+              <div class="vid-thumb-placeholder"><i data-lucide="play-circle"></i></div>
+              {% endif %}
+              <div class="vid-play-overlay"><i data-lucide="play"></i></div>
+            </a>
+            <div class="vid-info">
+              <a href="{{ result.url }}" class="vid-title" target="_blank" rel="noopener">{{ result.title }}</a>
+              {% if result.content %}
+              <p class="vid-desc">{{ result.content | truncate(length=200) }}</p>
+              {% endif %}
+              <div class="vid-meta">
+                <span class="meta-chip"><i data-lucide="tv-2"></i>{{ result.engine }}</span>
+                {% if result.published_date %}
+                <span class="meta-chip"><i data-lucide="calendar"></i>{{ result.published_date }}</span>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+
+        <!-- ── NEWS ── -->
+        {% elif category == "news" %}
+        <div id="typed-results">
+          {% for result in results %}
+          <article class="news-card">
+            {% if result.thumbnail %}
+            <a href="{{ result.url }}" class="news-thumb" target="_blank" rel="noopener">
+              <img src="{{ result.thumbnail }}" alt="" loading="lazy" onerror="this.closest('.news-thumb').style.display='none'">
+            </a>
+            {% endif %}
+            <div class="news-body">
+              <div class="news-source-row">
+                <img class="favicon" src="https://www.google.com/s2/favicons?domain={{ result.url }}&sz=16" alt="" loading="lazy" onerror="this.style.display='none'">
+                <span class="news-source">{{ result.engine }}</span>
+                {% if result.published_date %}
+                <span class="news-date"><i data-lucide="clock"></i>{{ result.published_date }}</span>
+                {% endif %}
+              </div>
+              <a href="{{ result.url }}" class="news-title" target="_blank" rel="noopener">{{ result.title }}</a>
+              {% if result.content %}
+              <p class="news-snippet">{{ result.content | truncate(length=300) }}</p>
+              {% endif %}
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+
+        <!-- ── MUSIC ── -->
+        {% elif category == "music" %}
+        <div id="typed-results">
+          {% for result in results %}
+          <article class="music-card">
+            <div class="music-art">
+              {% if result.thumbnail %}
+              <img src="{{ result.thumbnail }}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<i data-lucide=\'music\'></i>'">
+              {% else %}
+              <i data-lucide="music"></i>
+              {% endif %}
+            </div>
+            <div class="music-info">
+              <a href="{{ result.url }}" class="music-title" target="_blank" rel="noopener">{{ result.title }}</a>
+              {% if result.content %}
+              <p class="music-desc">{{ result.content | truncate(length=200) }}</p>
+              {% endif %}
+              <div class="music-meta">
+                <span class="meta-chip"><i data-lucide="headphones"></i>{{ result.engine }}</span>
+              </div>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+
+        <!-- ── GENERAL / SCIENCE / IT / FILES / SOCIAL ── -->
+        {% else %}
+        <div id="typed-results">
+          {% for result in results %}
+          <article class="result-card">
+            <div class="result-url-row">
+              <img class="favicon" src="https://www.google.com/s2/favicons?domain={{ result.url }}&sz=32" alt="" loading="lazy" onerror="this.style.display='none'">
+              <cite class="result-url">{{ result.url | truncate(length=80) }}</cite>
+            </div>
+            <a href="{{ result.url }}" class="result-title" target="_blank" rel="noopener">{{ result.title }}</a>
+            {% if result.content %}
+            <p class="result-snippet">{{ result.content | truncate(length=300) }}</p>
+            {% endif %}
+            {% if result.thumbnail %}
+            <div class="result-thumb">
+              <img src="{{ result.thumbnail }}" alt="" loading="lazy" onerror="this.closest('.result-thumb').style.display='none'">
+            </div>
+            {% endif %}
+            <div class="result-meta-row">
+              <span class="meta-chip"><i data-lucide="box"></i>{{ result.engine }}</span>
+              {% if result.published_date %}
+              <span class="meta-chip"><i data-lucide="calendar"></i>{{ result.published_date }}</span>
+              {% endif %}
+              {% if result.category and result.category != "general" %}
+              <span class="meta-chip meta-chip--accent">{{ result.category }}</span>
+              {% endif %}
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div><!-- #results-container -->
+
+      <!-- Infinite Scroll Sentinel -->
+      {% if number_of_results > 10 %}
+      <div id="scroll-sentinel" class="scroll-sentinel">
+        <div class="scroll-spinner" id="scroll-spinner" style="display:none">
+          <div class="spinner"></div>
+          <span>Loading more results…</span>
+        </div>
+        <div id="scroll-end" class="scroll-end" style="display:none">
+          <i data-lucide="check-circle-2"></i>
+          <span>You've reached the end</span>
+        </div>
+      </div>
+      {% endif %}
+
+      {% endif %}<!-- /results check -->
+
+    </main>
+
+    <!-- ── Sidebar ──────────────────────────────────────────── -->
+    <aside class="rp-sidebar">
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-heading">
+          <i data-lucide="cpu"></i> Engines
+        </h3>
+        <div class="sidebar-card">
+          {% if engines_used | length > 0 %}
+          <div class="sidebar-stat">
+            <i data-lucide="check-circle-2" class="icon-ok"></i>
+            <span>{{ engines_used | length }} responded</span>
+          </div>
+          {% endif %}
+          {% if engines_failed is defined and engines_failed | length > 0 %}
+          <div class="sidebar-stat sidebar-stat--warn">
+            <i data-lucide="alert-triangle" class="icon-warn"></i>
+            <span>{{ engines_failed | length }} failed</span>
+          </div>
+          <details class="sidebar-details">
+            <summary>Show failed engines</summary>
+            <ul class="sidebar-failed-list">
+              {% for engine in engines_failed %}
+              <li>{{ engine }}</li>
+              {% endfor %}
+            </ul>
+          </details>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-heading">
+          <i data-lucide="info"></i> Query Info
+        </h3>
+        <div class="sidebar-card">
+          <div class="sidebar-kv">
+            <span class="sidebar-key">Category</span>
+            <span class="sidebar-val">{{ category | capitalize }}</span>
+          </div>
+          <div class="sidebar-kv">
+            <span class="sidebar-key">Time</span>
+            <span class="sidebar-val">{{ search_time_ms }}ms</span>
+          </div>
+          <div class="sidebar-kv">
+            <span class="sidebar-key">Results</span>
+            <span class="sidebar-val">{{ number_of_results }}</span>
+          </div>
+          <div class="sidebar-kv">
+            <span class="sidebar-key">Safe search</span>
+            <span class="sidebar-val">{{ safe_search | default(value="Moderate") }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-heading">
+          <i data-lucide="shield"></i> Privacy
+        </h3>
+        <div class="sidebar-card sidebar-card--subtle">
+          <p class="sidebar-note">No tracking. No profiling. No ads. Results from 200+ sources.</p>
+        </div>
+      </div>
+
+    </aside>
+  </div><!-- .rp-body -->
+
+  <!-- ── Footer ─────────────────────────────────────────────── -->
+  <footer class="rp-footer">
+    <div class="rp-footer-inner">
+      <div class="footer-brand">
+        <span class="brand-icon-sm"><i data-lucide="search"></i></span>
+        <span>Metasearch</span>
+      </div>
+      <nav class="footer-links">
+        <a href="/">Home</a>
+        <a href="/about">About</a>
+        <a href="/preferences">Preferences</a>
+        <a href="/api/v1/engines">Engines</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- ── Customize Drawer ──────────────────────────────────── -->
+  <div class="customize-backdrop" id="customize-backdrop"></div>
+  <aside class="customize-drawer" id="customize-drawer" role="dialog" aria-label="Customize search" aria-modal="true">
+    <div class="customize-drawer-header">
+      <span class="customize-drawer-title">Customize Search</span>
+      <button class="customize-drawer-close" id="customize-close-btn" aria-label="Close">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="customize-drawer-body">
+      <div class="cz-section">
+        <p class="cz-section-label">Search Settings</p>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Safe Search</div>
+            <div class="cz-row-desc">Filter explicit content from results</div>
+          </div>
+          <select class="cz-select" id="cz-safe-search">
+            <option value="0">Off</option>
+            <option value="1" selected>Moderate</option>
+            <option value="2">Strict</option>
+          </select>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Results per Page</div>
+            <div class="cz-row-desc">How many results to load at once</div>
+          </div>
+          <select class="cz-select" id="cz-results-per-page">
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Language</div>
+            <div class="cz-row-desc">Preferred language for results</div>
+          </div>
+          <select class="cz-select" id="cz-language">
+            <option value="auto" selected>Auto</option>
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="zh">Chinese</option>
+            <option value="ja">Japanese</option>
+          </select>
+        </div>
+      </div>
+      <div class="cz-section">
+        <p class="cz-section-label">Current Search</p>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Category</div>
+          </div>
+          <span style="font-size:0.8125rem;color:#ededed;font-weight:500;">{{ category | capitalize }}</span>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Results found</div>
+          </div>
+          <span style="font-size:0.8125rem;color:#ededed;font-weight:500;">{{ number_of_results }}</span>
+        </div>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">Search time</div>
+          </div>
+          <span style="font-size:0.8125rem;color:#ededed;font-weight:500;">{{ search_time_ms }}ms{% if from_cache %} · cached{% endif %}</span>
+        </div>
+      </div>
+      <div class="cz-section">
+        <p class="cz-section-label">Privacy</p>
+        <div class="cz-row">
+          <div class="cz-row-info">
+            <div class="cz-row-label">No tracking</div>
+            <div class="cz-row-desc">We never store your searches</div>
+          </div>
+          <span style="font-size:0.75rem;color:#50e3c2;">Always on</span>
+        </div>
+      </div>
+    </div>
+    <div class="customize-drawer-footer">
+      <button class="btn btn-primary" id="cz-save-btn" style="flex:1;">Save Preferences</button>
+      <a href="/preferences" class="btn btn-secondary" style="flex:1;justify-content:center;">All Settings</a>
+    </div>
+  </aside>
+
+  <!-- ── Infinite Scroll Script ─────────────────────────────── -->
+  {% if number_of_results > 10 %}
+  <script>
+  (function () {
+    const QUERY    = {{ query | json_encode | safe }};
+    const CATEGORY = {{ category | json_encode | safe }};
+    let currentPage = {{ page }};
+    const totalPages = {{ total_pages }};
+    let loading = false;
+
+    const sentinel  = document.getElementById('scroll-sentinel');
+    const spinner   = document.getElementById('scroll-spinner');
+    const endMsg    = document.getElementById('scroll-end');
+    const container = document.getElementById('results-container');
+    const typedDiv  = document.getElementById('typed-results');
+
+    if (!sentinel || !container || !typedDiv) return;
+
+    function buildUrl(page) {
+      return `/search?q=${encodeURIComponent(QUERY)}&category=${encodeURIComponent(CATEGORY)}&page=${page}`;
+    }
+
+    async function loadMore() {
+      if (loading || currentPage >= totalPages) {
+        if (currentPage >= totalPages) showEnd();
+        return;
+      }
+      loading = true;
+      spinner.style.display = 'flex';
+
+      try {
+        currentPage++;
+        const res = await fetch(buildUrl(currentPage));
+        if (!res.ok) throw new Error('fetch failed');
+        const html = await res.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const newTyped = doc.getElementById('typed-results');
+
+        if (newTyped) {
+          // Append children from fetched page into current typed-results
+          const frag = document.createDocumentFragment();
+          Array.from(newTyped.children).forEach(child => frag.appendChild(child.cloneNode(true)));
+          typedDiv.appendChild(frag);
+          // Re-run Lucide icons on newly appended nodes
+          if (window.lucide) lucide.createIcons({ nodes: Array.from(typedDiv.children).slice(-newTyped.children.length) });
+        }
+
+        if (currentPage >= totalPages) {
+          showEnd();
+        }
+      } catch (e) {
+        console.error('Infinite scroll error:', e);
+      } finally {
+        loading = false;
+        spinner.style.display = 'none';
+      }
+    }
+
+    function showEnd() {
+      spinner.style.display = 'none';
+      endMsg.style.display  = 'flex';
+      observer.disconnect();
+    }
+
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) loadMore();
+    }, { rootMargin: '300px' });
+
+    if (totalPages > 1) {
+      observer.observe(sentinel);
+    } else {
+      showEnd();
+    }
+  })();
+  </script>
+  {% endif %}
+
+  <!-- ── Search Autocomplete ──────────────────────────────── -->
+  <script>
+  (function () {
+    var input = document.getElementById('search-input');
+    var list  = document.getElementById('autocomplete-list');
+    var form  = document.getElementById('search-form');
+    if (!input || !list) return;
+
+    var activeIdx = -1;
+    var lastQuery = '';
+    var timer;
+
+    function clearDropdown() {
+      list.innerHTML = '';
+      list.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+      activeIdx = -1;
+    }
+
+    function renderSuggestions(query, suggestions) {
+      clearDropdown();
+      if (!suggestions || suggestions.length === 0) return;
+      suggestions.forEach(function (text, i) {
+        var li = document.createElement('li');
+        li.setAttribute('role', 'option');
+        li.setAttribute('id', 'ac-item-' + i);
+
+        var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('class', 'ac-icon');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('stroke', 'currentColor');
+        icon.setAttribute('stroke-width', '2');
+        icon.setAttribute('stroke-linecap', 'round');
+        icon.setAttribute('stroke-linejoin', 'round');
+        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', '11'); circle.setAttribute('cy', '11'); circle.setAttribute('r', '8');
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'm21 21-4.35-4.35');
+        icon.append(circle, path);
+
+        var span = document.createElement('span');
+        span.textContent = text;
+        li.append(icon, span);
+
+        li.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          input.value = text;
+          clearDropdown();
+          form.submit();
+        });
+        list.appendChild(li);
+      });
+      list.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+    }
+
+    function setActiveItem(idx) {
+      var items = list.querySelectorAll('li');
+      items.forEach(function (el, i) {
+        if (i === idx) {
+          el.setAttribute('aria-selected', 'true');
+          input.value = el.querySelector('span').textContent;
+        } else {
+          el.removeAttribute('aria-selected');
+        }
+      });
+      activeIdx = idx;
+    }
+
+    function fetchSuggestions(query) {
+      fetch('/autocomplete?q=' + encodeURIComponent(query))
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (Array.isArray(data) && data.length >= 2) {
+            renderSuggestions(data[0], data[1]);
+          }
+        })
+        .catch(function () {});
+    }
+
+    input.addEventListener('input', function () {
+      var q = input.value.trim();
+      if (q === lastQuery) return;
+      lastQuery = q;
+      activeIdx = -1;
+      clearTimeout(timer);
+      if (q.length < 2) { clearDropdown(); return; }
+      timer = setTimeout(function () { fetchSuggestions(q); }, 180);
+    });
+
+    input.addEventListener('keydown', function (e) {
+      var items = list.querySelectorAll('li');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveItem(Math.min(activeIdx + 1, items.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        var prev = activeIdx - 1;
+        if (prev < 0) { input.value = lastQuery; items.forEach(function(el){ el.removeAttribute('aria-selected'); }); activeIdx = -1; }
+        else setActiveItem(prev);
+      } else if (e.key === 'Escape') {
+        clearDropdown();
+      } else if (e.key === 'Enter' && activeIdx >= 0) {
+        e.preventDefault();
+        form.submit();
+      }
+    });
+
+    input.addEventListener('blur', function () { setTimeout(clearDropdown, 150); });
+    input.addEventListener('focus', function () {
+      if (input.value.trim().length >= 2 && list.children.length > 0) {
+        list.hidden = false;
+        input.setAttribute('aria-expanded', 'true');
+      }
+    });
+  }());
+  </script>
+
+  <!-- ── Loading bar + Customize panel ──────────────────────── -->
+  <script>
+  (function () {
+    /* ── Loading bar ── */
+    var bar = document.getElementById('page-loading-bar');
+    var form = document.getElementById('search-form');
+    if (form && bar) {
+      form.addEventListener('submit', function () {
+        bar.classList.add('active');
+      });
+    }
+    /* complete bar when page is about to unload */
+    window.addEventListener('beforeunload', function () {
+      if (bar) { bar.classList.add('complete'); }
+    });
+
+    /* ── Customize drawer ── */
+    var backdrop    = document.getElementById('customize-backdrop');
+    var drawer      = document.getElementById('customize-drawer');
+    var openBtn     = document.getElementById('customize-open-btn');
+    var closeBtn    = document.getElementById('customize-close-btn');
+    var saveBtn     = document.getElementById('cz-save-btn');
+    var czSafe      = document.getElementById('cz-safe-search');
+    var czRpp       = document.getElementById('cz-results-per-page');
+    var czLang      = document.getElementById('cz-language');
+
+    function openDrawer() {
+      if (!drawer || !backdrop) return;
+      loadCzPrefs();
+      drawer.classList.add('open');
+      backdrop.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      if (window.lucide) lucide.createIcons({ nodes: [drawer] });
+    }
+    function closeDrawer() {
+      if (!drawer || !backdrop) return;
+      drawer.classList.remove('open');
+      backdrop.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    function loadCzPrefs() {
+      var p = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+      if (czSafe && p.safeSearch)       czSafe.value = p.safeSearch;
+      if (czRpp  && p.resultsPerPage)   czRpp.value  = p.resultsPerPage;
+      if (czLang && p.language)         czLang.value = p.language;
+    }
+    function saveCzPrefs() {
+      var p = JSON.parse(localStorage.getItem('metasearch-prefs') || '{}');
+      if (czSafe) p.safeSearch      = czSafe.value;
+      if (czRpp)  p.resultsPerPage  = czRpp.value;
+      if (czLang) p.language        = czLang.value;
+      localStorage.setItem('metasearch-prefs', JSON.stringify(p));
+      if (saveBtn) {
+        var orig = saveBtn.textContent;
+        saveBtn.textContent = 'Saved!';
+        saveBtn.disabled = true;
+        setTimeout(function () {
+          saveBtn.textContent = orig;
+          saveBtn.disabled = false;
+        }, 1500);
+      }
+    }
+
+    if (openBtn)  openBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+    if (backdrop) backdrop.addEventListener('click', closeDrawer);
+    if (saveBtn)  saveBtn.addEventListener('click', saveCzPrefs);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeDrawer();
+    });
+  }());
+  </script>
+
+</body>
+</html>

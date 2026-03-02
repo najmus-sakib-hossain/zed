@@ -57,6 +57,11 @@ impl DxProviderRegistry {
         self.media_providers.write().insert(id, provider);
     }
 
+    /// Alias for `register_media_provider` for convenience.
+    pub fn register_media(&self, provider: Arc<dyn MediaProvider>) {
+        self.register_media_provider(provider);
+    }
+
     pub fn get_media_provider(&self, id: &MediaProviderId) -> Option<Arc<dyn MediaProvider>> {
         self.media_providers.read().get(id).cloned()
     }

@@ -1,0 +1,30 @@
+# See src/config.rs for all of the possible options.
+# The commented-out lines are examples of values you could set, not the defaults.
+
+bind = "0.0.0.0:28019"
+api = false
+
+[ui]
+engine_list_separator = true
+show_version_info = true
+stylesheet_url = "/themes/catppuccin-mocha.css"
+favicon_url = "data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMzIgMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTEiLz48L3N2Zz4="
+
+[image_search]
+enabled = true
+
+[engines]
+numbat = false
+fend = true
+
+[urls.replace]
+"www.reddit.com" = "old.reddit.com"
+"medium.com" = "scribe.rip"
+".medium.com" = "scribe.rip"
+
+[urls.weight]
+# These are checked after applying replacements. Setting the weight to 0 (or any
+# negative number) completely hides the result. Longer matches have a higher
+# priority.
+"quora.com" = 0.1
+".quora.com" = 0.1

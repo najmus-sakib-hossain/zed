@@ -69,6 +69,33 @@ impl HardwareProfile {
             self.tier,
         )
     }
+
+    /// Total RAM in gigabytes.
+    pub fn ram_gb(&self) -> f64 {
+        self.ram_bytes as f64 / 1_073_741_824.0
+    }
+
+    /// GPU VRAM in gigabytes.
+    pub fn vram_gb(&self) -> f64 {
+        self.gpu.vram_bytes as f64 / 1_073_741_824.0
+    }
+
+    /// Number of CPU cores.
+    pub fn cpu_cores(&self) -> usize {
+        self.cpu_cores
+    }
+
+    /// Whether the system has an SSD (heuristic based on disk speed).
+    pub fn has_ssd(&self) -> bool {
+        // Conservative heuristic: if disk is >100GB total, likely SSD
+        // Real implementation would check device type via platform API
+        self.disk_total_bytes > 100 * 1_073_741_824
+    }
+
+    /// Available disk space in gigabytes.
+    pub fn disk_free_gb(&self) -> f64 {
+        self.disk_available_bytes as f64 / 1_073_741_824.0
+    }
 }
 
 fn classify_tier(cpu_cores: usize, ram_bytes: u64, gpu: &GpuCapability) -> DeviceTier {
@@ -89,12 +116,52 @@ fn classify_tier(cpu_cores: usize, ram_bytes: u64, gpu: &GpuCapability) -> Devic
 }
 
 fn detect_cpu_model() -> String {
-    // Simplified — real implementation would use sysinfo crate
     #[cfg(target_os = "windows")]
     {
-        std::env::var("PROCESSOR_IDENTIFIER").unwrap_or_else(|_| "Unknown CPU".into())
+        // Try Windows environment variable first
+        if let Ok(id) = std::env::var("PROCESSOR_IDENTIFIER") {
+            return id;
+        }
+        // Fallback: try WMIC
+        if let Ok(output) = std::process::Command::new("wmic")
+            .args(["cpu", "get", "Name", "/format:list"])
+            .output()
+        {
+            let text = String::from_utf8_lossy(&output.stdout);
+            for line in text.lines() {
+                if let Some(name) = line.strip_prefix("Name=") {
+                    return name.trim().to_string();
+                }
+            }
+        }
+        "Unknown CPU".into()
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        if let Ok(output) = std::process::Command::new("sysctl")
+            .args(["-n", "machdep.cpu.brand_string"])
+            .output()
+        {
+            if output.status.success() {
+                return String::from_utf8_lossy(&output.stdout).trim().to_string();
+            }
+        }
+        "Apple Silicon".into()
+    }
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(contents) = std::fs::read_to_string("/proc/cpuinfo") {
+            for line in contents.lines() {
+                if line.starts_with("model name") {
+                    if let Some(name) = line.split(':').nth(1) {
+                        return name.trim().to_string();
+                    }
+                }
+            }
+        }
+        "Unknown CPU".into()
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
     {
         "Unknown CPU".into()
     }
@@ -106,24 +173,186 @@ fn num_cpus() -> usize {
 }
 
 fn total_ram() -> u64 {
-    // Placeholder — real implementation would use sysinfo or platform APIs
     #[cfg(target_os = "windows")]
     {
-        // Try to read from Windows API if available
-        8 * 1_073_741_824 // Conservative default: 8 GB
+        // Use Windows GlobalMemoryStatusEx via wmic
+        if let Ok(output) = std::process::Command::new("wmic")
+            .args(["OS", "get", "TotalVisibleMemorySize", "/format:list"])
+            .output()
+        {
+            let text = String::from_utf8_lossy(&output.stdout);
+            for line in text.lines() {
+                if let Some(val) = line.strip_prefix("TotalVisibleMemorySize=") {
+                    if let Ok(kb) = val.trim().parse::<u64>() {
+                        return kb * 1024; // KB to bytes
+                    }
+                }
+            }
+        }
+        8 * 1_073_741_824 // fallback: 8 GB
     }
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(target_os = "macos")]
+    {
+        if let Ok(output) = std::process::Command::new("sysctl")
+            .args(["-n", "hw.memsize"])
+            .output()
+        {
+            if output.status.success() {
+                let text = String::from_utf8_lossy(&output.stdout);
+                if let Ok(bytes) = text.trim().parse::<u64>() {
+                    return bytes;
+                }
+            }
+        }
+        8 * 1_073_741_824
+    }
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(contents) = std::fs::read_to_string("/proc/meminfo") {
+            for line in contents.lines() {
+                if line.starts_with("MemTotal:") {
+                    let parts: Vec<&str> = line.split_whitespace().collect();
+                    if parts.len() >= 2 {
+                        if let Ok(kb) = parts[1].parse::<u64>() {
+                            return kb * 1024;
+                        }
+                    }
+                }
+            }
+        }
+        8 * 1_073_741_824
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
     {
         8 * 1_073_741_824
     }
 }
 
 fn available_ram() -> u64 {
-    // Placeholder
-    4 * 1_073_741_824
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(output) = std::process::Command::new("wmic")
+            .args(["OS", "get", "FreePhysicalMemory", "/format:list"])
+            .output()
+        {
+            let text = String::from_utf8_lossy(&output.stdout);
+            for line in text.lines() {
+                if let Some(val) = line.strip_prefix("FreePhysicalMemory=") {
+                    if let Ok(kb) = val.trim().parse::<u64>() {
+                        return kb * 1024;
+                    }
+                }
+            }
+        }
+        4 * 1_073_741_824
+    }
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(contents) = std::fs::read_to_string("/proc/meminfo") {
+            for line in contents.lines() {
+                if line.starts_with("MemAvailable:") {
+                    let parts: Vec<&str> = line.split_whitespace().collect();
+                    if parts.len() >= 2 {
+                        if let Ok(kb) = parts[1].parse::<u64>() {
+                            return kb * 1024;
+                        }
+                    }
+                }
+            }
+        }
+        4 * 1_073_741_824
+    }
+    #[cfg(target_os = "macos")]
+    {
+        // macOS: use vm_stat to estimate available memory
+        if let Ok(output) = std::process::Command::new("vm_stat").output() {
+            let text = String::from_utf8_lossy(&output.stdout);
+            let mut free_pages = 0u64;
+            let mut inactive_pages = 0u64;
+            let page_size = 16384u64; // ARM64 macOS uses 16KB pages
+            for line in text.lines() {
+                if line.starts_with("Pages free:") {
+                    if let Some(val) = line.split(':').nth(1) {
+                        free_pages = val.trim().trim_end_matches('.').parse().unwrap_or(0);
+                    }
+                } else if line.starts_with("Pages inactive:") {
+                    if let Some(val) = line.split(':').nth(1) {
+                        inactive_pages = val.trim().trim_end_matches('.').parse().unwrap_or(0);
+                    }
+                }
+            }
+            return (free_pages + inactive_pages) * page_size;
+        }
+        4 * 1_073_741_824
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        4 * 1_073_741_824
+    }
 }
 
 fn disk_space() -> (u64, u64) {
-    // Placeholder
-    (500 * 1_073_741_824, 50 * 1_073_741_824)
+    #[cfg(target_os = "windows")]
+    {
+        // Use wmic to get disk space on C: drive
+        if let Ok(output) = std::process::Command::new("wmic")
+            .args(["logicaldisk", "where", "DeviceID='C:'", "get", "Size,FreeSpace", "/format:list"])
+            .output()
+        {
+            let text = String::from_utf8_lossy(&output.stdout);
+            let mut total = 0u64;
+            let mut free = 0u64;
+            for line in text.lines() {
+                if let Some(val) = line.strip_prefix("Size=") {
+                    total = val.trim().parse().unwrap_or(0);
+                } else if let Some(val) = line.strip_prefix("FreeSpace=") {
+                    free = val.trim().parse().unwrap_or(0);
+                }
+            }
+            if total > 0 {
+                return (total, free);
+            }
+        }
+        (500 * 1_073_741_824, 50 * 1_073_741_824)
+    }
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(output) = std::process::Command::new("df")
+            .args(["-B1", "/"])
+            .output()
+        {
+            let text = String::from_utf8_lossy(&output.stdout);
+            for line in text.lines().skip(1) {
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                if parts.len() >= 4 {
+                    let total = parts[1].parse().unwrap_or(0);
+                    let avail = parts[3].parse().unwrap_or(0);
+                    return (total, avail);
+                }
+            }
+        }
+        (500 * 1_073_741_824, 50 * 1_073_741_824)
+    }
+    #[cfg(target_os = "macos")]
+    {
+        if let Ok(output) = std::process::Command::new("df")
+            .args(["-b", "/"])
+            .output()
+        {
+            let text = String::from_utf8_lossy(&output.stdout);
+            for line in text.lines().skip(1) {
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                if parts.len() >= 4 {
+                    let total: u64 = parts[1].parse().unwrap_or(0) * 512; // 512-byte blocks
+                    let avail: u64 = parts[3].parse().unwrap_or(0) * 512;
+                    return (total, avail);
+                }
+            }
+        }
+        (500 * 1_073_741_824, 50 * 1_073_741_824)
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        (500 * 1_073_741_824, 50 * 1_073_741_824)
+    }
 }

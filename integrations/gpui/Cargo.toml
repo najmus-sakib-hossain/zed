@@ -1,0 +1,68 @@
+[package]
+name = "gpui-media-app"
+version = "0.1.0"
+edition = "2024"
+authors = ["najmus-sakib-hossain"]
+description = "Single-Binary GPUI Desktop App — Pure Rust multimedia powerhouse"
+license = "MIT"
+
+[[bin]]
+name = "gpui-media-app"
+path = "src/main.rs"
+
+[dependencies]
+# ═══════ GPUI ═══════
+gpui = "0.2"
+gpui-component = "0.5"
+gpui-component-assets = "0.5"
+
+# ═══════ VIDEO ═══════
+symphonia = { version = "0.5", features = ["all"] }
+openh264 = "0.6"
+mp4 = "0.14"
+
+# ═══════ 3D ═══════
+wgpu = "24"
+glam = "0.29"
+bytemuck = { version = "1", features = ["derive"] }
+flume = "0.11"
+
+# ═══════ AUDIO ═══════
+rodio = "0.19"
+
+# ═══════ PDF ═══════
+hayro = "0.1"
+
+# ═══════ DOCUMENTS ═══════
+docx-rs = "0.4"
+calamine = "0.26"
+
+# ═══════ TYPESETTING / LATEX ═══════
+typst = "0.14"
+typst-render = "0.14"
+# katex = "0.4"  # Disabled: QuickJS backend doesn't support MSVC on Windows
+
+# ═══════ CHARTS ═══════
+plotters = "0.3"
+plotters-bitmap = "0.3"
+
+# ═══════ UTILITIES ═══════
+resvg = "0.44"
+image = "0.25"
+anyhow = "1"
+tokio = { version = "1", features = ["full"] }
+smol = "2"
+ureq = { version = "2", features = ["tls"] }
+log = "0.4"
+env_logger = "0.11"
+
+# ─── Release profile: max perf, minimal binary ───────────────────────────────
+[profile.release]
+opt-level      = 3
+lto            = "fat"      # whole-program link-time optimisation
+codegen-units  = 1          # single codegen unit → better inlining
+panic          = "abort"    # no unwinding machinery in release
+strip          = true       # strip debug symbols
+
+[profile.release.build-override]
+opt-level = 3               # also optimise proc-macro / build-script output

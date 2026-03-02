@@ -1,0 +1,27 @@
+# Workspace-level Cargo configuration
+# See: https://doc.rust-lang.org/cargo/reference/config.html
+
+[build]
+# target-cpu=native: enables auto-detection of all SIMD extensions available  
+# on the build machine (AVX2, AVX-512, etc.).  This is REQUIRED for sonic-rs  
+# to use SIMD-accelerated JSON parsing.
+#
+# ⚠️  Do NOT use this for distributed binaries (use target-cpu=x86-64-v3 instead).
+#     Only use `native` for self-hosted deployments on known hardware.
+rustflags = ["-C", "target-cpu=native"]
+
+# Alternatively, for slightly-less-specific but portable tuning that still
+# enables AVX2 (required by most SIMD crates), use:
+# rustflags = ["-C", "target-cpu=x86-64-v3"]
+
+[profile.release]
+# opt-level, lto, codegen-units, panic, strip are set in workspace Cargo.toml
+# This section exists to remind you PGO can be added here for additional 10-30%:
+#
+# Step 1 — instrumented build:
+#   RUSTFLAGS="-Cprofile-generate=/tmp/pgo-data" cargo build --release
+# Step 2 — run representative workload
+# Step 3 — merge profiles:
+#   llvm-profdata merge -o /tmp/pgo-data/merged.profdata /tmp/pgo-data
+# Step 4 — optimised build using profile data:
+#   RUSTFLAGS="-Cprofile-use=/tmp/pgo-data/merged.profdata" cargo build --release

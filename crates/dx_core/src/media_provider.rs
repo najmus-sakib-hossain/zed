@@ -19,6 +19,8 @@ pub enum MediaType {
     Music,
     ThreeD,
     Document,
+    /// Real-time live conversational avatar (audio + video streaming).
+    Live,
 }
 
 impl MediaType {
@@ -30,6 +32,7 @@ impl MediaType {
             MediaType::Music => "Music",
             MediaType::ThreeD => "3D Model",
             MediaType::Document => "Document",
+            MediaType::Live => "Live Avatar",
         }
     }
 }
@@ -165,6 +168,7 @@ pub trait MediaProvider: Send + Sync {
 pub mod image_providers {
     use super::MediaProviderId;
 
+    // Core providers
     pub fn openai() -> MediaProviderId { MediaProviderId::new("openai-image") }
     pub fn fal_ai() -> MediaProviderId { MediaProviderId::new("fal-ai") }
     pub fn stability_ai() -> MediaProviderId { MediaProviderId::new("stability-ai") }
@@ -177,6 +181,20 @@ pub mod image_providers {
     pub fn recraft() -> MediaProviderId { MediaProviderId::new("recraft") }
     pub fn ideogram() -> MediaProviderId { MediaProviderId::new("ideogram") }
     pub fn local_sdxl() -> MediaProviderId { MediaProviderId::new("local-sdxl") }
+    pub fn leonardo_ai() -> MediaProviderId { MediaProviderId::new("leonardo-ai") }
+    pub fn xai_grok() -> MediaProviderId { MediaProviderId::new("xai-grok-image") }
+    pub fn bria() -> MediaProviderId { MediaProviderId::new("bria") }
+    pub fn deepai() -> MediaProviderId { MediaProviderId::new("deepai") }
+
+    // New aggregator/gateway providers (Feb 2026)
+    pub fn huggingface() -> MediaProviderId { MediaProviderId::new("huggingface") }
+    pub fn together_ai() -> MediaProviderId { MediaProviderId::new("together-ai") }
+    pub fn fireworks_ai() -> MediaProviderId { MediaProviderId::new("fireworks-ai") }
+    pub fn siliconflow() -> MediaProviderId { MediaProviderId::new("siliconflow") }
+    pub fn aiml_api() -> MediaProviderId { MediaProviderId::new("aiml-api") }
+    pub fn runware() -> MediaProviderId { MediaProviderId::new("runware") }
+    pub fn wavespeed_ai() -> MediaProviderId { MediaProviderId::new("wavespeed-ai") }
+    pub fn modelslab() -> MediaProviderId { MediaProviderId::new("modelslab") }
 }
 
 // ---------------------------------------------------------------------------
@@ -186,6 +204,7 @@ pub mod image_providers {
 pub mod video_providers {
     use super::MediaProviderId;
 
+    // Core video generation providers
     pub fn runway() -> MediaProviderId { MediaProviderId::new("runway") }
     pub fn kling_ai() -> MediaProviderId { MediaProviderId::new("kling-ai") }
     pub fn pika() -> MediaProviderId { MediaProviderId::new("pika") }
@@ -195,6 +214,14 @@ pub mod video_providers {
     pub fn minimax() -> MediaProviderId { MediaProviderId::new("minimax") }
     pub fn synthesia() -> MediaProviderId { MediaProviderId::new("synthesia") }
     pub fn heygen() -> MediaProviderId { MediaProviderId::new("heygen") }
+    pub fn hailuo_ai() -> MediaProviderId { MediaProviderId::new("hailuo-ai") }
+
+    // New providers (Feb 2026)
+    pub fn stability_svd() -> MediaProviderId { MediaProviderId::new("stability-svd") }
+    pub fn d_id() -> MediaProviderId { MediaProviderId::new("d-id-video") }
+    pub fn colossyan() -> MediaProviderId { MediaProviderId::new("colossyan") }
+    pub fn deepbrain_ai() -> MediaProviderId { MediaProviderId::new("deepbrain-ai") }
+    pub fn tavus() -> MediaProviderId { MediaProviderId::new("tavus") }
 }
 
 // ---------------------------------------------------------------------------
@@ -204,6 +231,7 @@ pub mod video_providers {
 pub mod music_providers {
     use super::MediaProviderId;
 
+    // Full song / music composition providers
     pub fn suno_ai() -> MediaProviderId { MediaProviderId::new("suno-ai") }
     pub fn udio() -> MediaProviderId { MediaProviderId::new("udio") }
     pub fn stability_audio() -> MediaProviderId { MediaProviderId::new("stability-audio") }
@@ -211,6 +239,32 @@ pub mod music_providers {
     pub fn google_musicfx() -> MediaProviderId { MediaProviderId::new("google-musicfx") }
     pub fn aiva() -> MediaProviderId { MediaProviderId::new("aiva") }
     pub fn mubert() -> MediaProviderId { MediaProviderId::new("mubert") }
+    pub fn soundraw() -> MediaProviderId { MediaProviderId::new("soundraw") }
+
+    // New providers (Feb 2026) - ElevenLabs Music etc.
+    pub fn elevenlabs_music() -> MediaProviderId { MediaProviderId::new("elevenlabs-music") }
+}
+
+// ---------------------------------------------------------------------------
+// Well-known audio/TTS providers (Part 12b)
+// ---------------------------------------------------------------------------
+
+pub mod audio_providers {
+    use super::MediaProviderId;
+
+    // TTS / Voice generation providers
+    pub fn elevenlabs() -> MediaProviderId { MediaProviderId::new("elevenlabs") }
+    pub fn openai_tts() -> MediaProviderId { MediaProviderId::new("openai-tts") }
+    pub fn google_tts() -> MediaProviderId { MediaProviderId::new("google-tts") }
+    pub fn play_ht() -> MediaProviderId { MediaProviderId::new("play-ht") }
+    pub fn cartesia() -> MediaProviderId { MediaProviderId::new("cartesia") }
+    pub fn deepgram() -> MediaProviderId { MediaProviderId::new("deepgram") }
+    pub fn fish_audio() -> MediaProviderId { MediaProviderId::new("fish-audio") }
+    pub fn murf_ai() -> MediaProviderId { MediaProviderId::new("murf-ai") }
+
+    // New providers (Feb 2026)
+    /// ElevenLabs sound effects generation
+    pub fn elevenlabs_sfx() -> MediaProviderId { MediaProviderId::new("elevenlabs-sfx") }
 }
 
 // ---------------------------------------------------------------------------
@@ -220,6 +274,7 @@ pub mod music_providers {
 pub mod threed_providers {
     use super::MediaProviderId;
 
+    // Core 3D generation providers
     pub fn meshy() -> MediaProviderId { MediaProviderId::new("meshy") }
     pub fn tripo_ai() -> MediaProviderId { MediaProviderId::new("tripo-ai") }
     pub fn luma_genie() -> MediaProviderId { MediaProviderId::new("luma-genie") }
@@ -229,4 +284,57 @@ pub mod threed_providers {
     pub fn kaedim() -> MediaProviderId { MediaProviderId::new("kaedim") }
     pub fn rodin_ai() -> MediaProviderId { MediaProviderId::new("rodin-ai") }
     pub fn local_triposr() -> MediaProviderId { MediaProviderId::new("local-triposr") }
+    pub fn world_labs() -> MediaProviderId { MediaProviderId::new("world-labs") }
+    pub fn swiftxr() -> MediaProviderId { MediaProviderId::new("swiftxr") }
+
+    // New providers (Feb 2026)
+    pub fn modelslab_3d() -> MediaProviderId { MediaProviderId::new("modelslab-3d") }
+    pub fn pixazo() -> MediaProviderId { MediaProviderId::new("pixazo") }
+    pub fn trellis() -> MediaProviderId { MediaProviderId::new("trellis") }
+    pub fn hunyuan_3d() -> MediaProviderId { MediaProviderId::new("hunyuan-3d") }
+}
+
+// ---------------------------------------------------------------------------
+// Well-known live conversational avatar providers (Part 15)
+// ---------------------------------------------------------------------------
+
+pub mod live_providers {
+    use super::MediaProviderId;
+
+    // Real-time conversational avatar providers (audio + video streaming)
+    pub fn d_id() -> MediaProviderId { MediaProviderId::new("d-id") }
+    pub fn tavus() -> MediaProviderId { MediaProviderId::new("tavus") }
+    pub fn heygen_live() -> MediaProviderId { MediaProviderId::new("heygen-live") }
+    pub fn deepbrain_ai() -> MediaProviderId { MediaProviderId::new("deepbrain-ai") }
+    pub fn beyond_presence() -> MediaProviderId { MediaProviderId::new("beyond-presence") }
+    pub fn hedra() -> MediaProviderId { MediaProviderId::new("hedra") }
+    pub fn simli() -> MediaProviderId { MediaProviderId::new("simli") }
+    pub fn anam_ai() -> MediaProviderId { MediaProviderId::new("anam-ai") }
+
+    // Voice-first + avatar combos (new Feb 2026)
+    pub fn livekit_agents() -> MediaProviderId { MediaProviderId::new("livekit-agents") }
+    pub fn agora_ai() -> MediaProviderId { MediaProviderId::new("agora-ai") }
+}
+
+// ---------------------------------------------------------------------------
+// Well-known document/PDF/chart generation providers (Part 16)
+// ---------------------------------------------------------------------------
+
+pub mod document_providers {
+    use super::MediaProviderId;
+
+    // PDF / Document / Chart generation providers
+    pub fn carbone() -> MediaProviderId { MediaProviderId::new("carbone") }
+    pub fn craftmypdf() -> MediaProviderId { MediaProviderId::new("craftmypdf") }
+    pub fn apitemplate() -> MediaProviderId { MediaProviderId::new("apitemplate") }
+    pub fn pdfshift() -> MediaProviderId { MediaProviderId::new("pdfshift") }
+    pub fn docraptor() -> MediaProviderId { MediaProviderId::new("docraptor") }
+    pub fn quickchart() -> MediaProviderId { MediaProviderId::new("quickchart") }
+    pub fn adobe_pdf() -> MediaProviderId { MediaProviderId::new("adobe-pdf") }
+    pub fn pdf_co() -> MediaProviderId { MediaProviderId::new("pdf-co") }
+    pub fn ilovepdf() -> MediaProviderId { MediaProviderId::new("ilovepdf") }
+    pub fn local_document() -> MediaProviderId { MediaProviderId::new("local-document") }
+
+    // New providers (Feb 2026)
+    pub fn pdf_generator_api() -> MediaProviderId { MediaProviderId::new("pdf-generator-api") }
 }
