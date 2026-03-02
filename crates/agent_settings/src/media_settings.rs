@@ -7,7 +7,6 @@ use gpui::App;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use settings::{RegisterSetting, Settings, SettingsContent};
-use std::collections::HashMap;
 
 /// Media provider identifier (matches dx_core::MediaProviderId).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, JsonSchema)]
